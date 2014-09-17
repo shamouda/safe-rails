@@ -1,0 +1,156 @@
+[submodule "ext/gitlabhq"]
+	path = ext/gitlabhq
+	url = https://github.com/gitlabhq/gitlabhq
+[submodule "ext/discourse"]
+	path = ext/discourse
+	url = https://github.com/discourse/discourse
+[submodule "ext/diaspora"]
+	path = ext/diaspora
+	url = https://github.com/diaspora/diaspora
+[submodule "ext/spree"]
+	path = ext/spree
+	url = https://github.com/spree/spree
+[submodule "ext/refinerycms"]
+	path = ext/refinerycms
+	url = https://github.com/refinery/refinerycms
+[submodule "ext/selfstarter"]
+	path = ext/selfstarter
+	url = https://github.com/lockitron/selfstarter
+[submodule "ext/errbit"]
+	path = ext/errbit
+	url = https://github.com/errbit/errbit
+[submodule "ext/fat_free_crm"]
+	path = ext/fat_free_crm
+	url = https://github.com/fatfreecrm/fat_free_crm
+[submodule "ext/redmine"]
+	path = ext/redmine
+	url = https://github.com/edavis10/redmine
+[submodule "ext/kandan"]
+	path = ext/kandan
+	url = https://github.com/kandanapp/kandan
+[submodule "ext/teambox"]
+	path = ext/teambox
+	url = https://github.com/teambox/teambox
+[submodule "ext/browsercms"]
+	path = ext/browsercms
+	url = https://github.com/browsermedia/browsercms
+[submodule "ext/engine"]
+	path = ext/engine
+	url = https://github.com/locomotivecms/engine
+[submodule "ext/insoshi"]
+	path = ext/insoshi
+	url = https://github.com/insoshi/insoshi
+[submodule "ext/radiant"]
+	path = ext/radiant
+	url = https://github.com/radiant/radiant
+[submodule "ext/obtvse"]
+	path = ext/obtvse
+	url = https://github.com/natew/obtvse
+[submodule "ext/comfortable-mexican-sofa"]
+	path = ext/comfortable-mexican-sofa
+	url = https://github.com/comfy/comfortable-mexican-sofa
+[submodule "ext/monocle"]
+	path = ext/monocle
+	url = https://github.com/maccman/monocle
+[submodule "ext/fulcrum"]
+	path = ext/fulcrum
+	url = https://github.com/fulcrum-agile/fulcrum
+[submodule "ext/forem"]
+	path = ext/forem
+	url = https://github.com/radar/forem
+[submodule "ext/publify"]
+	path = ext/publify
+	url = https://github.com/publify/publify
+[submodule "ext/barkeep"]
+	path = ext/barkeep
+	url = https://github.com/ooyala/barkeep
+[submodule "ext/canvas-lms"]
+	path = ext/canvas-lms
+	url = https://github.com/instructure/canvas-lms
+[submodule "ext/gitlab-ci"]
+	path = ext/gitlab-ci
+	url = https://github.com/gitlabhq/gitlab-ci
+[submodule "ext/communityengine"]
+	path = ext/communityengine
+	url = https://github.com/bborn/communityengine
+[submodule "ext/onebody"]
+	path = ext/onebody
+	url = https://github.com/churchio/onebody
+[submodule "ext/juvia"]
+	path = ext/juvia
+	url = https://github.com/phusion/juvia
+[submodule "ext/ror_ecommerce"]
+	path = ext/ror_ecommerce
+	url = https://github.com/drhenner/ror_ecommerce
+[submodule "ext/rstat.us"]
+	path = ext/rstat.us
+	url = https://github.com/hotsh/rstat.us
+[submodule "ext/copycopter-server"]
+	path = ext/copycopter-server
+	url = https://github.com/copycopter/copycopter-server
+[submodule "ext/lobsters"]
+	path = ext/lobsters
+	url = https://github.com/jcs/lobsters
+[submodule "ext/tracks"]
+	path = ext/tracks
+	url = https://github.com/TracksApp/tracks
+[submodule "ext/lovd-by-less"]
+	path = ext/lovd-by-less
+	url = https://github.com/stevenbristol/lovd-by-less
+[submodule "ext/saasy"]
+	path = ext/saasy
+	url = https://github.com/maccman/saasy
+[submodule "ext/snorby"]
+	path = ext/snorby
+	url = https://github.com/Snorby/snorby
+[submodule "ext/jobsworth"]
+	path = ext/jobsworth
+	url = https://github.com/ari/jobsworth
+[submodule "ext/spot-us"]
+	path = ext/spot-us
+	url = https://github.com/spot-us/spot-us
+[submodule "ext/openproject"]
+	path = ext/openproject
+	url = https://github.com/opf/openproject
+[submodule "ext/fedena"]
+	path = ext/fedena
+	url = https://github.com/projectfedena/fedena
+[submodule "ext/sprintapp"]
+	path = ext/sprintapp
+	url = https://github.com/macfanatic/SprintApp
+[submodule "ext/wagn"]
+	path = ext/wagn
+	url = https://github.com/wagn/wagn
+[submodule "ext/alchemy_cms"]
+	path = ext/alchemy_cms
+	url = https://github.com/magiclabs/alchemy_cms
+[submodule "ext/invoicing"]
+	path = ext/invoicing
+	url = https://github.com/ept/invoicing
+[submodule "ext/calagator"]
+	path = ext/calagator
+	url = https://github.com/calagator/calagator
+[submodule "ext/opengovernment"]
+	path = ext/opengovernment
+	url = https://github.com/opengovernment/opengovernment
+[submodule "ext/piggybak"]
+	path = ext/piggybak
+	url = https://github.com/piggybak/piggybak
+[submodule "ext/citizenry"]
+	path = ext/citizenry
+	url = https://github.com/reidab/citizenry
+[submodule "ext/opencongress"]
+	path = ext/opencongress
+	url = https://github.com/opencongress/opencongress
+[submodule "ext/portlandcrime"]
+	path = ext/portlandcrime
+	url = https://github.com/Caged/portlandcrime
+[submodule "ext/nimbleshop"]
+	path = ext/nimbleshop
+	url = https://github.com/nimbleshop/nimbleshop
+[submodule "ext/carter"]
+	path = ext/carter
+	url = https://github.com/gillies-dunlop/carter/
+[submodule "ext/squaresquash"]
+	path = ext/squaresquash
+	url = https://github.com/SquareSquash/web

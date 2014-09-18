@@ -1,0 +1,27 @@
+<%= form_for :user, url: users_path do |f| %>
+  <p>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </p>
+ 
+  <p>
+    <%= f.label :age %><br>
+    <%= f.text_field :age %>
+  </p>
+ 
+  <p>
+    <%= f.submit %>
+  </p>
+<% end %>
+
+<%= form_for(:user, :html => {:method => 'delete'}, url: users_path(:id)) do |f| %>
+  <p>
+    <%= f.label :id %><br>
+    <%= f.text_field :id %>
+  </p>
+ 
+   <p>
+    <%= f.submit "Destroy" %>
+  </p>
+<% end %>
+

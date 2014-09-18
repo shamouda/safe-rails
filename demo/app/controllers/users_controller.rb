@@ -4,11 +4,21 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     @user.save
 
-    render plain: user_params
+    puts @user.id
+    render json: @user
   end
 
   def index
     render json: User.all()
+  end
+
+  def destroy
+    begin
+      User.find(params[:id]).destroy
+      render plain: "Deleted "+params[:id]
+    rescue ActiveRecord::RecordNotFound
+      render plain: params[:id]+" not found!"
+    end
   end
 
 private

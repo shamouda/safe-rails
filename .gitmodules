@@ -154,3 +154,6 @@
 [submodule "ext/squaresquash"]
 	path = ext/squaresquash
 	url = https://github.com/SquareSquash/web
+[submodule "rails"]
+	path = rails
+	url = https://github.com/rails/rails.git

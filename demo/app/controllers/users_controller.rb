@@ -1,11 +1,15 @@
 class UsersController < ApplicationController
   skip_before_action :verify_authenticity_token
   def create
-    @user = User.new(user_params)
-    @user.save
+    begin
+      @user = User.new(user_params)
+      @user.save!
+      puts @user.id
+      render json: @user
 
-    puts @user.id
-    render json: @user
+    rescue ActiveRecord::RecordInvalid
+      render plain: "ERROR"
+    end
   end
 
   def index

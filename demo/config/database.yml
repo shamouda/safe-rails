@@ -12,10 +12,10 @@
 default: &default
    adapter: postgresql
    encoding: unicode
-   database: rails_demo
-   username: rails_demo
-   password: rails_demo
-   pool: 5
+   database: rails
+   username: rails
+   password: rails
+   pool: 16
 
 development:
   <<: *default

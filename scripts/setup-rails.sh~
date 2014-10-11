@@ -1,0 +1,4 @@
+CREATE user rails with password 'rails';
+CREATE DATABASE rails;
+GRANT ALL PRIVILEGES ON DATABASE rails to rails;
+\q

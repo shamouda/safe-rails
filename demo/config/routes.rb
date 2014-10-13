@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   root 'welcome#index'
 
   resources :users
+  resources :simple_key_values
+  resources :unique_key_values
+  resources :indexed_key_values
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

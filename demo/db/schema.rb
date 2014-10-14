@@ -11,10 +11,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141013064126) do
+ActiveRecord::Schema.define(version: 20141014205553) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "belongs_to_departments", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "belongs_to_users", force: true do |t|
+    t.integer  "belongs_to_department_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "belongs_to_users", ["belongs_to_department_id"], name: "index_belongs_to_users_on_belongs_to_department_id", using: :btree
+
+  create_table "dbfk_departments", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "dbfk_users", force: true do |t|
+    t.integer  "dbfk_department_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "dbfk_users", ["dbfk_department_id"], name: "index_dbfk_users_on_dbfk_department_id", using: :btree
 
   create_table "indexed_key_values", force: true do |t|
     t.string   "key"
@@ -25,9 +51,20 @@ ActiveRecord::Schema.define(version: 20141013064126) do
 
   add_index "indexed_key_values", ["key"], name: "index_indexed_key_values_on_key", unique: true, using: :btree
 
+  create_table "simple_departments", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "simple_key_values", force: true do |t|
     t.string   "key"
     t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "simple_users", force: true do |t|
+    t.integer  "department_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -45,5 +82,7 @@ ActiveRecord::Schema.define(version: 20141013064126) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_foreign_key "dbfk_users", "dbfk_departments", name: "dbfk_users_dbfk_department_id_fk"
 
 end

@@ -117,4 +117,4 @@ def reset_postgres(host):
 
 def start_passenger(host, nprocs):
     ssh(host, "cd ~/safe-rails/demo; passenger stop")
-    ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start --max-pool-size %d --min-instances %d &> /tmp/passenger.out & disown" % (nprocs, nprocs), bg=True)
+    ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start -d --log-file /tmp/phusion-log.out --max-pool-size %d --min-instances %d &> /tmp/passenger.out & disown" % (nprocs, nprocs), bg=True)

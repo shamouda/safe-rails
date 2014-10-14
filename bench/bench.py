@@ -28,7 +28,7 @@ for m in models:
     print "...",
 
     reset_hosts(nprocs)
-    model_results[m] = bsp_bench(RAILS_HOST, model=m)
+    model_results[m] = bsp_bench(RAILS_HOST, model=m, parallelism=10, trials=100)
     dups[m] = count_duplicates(RAILS_HOST, m)
     print dups[m]
 

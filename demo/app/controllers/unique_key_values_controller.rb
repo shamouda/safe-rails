@@ -18,9 +18,9 @@ class UniqueKeyValuesController < ApplicationController
   end
 
   def update_key
-    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    @kvp = UniqueKeyValue.find_by(key: uniquekeyvalue_params[:key])
     if @kvp
-      @kvp.update!(indexedkeyvalue_params)
+      @kvp.update!(uniquekeyvalue_params)
       render plain: "Success!"
     else
       render plain: "ERROR: nil"
@@ -28,7 +28,7 @@ class UniqueKeyValuesController < ApplicationController
   end
 
   def get_key
-    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    @kvp = UniqueKeyValue.find_by(key: uniquekeyvalue_params[:key])
     if @kvp
       render json: @kvp
     else
@@ -47,6 +47,16 @@ class UniqueKeyValuesController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       render plain: params[:id]+" not found!"
     end
+  end
+
+  def destroy_key
+    @nrec  = UniqueKeyValue.destroy_all(key: uniquekeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
+  end
+
+  def delete_key
+    @nrec  = UniqueKeyValue.delete_all(key: uniquekeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
   end
 
   def destroy_all

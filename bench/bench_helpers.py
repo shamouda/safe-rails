@@ -24,13 +24,26 @@ class Worker:
                     self.headers)
         return self.conn.getresponse()
 
-    def delete_kvp(self, which_key, model="indexed_key_value"):
+    def delete_id(self, id, model="indexed_key_value"):
         self.conn.request("DELETE",
-                          "/"+model+"s/"+str(which_key),
+                          "/"+model+"s/"+str(id),
                           "",
                           self.headers)
         return self.conn.getresponse()
 
+    def delete_kvp(self, key, model="indexed_key_value"):
+        self.conn.request("POST",
+                          "/"+model+"s/delete_key",
+                          urlencode({model+"[key]":key}),
+                          self.headers)
+        return self.conn.getresponse()
+
+    def destroy_kvp(self, key, model="indexed_key_value"):
+        self.conn.request("POST",
+                          "/"+model+"s/delete_key",
+                          urlencode({model+"[key]":key}),
+                          self.headers)
+        return self.conn.getresponse()
 
     def update_kvp(self, key, value, model="indexed_key_value"):
         self.conn.request("POST",

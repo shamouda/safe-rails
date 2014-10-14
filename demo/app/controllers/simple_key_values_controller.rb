@@ -18,9 +18,9 @@ class SimpleKeyValuesController < ApplicationController
   end
 
   def update_key
-    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    @kvp = SimpleKeyValue.find_by(key: simplekeyvalue_params[:key])
     if @kvp
-      @kvp.update!(indexedkeyvalue_params)
+      @kvp.update!(simplekeyvalue_params)
       render plain: "Success!"
     else
       render plain: "ERROR: nil"
@@ -28,12 +28,22 @@ class SimpleKeyValuesController < ApplicationController
   end
 
   def get_key
-    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    @kvp = SimpleKeyValue.find_by(key: simplekeyvalue_params[:key])
     if @kvp
       render json: @kvp
     else
       render plain: "ERROR: nil"
     end
+  end
+
+  def destroy_key
+    @nrec  = SimpleKeyValue.destroy_all(key: simplekeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
+  end
+
+  def delete_key
+    @nrec  = SimpleKeyValue.delete_all(key: simplekeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
   end
 
   def index

@@ -45,6 +45,16 @@ class IndexedKeyValuesController < ApplicationController
     end
   end
 
+  def destroy_key
+    @nrec  = IndexedKeyValue.destroy_all(key: indexedkeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
+  end
+
+  def delete_key
+    @nrec  = IndexedKeyValue.delete_all(key: indexedkeyvalue_params[:key])
+    render plain: "Destroyed "+@nrec.to_s
+  end
+
   def destroy_all
     begin
       IndexedKeyValue.find_by_key(params[:key]) do |r| 

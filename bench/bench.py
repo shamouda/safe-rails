@@ -31,11 +31,17 @@ for m in models:
     reset_hosts(nprocs)
 
     '''
-    w = Worker(RAILS_HOST+":3000")
-    print w.insert_kvp("test", "test").read()
 
     w = Worker(RAILS_HOST+":3000")
-    print w.update_kvp("test", m).read()
+    print w.insert_kvp("test", "test", model=m).read()
+
+    w = Worker(RAILS_HOST+":3000")
+    print w.delete_kvp("test", model=m).read()
+
+    raw_input()
+
+    continue
+
 
     print w.get_kvp("test").read()
     print w.get_kvp("baz").read()

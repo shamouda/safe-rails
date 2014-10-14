@@ -17,7 +17,7 @@ class Worker:
         self.headers = {"Content-type": "application/x-www-form-urlencoded",
                         "Accept": "text/plain"}
 
-    def make_kvp(self, key, value, model="indexed_key_value"):
+    def insert_kvp(self, key, value, model="indexed_key_value"):
         self.conn.request("POST",
                     "/"+model+"s",
                           urlencode({model+"[key]":key, model+"[value]":value}),
@@ -30,6 +30,22 @@ class Worker:
                           "",
                           self.headers)
         return self.conn.getresponse()
+
+
+    def update_kvp(self, key, value, model="indexed_key_value"):
+        self.conn.request("POST",
+                          "/"+model+"s/update_key",
+                          urlencode({model+"[key]":key, model+"[value]":value}),
+                          self.headers)
+        return self.conn.getresponse()
+
+    def get_kvp(self, key, model="indexed_key_value"):
+        self.conn.request("POST",
+                          "/"+model+"s/get_key",
+                          urlencode({model+"[key]":key}),
+                          self.headers)
+        return self.conn.getresponse()
+
 
 INSERT = 0
 
@@ -50,7 +66,7 @@ def bsp_pool_task(tup):
     rails_host, port, key, value, model = tup
     w = Worker(rails_host+":"+str(port))
     st = datetime.now()
-    raw_result = w.make_kvp(key, value, model=model).read()
+    raw_result = w.insert_kvp(key, value, model=model).read()
     et = datetime.now()
     
     lat_ms = (et-st).total_seconds()*1000.
@@ -74,7 +90,7 @@ def count_duplicates(host, model):
 
 def bsp_bench(rails_host, parallelism=100, trials=10, port=3000, model="indexed_key_value"):
     w = Worker(rails_host+":"+str(port))
-    response = w.make_kvp("peter", "bar")
+    response = w.insert_kvp("peter", "bar")
     print response.status, response.reason, response.read()
     
     response = w.delete_kvp(1)

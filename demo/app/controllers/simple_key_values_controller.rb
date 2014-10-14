@@ -17,6 +17,25 @@ class SimpleKeyValuesController < ApplicationController
     @kvp.update(simplekeyvalue_params)
   end
 
+  def update_key
+    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    if @kvp
+      @kvp.update!(indexedkeyvalue_params)
+      render plain: "Success!"
+    else
+      render plain: "ERROR: nil"
+    end
+  end
+
+  def get_key
+    @kvp = IndexedKeyValue.find_by(key: indexedkeyvalue_params[:key])
+    if @kvp
+      render json: @kvp
+    else
+      render plain: "ERROR: nil"
+    end
+  end
+
   def index
     render json: SimpleKeyValue.all()
   end

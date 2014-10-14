@@ -11,6 +11,15 @@ Rails.application.routes.draw do
   resources :simple_key_values
   resources :unique_key_values
   resources :indexed_key_values
+  
+  match 'simple_key_values/update_key', :to => 'simple_key_values#update_key', :via => :post
+  match 'simple_key_values/get_key', :to => 'simple_key_values#get_key', :via => :post
+
+  match 'unique_key_values/update_key', :to => 'unique_key_values#update_key', :via => :post
+  match 'unique_key_values/get_key', :to => 'unique_key_values#get_key', :via => :post
+
+  match 'indexed_key_values/update_key', :to => 'indexed_key_values#update_key', :via => :post
+  match 'indexed_key_values/get_key', :to => 'indexed_key_values#get_key', :via => :post
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

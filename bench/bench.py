@@ -4,7 +4,7 @@ from time import sleep
 import pickle
 
 PG_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
-RAILS_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
+RAILS_HOST = "ec2-54-245-166-54.us-west-2.compute.amazonaws.com"
 
 def reset_hosts(nprocs):
     print "Starting PG"

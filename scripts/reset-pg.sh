@@ -12,7 +12,7 @@ sudo pkill -9 postgres
 sudo killall -9 postgres
 rm -rf /mnt/external/PGDATA
 pg_ctl init -D /mnt/external/PGDATA
-echo "shared_buffers = 30GB" >> /mnt/external/PGDATA/postgresql.conf
+echo "shared_buffers = 10GB" >> /mnt/external/PGDATA/postgresql.conf
 echo "listen_addresses '*'" >> /mnt/external/PGDATA/postgresql.conf
 echo "host all all             all           trust" >> /mnt/external/PGDATA/pg_hba.conf
  /usr/lib/postgresql/9.3/bin/postgres -D /mnt/external/PGDATA & 

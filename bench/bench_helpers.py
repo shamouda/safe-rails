@@ -1,6 +1,7 @@
 
 from os import system
 
+from random import random, randint
 from httplib import HTTPConnection
 from urllib import urlencode
 from multiprocessing import Pool, Queue
@@ -122,9 +123,15 @@ def pk_stress_task(tup):
     resultQueue.put(result)
     return 1
 
-def pk_stress(rails_host, parallelism=100, trials=10, port=3000, model="indexed_key_value"):
-    w = Worker(rails_host+":"+str(port))
-    p = Pool(parallelism)
+def pk_stress(rails_host, nclients=100, trials=10, port=3000, model="indexed_key_value"):
+    p = Pool(nclients)
+
+    #warm up rails
+    for i in range(0, nclients):
+        w = Worker(rails_host+":"+str(port))
+        w.insert_kvp("-1", "dummy", model=model).read()
+        w = Worker(rails_host+":"+str(port))
+        w.delete_kvp("-1", model=model).read()
 
     fails = []
     allresults = []
@@ -133,12 +140,12 @@ def pk_stress(rails_host, parallelism=100, trials=10, port=3000, model="indexed_
 
     for nameit in range(0, trials):
         k = str(nameit)
-        workers = [(rails_host, port, k, v, model) for i in range(0, parallelism)]
+        workers = [(rails_host, port, k, v, model) for i in range(0, nclients)]
 
         p.map(pk_stress_task, workers)
 
         results = []
-        for i in range(0, parallelism):
+        for i in range(0, nclients):
             results.append(resultQueue.get())
 
         f = sum(1 for r in results if r.success)
@@ -181,9 +188,22 @@ def fk_stress_task(tup, doLog=True):
         resultQueue.put(result)
     return 1
 
-def fk_stress(rails_host, parallelism=100, trials=10, port=3000, model="simple"):
+def chunkIt(seq, num):
+  avg = len(seq) / float(num)
+  out = []
+  last = 0.0
+
+  while last < len(seq):
+    out.append(seq[int(last):int(last + avg)])
+    last += avg
+
+  return out
+
+
+
+def fk_stress(rails_host, nworkers=100, trials=10, port=3000, model="simple"):
     w = Worker(rails_host+":"+str(port))
-    p = Pool(parallelism)
+    p = Pool(nworkers)
 
     user_model = model+"_user"
     dept_model = model+"_department"
@@ -198,12 +218,12 @@ def fk_stress(rails_host, parallelism=100, trials=10, port=3000, model="simple")
         
         # first task is to delete the "ones"
         workers = [(rails_host, port, k, DELETE, None, dept_model)]
-        workers += [(rails_host, port, None, INSERT, k, user_model) for i in range(0, parallelism)]
+        workers += [(rails_host, port, None, INSERT, k, user_model) for i in range(0, nworkers)]
 
         p.map(fk_stress_task, workers)
 
         results = []
-        for i in range(0, parallelism+1):
+        for i in range(0, nworkers+1):
             results.append(resultQueue.get())
 
         f = sum(1 for r in results if r.success and r.requestType == INSERT)
@@ -221,29 +241,35 @@ def count_dangling_users(host, model):
     cur.execute("SELECT %s_department_id AS department_id, COUNT(*) FROM %s_users AS U LEFT OUTER JOIN %s_departments AS D ON U.%s_department_id = D.id WHERE D.id IS NULL GROUP BY %s_department_id HAVING COUNT(*) > 0;" % (model, model, model, model, model))
     return cur.fetchall()
 
+cached_zetas = {}
+
 def zeta(N, theta):
+    if (N, theta) in cached_zetas:
+        return cached_zetas[(N, theta)]
     ans = 0L
     # linkbench and ycsb use 1/pow(i, theta), not gray's suggested pow(1./N, theta)
     # gray's prose suggest this is a typo... choosing linkbench and ycsb implementation
     for i in range(1, N+1):
         ans += 1.0/pow(i+1, theta)
+    cached_zetas[(N, theta)] = ans
     return ans
 
 def gen_zipf(N, theta):
     alpha = 1.0/(1-theta)
     zetan = zeta(N, theta)
-    eta = (1.0 - pow(2.0/n, 1-theta))/(1.0-zeta(theta, 2)/zetan)
+    zeta2theta = zeta(2, theta)
+    eta = (1.0 - pow(2.0/N, 1-theta))/(1.0-zeta2theta/zetan)
     u = random()
     uz = u*zetan
     if uz < 1:
         return 1
     if uz < 1 + pow(0.5, theta):
         return 2
-    return 1 + n*pow(eta*u-eta+1, alpha)
+    return int(1 + N*pow(eta*u-eta+1, alpha))
 
-# copying Gray's paper as in YCSB paper; precompute samples to avoid runtime overhead
+# copying Gray's paper as in YCSB code; precompute samples to avoid runtime overhead
 def gen_zipf_samples(num_samples, N, theta):
-    return [gen_zipf(N, theta) for i in range(0, num-samples)]
+    return [gen_zipf(N, theta) for i in range(0, num_samples)]
 
 def gen_ycsb(num_samples, total_num_records):
     # YCSB uses a "ZIPFIAN_CONSTANT" of 0.99; becomes theta
@@ -256,6 +282,9 @@ def gen_linkbench_write(num_samples, total_num_records):
 def gen_linkbench_update(num_samples, total_num_records):
     # write_shape = 0.606
     return gen_zipf_samples(num_samples, total_num_records, 0.606)
+
+def gen_random(num_samples, total_num_records):
+    return [randint(1, total_num_records) for i in range(0, num_samples)]
 
 #linkbench deletes are uniform!
 '''
@@ -275,3 +304,61 @@ def reset_postgres(host):
 def start_passenger(host, nprocs):
     ssh(host, "cd ~/safe-rails/demo; passenger stop")
     ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start -d --log-file /tmp/phusion-log.out --max-pool-size %d --min-instances %d &> /tmp/passenger.out & disown" % (nprocs, nprocs), bg=True)
+
+
+def pk_workload_task(tup):
+    rails_host, port, model, keys = tup
+    value = "test"
+    for key in keys:
+        w = Worker(rails_host+":"+str(port))
+        st = datetime.now()
+        raw_result = w.insert_kvp(key, value, model=model).read()
+        et = datetime.now()
+    
+        lat_ms = (et-st).total_seconds()*1000.
+        
+        result = Result(INSERT,
+                        key,
+                        value,
+                        raw_result, lat_ms)
+        
+        resultQueue.put(result)
+
+    return 1
+
+def pk_workload(rails_host, workload="uniform", records=100, model="simple_key_value", ops_per_client=100, n_clients=100, port=3000):
+    w = Worker(rails_host+":"+str(port))
+    p = Pool(n_clients)
+
+    #warm up rails
+    for i in range(0, n_clients):
+        w = Worker(rails_host+":"+str(port))
+        w.insert_kvp("-1", "dummy", model=model).read()
+        w = Worker(rails_host+":"+str(port))
+        w.delete_kvp("-1", model=model).read()
+
+    results = []
+
+    if workload == "uniform":
+        allKeys = gen_random(ops_per_client*n_clients, records)
+    elif workload == "ycsb":
+        allKeys = gen_ycsb(ops_per_client*n_clients, records)
+    elif workload == "linkbench-ins":
+        allKeys = gen_linkbench_write(ops_per_client*n_clients, records)
+    elif workload == "linkbench-upd":
+        allKeys = gen_linkbench_update(ops_per_client*n_clients, records)
+
+    keys_per_worker = chunkIt(allKeys, n_clients)
+
+    workers = map(lambda keys: (rails_host, port, model, keys), keys_per_worker)
+
+    p.map(pk_workload_task, workers)
+
+    for i in range(0, len(allKeys)):
+        results.append(resultQueue.get())
+
+    f = sum(1 for r in results if r.success)
+
+    print workload, f, average([r.lat_ms for r in results])
+
+    return f, results

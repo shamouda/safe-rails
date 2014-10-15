@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 20141014205553) do
   end
 
   create_table "simple_users", force: true do |t|
-    t.integer  "department_id"
+    t.integer  "simple_department_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

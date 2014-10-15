@@ -1,6 +1,7 @@
 
 from bench_helpers import *
 from time import sleep
+import pickle
 
 PG_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
 RAILS_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
@@ -15,46 +16,64 @@ def reset_hosts(nprocs):
 
 print "Starting bench"
 
-models = ["indexed_key_value", "simple_key_value", "unique_key_value"]
+pk_models = ["indexed_key_value", "simple_key_value", "unique_key_value"]
+fk_models = ["simple", "belongs_to", "dbfk"]
 
-model_results = {}
-dups = {}
+NPROCS = [1, 2, 4, 8, 16, 32, 64]
 
-nprocs = 10
+BENCH_PK_STRESS = True
+BENCH_FK_STRESS = True
 
-for m in models:
-    print "STARTING"
-    print m
-    print "..."
+iterations = 2
+
+FK_USERS_TO_DEPT_PROPORTION = 10
+
+OUTFILE = "results.pkl"
+
+ALL_RESULTS = []
+
+if BENCH_PK_STRESS:
+    for it in range(0, iterations):
+        for nprocs in NPROCS:
+            pk_stress_model_results = {}
+            pk_stress_dups = {}
+            for m in pk_models:
+                print "STARTING", m, "..."
+                reset_hosts(nprocs)
+                pk_stress_model_results[m] = pk_stress(RAILS_HOST, model=m, parallelism=64, trials=10)
+                pk_stress_dups[m] = count_duplicates(PG_HOST, m)
+                print pk_stress_dups[m]
+                ALL_RESULTS.append({ 
+                "bench":"PK_STRESS",
+                "model":m,
+                "iteration":it,
+                "rails_procs":nprocs,
+                "results": pk_stress_model_results,
+                "dups" : pk_stress_dups
+                })
 
 
-    reset_hosts(nprocs)
+if BENCH_FK_STRESS:
+    for it in range(0, iterations):
+        for nprocs in NPROCS:
+            fk_stress_model_results = {}
+            fk_stress_dups = {}
+            for m in fk_models:
+                print "STARTING", m, "..."
+                reset_hosts(nprocs)
+                fk_stress_model_results[m] = fk_stress(RAILS_HOST, model=m, parallelism=64, trials=10)
+                fk_stress_dups[m] = count_dangling_users(PG_HOST, m)
+                print fk_stress_dups[m]
+                ALL_RESULTS.append({ 
+                    "bench":"FK_STRESS",
+                    "model":m,
+                    "iteration":it,
+                    "rails_procs":nprocs,
+                    "results": fk_stress_model_results,
+                    "dangling" : fk_stress_dups
+            })
 
-    '''
-
-    w = Worker(RAILS_HOST+":3000")
-    print w.insert_kvp("test", "test", model=m).read()
-
-    w = Worker(RAILS_HOST+":3000")
-    print w.delete_kvp("test", model=m).read()
-
-    raw_input()
-
-    continue
-
-
-    print w.get_kvp("test").read()
-    print w.get_kvp("baz").read()
-    continue
-
-    #w = Worker(RAILS_HOST+":3000")
-    #print w.delete_kvp("test").read()
-    exit(-1)
-    '''
-
-    model_results[m] = bsp_bench(RAILS_HOST, model=m, parallelism=10, trials=100)
-    dups[m] = count_duplicates(RAILS_HOST, m)
-    print dups[m]
+pickle.dump(ALL_RESULTS, open(OUTFILE, 'w'))
 
 exit(0)
 

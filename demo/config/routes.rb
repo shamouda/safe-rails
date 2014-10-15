@@ -27,6 +27,15 @@ Rails.application.routes.draw do
   match 'indexed_key_values/delete_key', :to => 'indexed_key_values#delete_key', :via => :post
   match 'indexed_key_values/destroy_key', :to => 'indexed_key_values#destroy_key', :via => :post
 
+  resources :belongs_to_users
+  resources :belongs_to_departments
+
+  resources :dbfk_users
+  resources :dbfk_departments
+
+  resources :simple_users
+  resources :simple_departments
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

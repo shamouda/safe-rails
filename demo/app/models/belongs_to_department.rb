@@ -1,3 +1,3 @@
 class BelongsToDepartment < ActiveRecord::Base
-  belongs_to :belongs_to_department
+  has_many :belongs_to_users
 end

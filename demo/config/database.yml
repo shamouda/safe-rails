@@ -12,10 +12,11 @@
 default: &default
    adapter: postgresql
    encoding: unicode
+   host: ec2-54-203-221-73.us-west-2.compute.amazonaws.com
    database: rails
    username: rails
    password: rails
-   pool: 16
+   pool: 64
 
 development:
   <<: *default

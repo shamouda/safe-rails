@@ -1,0 +1,113 @@
+
+\documentclass{sig-alternate}
+\usepackage{balance,array,microtype,pifont}
+\usepackage[bf]{subfigure}
+
+\let\proof\relax
+\let\endproof\relax
+
+
+\usepackage{color, times, mathptmx, amsmath, amssymb, amsthm, verbatim, 
+  mdwlist, graphicx, footnote, multirow, xspace, tikz, colortbl,dcolumn, mathtools,zi4}
+
+
+\usepackage[noadjust]{cite}
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\let\footnotesize\small
+
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
+
+\setlength{\parskip}{3ex plus 2ex minus 2ex}
+
+\theoremstyle{definition}
+\setlength{\textfloatsep}{1em}% Remove \textfloatsep
+
+\interfootnotelinepenalty=10000
+
+\usepackage{scrextend}
+\usepackage[hyphens]{url}
+\usepackage{breakurl}
+
+\newcommand{\commentt}[1]{{\small\texttt{#1}}}
+
+\newcommand{\miniheadnostop}[1]{{\vspace{.4em}\noindent\textit{#1} }}
+\newcommand{\minihead}[1]{{\vspace{.45em}\noindent\textbf{#1.} }}
+\newcommand{\miniheadit}[1]{{\vspace{.45em}\noindent\textit{#1.} }}
+\newcommand{\miniheadnopd}[2]{{\vspace{.4em}\noindent\textbf{#1}\hspace{.5em}{#2}\vspace{.4em} }}
+\newcommand{\minidef}[1]{{\vspace{.25em}\noindent\textit{#1} }}
+
+\newcommand{\pbnote}[1]{{\color{red}{#1 ---P.B.}}}
+
+\renewcommand{\ttdefault}{zi4}
+\usepackage[T1]{fontenc}
+
+
+
+\newenvironment{myitemize}
+{
+  \vspace{-.4em}
+    \begin{list}{$\bullet$ }{}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.25em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+    \vspace{-.4em}
+}
+
+\newenvironment{introenumerate}
+{
+
+   \vspace{-.5em}
+   \newcounter{qdcounter}
+    \begin{list}{\arabic{qdcounter}.~}{\usecounter{qdcounter}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+    \vspace{-.5em}
+}
+
+\usepackage[leftmargin=0em]{quoting}
+
+\begin{document}
+%
+% --- Author Metadata here ---
+\conferenceinfo{XXX}{YYY}
+%\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Feral Concurrency Control: A Study of\\Application Integrity in
+  a Modern Web Framework}
+
+{\author{}}
+\maketitle
+
+\input{abstract}
+
+\input{intro}
+
+\scriptsize
+\linespread{.98}
+\selectfont
+
+
+\bibliography{feral-cc} \bibliographystyle{abbrv}
+
+\balance
+
+
+\end{document}

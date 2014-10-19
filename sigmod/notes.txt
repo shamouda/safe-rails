@@ -1,0 +1,21 @@
+http://lesscode.org/2005/09/29/should-database-manage-the-meaning/
+"Why should we tolerate RDBMS opinions on our data? We’re the masters, RDBMS is the servant, it should shut up and serve."
+
+http://david.heinemeierhansson.com/arc/2005_09.html -- Choose a single layer of cleverness
+"opinionated software" "I don't \textit{want} my database to be clever! ...I consider stored procedures and constraints vile and reckless destroyers of coherence. No, Mr. Database, you can not have my business logic. Your procedural ambitions will bear no fruit and you'll have to pry that logic from my dead, cold object-oriented hands...I want a single layer of cleverness: My domain model"
+
+https://www.youtube.com/watch?v=9LfmrkyP81M
+"Computer science in itself just didn't really appeal to me, didn't make sense to me."
+"Most information system development has very little to do with the \textit{science} part of computer science [sic]"
+
+https://developers.google.com/open-source/osa/?csw=1
+2005 Google-O'Reilly Open Source Award Winners
+Best Hacker: David Heinemeier Hansson (Ruby on Rails and 37Signals)
+
+
+Learning Rails 3, 2012
+Everyone cool seems to agree: Ruby on Rails is an amazing way to build web applications.
+
+Ruby on Rails: Up and Running, 2006
+The Ruby on Rails phenomenon is sweeping through our industry with reckless disregard for established programming languages, longstanding conventions, or commercial support. 
+

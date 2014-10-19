@@ -2,6 +2,7 @@
 from bench_helpers import *
 from time import sleep
 import pickle
+from random import seed
 
 PG_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
 RAILS_HOST = "ec2-54-245-166-54.us-west-2.compute.amazonaws.com"
@@ -38,8 +39,8 @@ iterations = 2
 
 FK_USERS_TO_DEPT_PROPORTION = 10
 
-NUMRECORDS_PK = [1, 10, 100, 1000, 10000, 100000]
-NUMRECORDS_FK = [1, 10, 100, 1000, 10000, 100000]
+NUMRECORDS_PK = [1, 10, 100, 1000, 10000, 100000, 1000000]
+NUMRECORDS_FK = [10, 100, 1000, 10000, 100000, 1000000, 10000000]
 OPS_PER_CLIENT = 100
 WORKLOADS = ["ycsb", "linkbench-ins", "linkbench-upd", "uniform"]
 RECORD_TEST_N_RAILS_PROCS = 64
@@ -56,6 +57,7 @@ if BENCH_PK_WORKLOAD:
                 pk_bench_model_results = {}
                 pk_bench_dups = {}
                 for m in pk_models:
+                    seed()
                     print "STARTING", m, "..."
                     print RECORD_TEST_N_RAILS_PROCS, RECORD_TEST_N_CLIENTS
                     reset_hosts(RECORD_TEST_N_RAILS_PROCS)
@@ -88,6 +90,7 @@ if BENCH_PK_STRESS:
             pk_stress_model_results = {}
             pk_stress_dups = {}
             for m in pk_models:
+                seed()
                 print "STARTING", m, "..."
                 reset_hosts(nprocs)
                 pk_stress_model_results[m] = pk_stress(RAILS_HOST, model=m, nclients=STRESS_CLIENTS, trials=STRESS_TRIALS)
@@ -111,6 +114,7 @@ if BENCH_FK_WORKLOAD:
                 fk_bench_model_results = {}
                 fk_bench_dups = {}
                 for m in fk_models:
+                    seed()
                     print "STARTING", m, "..."
                     print RECORD_TEST_N_RAILS_PROCS, RECORD_TEST_N_CLIENTS
                     reset_hosts(RECORD_TEST_N_RAILS_PROCS)
@@ -144,6 +148,7 @@ if BENCH_FK_STRESS:
             fk_stress_model_results = {}
             fk_stress_dups = {}
             for m in fk_models:
+                seed()
                 print "STARTING", m, "..."
                 reset_hosts(nprocs)
                 fk_stress_model_results[m] = fk_stress(RAILS_HOST, model=m, n_clients=STRESS_CLIENTS, trials=STRESS_TRIALS)

@@ -142,7 +142,10 @@ def analyze_project(proj):
                 totlines +=1
                 continue
 
+            print line
+
             if line.replace(" ", "").find("<ActiveRecord::Base") != -1 and line.find("class") != -1:
+                print "FOUND!"
                 projectStat.num_models += 1
             
             if line.find("ActiveModel::Validator") != -1:

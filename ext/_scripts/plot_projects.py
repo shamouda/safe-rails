@@ -49,8 +49,6 @@ for line in lines:
 projects.sort(key = lambda x: int(x[3])+int(x[6]))
 projects.reverse()
 
-print projects
-
 bar(range(1, len(projects)+1), [int(projects[i][3])+int(projects[i][6]) for i in range(0, len(projects))], color="green", label="Associations", edgecolor="None", linewidth=0)
 bar(range(1, len(projects)+1), [int(projects[i][3]) for i in range(0, len(projects))], color="blue", label="Validations", edgecolor="None", linewidth=0)
 
@@ -124,7 +122,11 @@ for project in projects:
     if pname not in pset:
         pset.add(pname)
         # invariant
-        xs.append(int(project[3])/float(project[10])*1000)
+        if float(project[10]) > 0:
+            print pname, int(project[3])/float(project[10]), project[10]
+            xs.append(int(project[3])/float(project[10]))
+        else:
+            xs.append(0)
         # stars
         ys.append(project_to_github[pname][0])
 plot(ys, xs, 'x')
@@ -134,3 +136,30 @@ xlabel("Stars")
 
 xscale('log')
 savefig("stars-vs-invariants-per-model.pdf")
+
+
+cla()
+
+xs = []
+ys = []
+pset = set()
+
+for project in projects:
+    pname = project[0]
+    if pname not in pset:
+        pset.add(pname)
+        # invariant
+        if float(project[10]) > 0:
+            print pname, int(project[3])/float(project[10]), project[9]
+            xs.append(int(project[3])/float(project[10]))
+        else:
+            xs.append(0)
+        # stars
+        ys.append(int(project[9]))
+plot(ys, xs, 'x')
+
+ylabel("Avg. Invariants per Model")
+xlabel("Commits per Model")
+
+xscale('log')
+savefig("commits-vs-invariants-per-model.pdf")

@@ -25,7 +25,7 @@ lines = open("authors.txt").read().split("\n")
 print ",".join(lines[0].split("\t"))
 lines = lines[1:]
 
-# project, author, invariants_written, author_lines_inserted, author_lines_deleted, total_invariants, total_lines_inserted, total_lines_deleted, author_commits, total_commits
+# project, author, invariants_written, author_lines_inserted, author_lines_deleted, total_invariants, total_lines_inserted, total_lines_deletedd, author_commits, total_commits
 
 authors = []
 
@@ -170,15 +170,33 @@ for x in xs:
         interpolated_y = below_y+(above_y-below_y)*(x-below_x)/(above_x-below_x)
         this_sum += interpolated_y
 
-    avg_ys.append(this_sum/float(len(project_curves)))
+    y = this_sum/float(len(project_curves))
+    avg_ys.append(y)
 
-plot([0]+xs, avg_ys, color="red", linewidth=lw*1.5)
+ys_of_interest = [.95]#[.5, .95]
 
+for yi in ys_of_interest:
+    for i in range(0, len(avg_ys)):
+        if yi < avg_ys[i]:
+            above_y = avg_ys[i]
+            below_y = avg_ys[i-1]
+            above_x = xs[i]
+            below_x = xs[i-1]
+            
+            interpolated_x = below_x+(above_x-below_x)*(yi-below_y)/(above_y-below_y)
+            break
+    print yi, interpolated_x
+    plot([interpolated_x, interpolated_x], [0, yi], ':', color="black")
+    plot([0, interpolated_x], [yi, yi], ':', color="black")    
+
+    
 xlabel("Percentage of Authors")
 ylabel("Proportion Invariants")
 
 #xlim(xmax=.4)
 ylim(ymax=1)
+
+plot([0]+xs, avg_ys, color="red", linewidth=lw*1.5)
 
 savefig("invariant-authorship-cdf.pdf")
 
@@ -249,6 +267,23 @@ for x in xs:
 
     avg_ys.append(this_sum/float(len(project_curves)))
 
+ys_of_interest = [.95]#[.5, .95]
+
+for yi in ys_of_interest:
+    for i in range(0, len(avg_ys)):
+        if yi < avg_ys[i]:
+            above_y = avg_ys[i]
+            below_y = avg_ys[i-1]
+            above_x = xs[i]
+            below_x = xs[i-1]
+            
+            interpolated_x = below_x+(above_x-below_x)*(yi-below_y)/(above_y-below_y)
+            break
+    print yi, interpolated_x
+    plot([interpolated_x, interpolated_x], [0, yi], ':', color="black")
+    plot([0, interpolated_x], [yi, yi], ':', color="black")    
+
+    
 plot([0]+xs, avg_ys, color="red", linewidth=lw*1.5)
 
 xlabel("Percentage of Authors")

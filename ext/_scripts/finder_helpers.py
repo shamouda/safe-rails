@@ -142,7 +142,8 @@ def analyze_project(proj):
                 totlines +=1
                 continue
 
-            if line.find("ActiveRecord::Base"):
+            if line.find("ActiveRecord::Base") != -1:
+                print line
                 projectStat.num_models += 1
             
             if line.find("ActiveModel::Validator") != -1:

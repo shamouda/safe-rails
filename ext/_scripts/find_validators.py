@@ -6,12 +6,16 @@ for proj in listdir('.'):
     if proj == "_scripts":
         continue
 
+    if proj != "openproject":
+        continue
+    
     if DO_CHECK_AUTHORS:
         print proj
 
+        
     switch_hash(proj, "master")
     projects.append(analyze_project(proj))
-
+raw_input()
 
 # number of custom validators
 print "TOTAL CUSTOM VALIDATORS", sum([len(p.customs) for p in projects])

@@ -2,8 +2,6 @@ from os import listdir, system, walk, path
 import fnmatch, itertools
 from collections import defaultdict
 
-DO_CHECK_AUTHORS = True
-DO_CHECK_LINES = True
 
 def find_files(directory, pattern):
     for root, dirs, files in walk(directory):

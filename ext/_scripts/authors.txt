@@ -496,62 +496,62 @@ calagator	reidab	0	14077	5550	9	154903	142771	31	1916
 calagator	igal.koshevoy	4	43867	14375	9	154903	142771	145	1916
 calagator	Amy Farrell	0	0	0	9	154903	142771	1	1916
 calagator	Micah Geisel	0	4869	5339	9	154903	142771	222	1916
-browsercms	James Prior	0	931	529	51	347658	295411	31	4104
-browsercms	Dillon Hafer	0	2	2	51	347658	295411	1	4104
-browsercms	Joshua Vial	0	24	3	51	347658	295411	1	4104
-browsercms	Jim	0	3	2	51	347658	295411	1	4104
-browsercms	ssoper	1	4048	481	51	347658	295411	54	4104
-browsercms	John Bohn	0	7	1	51	347658	295411	1	4104
-browsercms	icarrera	0	395	46	51	347658	295411	6	4104
-browsercms	Max Schöfmann	0	5	5	51	347658	295411	1	4104
-browsercms	David Czarnecki	0	1	1	51	347658	295411	1	4104
-browsercms	pbarry	4	214221	199306	51	347658	295411	655	4104
-browsercms	Kim Chirnside	0	76	3	51	347658	295411	3	4104
-browsercms	Kevin Sung	0	106	117	51	347658	295411	25	4104
-browsercms	Kimmy Chirnside	0	147	13	51	347658	295411	9	4104
-browsercms	pete	0	674	185	51	347658	295411	21	4104
-browsercms	Phil Misiowiec	0	26	19	51	347658	295411	1	4104
-browsercms	daemianmack	0	1	1	51	347658	295411	1	4104
-browsercms	Nathan Sutton	0	3	2	51	347658	295411	6	4104
-browsercms	Roope Hakulinen	0	0	0	51	347658	295411	1	4104
-browsercms	djcp	0	1	1	51	347658	295411	1	4104
-browsercms	unknown	0	58	11	51	347658	295411	1	4104
-browsercms	jamesprior	0	948	533	51	347658	295411	39	4104
-browsercms	Chris Lang	1	35	5	51	347658	295411	8	4104
-browsercms	Andy Olliver	0	11	1	51	347658	295411	6	4104
-browsercms	Cyrille Bonnet	0	17	17	51	347658	295411	2	4104
-browsercms	Juan Alvarez	0	11	6	51	347658	295411	5	4104
-browsercms	Peak	0	32449	22000	51	347658	295411	765	4104
-browsercms	Ken Chirsden	0	34	9	51	347658	295411	2	4104
-browsercms	Jon Leighton	0	541	207	51	347658	295411	14	4104
-browsercms	Paul Barry	2	4426	2349	51	347658	295411	143	4104
-browsercms	Philippe Lafoucrière	0	0	0	51	347658	295411	1	4104
-browsercms	Filipe Chagas	0	0	0	51	347658	295411	1	4104
-browsercms	Andreas Haller	0	2	2	51	347658	295411	1	4104
-browsercms	Patrick Peak	22	32449	22000	51	347658	295411	764	4104
-browsercms	Caleb Land	0	0	0	51	347658	295411	2	4104
-browsercms	Marnen Laibow-Koser	0	0	0	51	347658	295411	2	4104
-browsercms	metalon	0	0	0	51	347658	295411	1	4104
-browsercms	Jeff Dettmann	0	281	96	51	347658	295411	35	4104
-browsercms	jdettmann	0	1311	927	51	347658	295411	152	4104
-browsercms	miskander	0	1	1	51	347658	295411	1	4104
-browsercms	Josiah Ivey	0	0	0	51	347658	295411	5	4104
-browsercms	Rafał Lisowski	0	0	0	51	347658	295411	2	4104
-browsercms	Daniel Collis-Puro	0	42	31	51	347658	295411	5	4104
-browsercms	philm	0	22	0	51	347658	295411	2	4104
-browsercms	Britney Wright	0	0	0	51	347658	295411	1	4104
-browsercms	peakpg	21	48671	42636	51	347658	295411	1183	4104
-browsercms	patrick	0	2549	1047	51	347658	295411	55	4104
-browsercms	Justin Windholtz	0	28	7	51	347658	295411	6	4104
-browsercms	Kyle Conrad	0	2	0	51	347658	295411	15	4104
-browsercms	Brian Lukoff	0	5	6	51	347658	295411	1	4104
-browsercms	Neil Middleton	0	0	0	51	347658	295411	1	4104
-browsercms	Jeffrey Dettmann	0	73	48	51	347658	295411	9	4104
-browsercms	Meike Wiemann	0	24	14	51	347658	295411	3	4104
-browsercms	Brian King	0	2977	2733	51	347658	295411	4	4104
-browsercms	ttozer	0	15	6	51	347658	295411	45	4104
-browsercms	Jack Dempsey	0	5	2	51	347658	295411	1	4104
-browsercms	Lee Irving	0	0	0	51	347658	295411	1	4104
+browsercms	James Prior	0	931	529	47	347658	295411	31	4104
+browsercms	Dillon Hafer	0	2	2	47	347658	295411	1	4104
+browsercms	Joshua Vial	0	24	3	47	347658	295411	1	4104
+browsercms	Jim	0	3	2	47	347658	295411	1	4104
+browsercms	ssoper	1	4048	481	47	347658	295411	54	4104
+browsercms	John Bohn	0	7	1	47	347658	295411	1	4104
+browsercms	icarrera	0	395	46	47	347658	295411	6	4104
+browsercms	Max Schöfmann	0	5	5	47	347658	295411	1	4104
+browsercms	David Czarnecki	0	1	1	47	347658	295411	1	4104
+browsercms	pbarry	2	214221	199306	47	347658	295411	655	4104
+browsercms	Kim Chirnside	0	76	3	47	347658	295411	3	4104
+browsercms	Kevin Sung	0	106	117	47	347658	295411	25	4104
+browsercms	Kimmy Chirnside	0	147	13	47	347658	295411	9	4104
+browsercms	pete	0	674	185	47	347658	295411	21	4104
+browsercms	Phil Misiowiec	0	26	19	47	347658	295411	1	4104
+browsercms	daemianmack	0	1	1	47	347658	295411	1	4104
+browsercms	Nathan Sutton	0	3	2	47	347658	295411	6	4104
+browsercms	Roope Hakulinen	0	0	0	47	347658	295411	1	4104
+browsercms	djcp	0	1	1	47	347658	295411	1	4104
+browsercms	unknown	0	58	11	47	347658	295411	1	4104
+browsercms	jamesprior	0	948	533	47	347658	295411	39	4104
+browsercms	Chris Lang	1	35	5	47	347658	295411	8	4104
+browsercms	Andy Olliver	0	11	1	47	347658	295411	6	4104
+browsercms	Cyrille Bonnet	0	17	17	47	347658	295411	2	4104
+browsercms	Juan Alvarez	0	11	6	47	347658	295411	5	4104
+browsercms	Peak	0	32449	22000	47	347658	295411	765	4104
+browsercms	Ken Chirsden	0	34	9	47	347658	295411	2	4104
+browsercms	Jon Leighton	0	541	207	47	347658	295411	14	4104
+browsercms	Paul Barry	2	4426	2349	47	347658	295411	143	4104
+browsercms	Philippe Lafoucrière	0	0	0	47	347658	295411	1	4104
+browsercms	Filipe Chagas	0	0	0	47	347658	295411	1	4104
+browsercms	Andreas Haller	0	2	2	47	347658	295411	1	4104
+browsercms	Patrick Peak	20	32449	22000	47	347658	295411	764	4104
+browsercms	Caleb Land	0	0	0	47	347658	295411	2	4104
+browsercms	Marnen Laibow-Koser	0	0	0	47	347658	295411	2	4104
+browsercms	metalon	0	0	0	47	347658	295411	1	4104
+browsercms	Jeff Dettmann	0	281	96	47	347658	295411	35	4104
+browsercms	jdettmann	0	1311	927	47	347658	295411	152	4104
+browsercms	miskander	0	1	1	47	347658	295411	1	4104
+browsercms	Josiah Ivey	0	0	0	47	347658	295411	5	4104
+browsercms	Rafał Lisowski	0	0	0	47	347658	295411	2	4104
+browsercms	Daniel Collis-Puro	0	42	31	47	347658	295411	5	4104
+browsercms	philm	0	22	0	47	347658	295411	2	4104
+browsercms	Britney Wright	0	0	0	47	347658	295411	1	4104
+browsercms	peakpg	21	48671	42636	47	347658	295411	1183	4104
+browsercms	patrick	0	2549	1047	47	347658	295411	55	4104
+browsercms	Justin Windholtz	0	28	7	47	347658	295411	6	4104
+browsercms	Kyle Conrad	0	2	0	47	347658	295411	15	4104
+browsercms	Brian Lukoff	0	5	6	47	347658	295411	1	4104
+browsercms	Neil Middleton	0	0	0	47	347658	295411	1	4104
+browsercms	Jeffrey Dettmann	0	73	48	47	347658	295411	9	4104
+browsercms	Meike Wiemann	0	24	14	47	347658	295411	3	4104
+browsercms	Brian King	0	2977	2733	47	347658	295411	4	4104
+browsercms	ttozer	0	15	6	47	347658	295411	45	4104
+browsercms	Jack Dempsey	0	5	2	47	347658	295411	1	4104
+browsercms	Lee Irving	0	0	0	47	347658	295411	1	4104
 snorby	Antonio Marques	0	155	29	11	17970	7765	14	814
 snorby	shadowbq	0	6	3	11	17970	7765	6	814
 snorby	Dariusz Czerniawski	0	0	0	11	17970	7765	1	814
@@ -574,23 +574,23 @@ snorby	bcd	0	0	0	11	17970	7765	1	814
 snorby	Dustin Webber	0	6	4	11	17970	7765	40	814
 snorby	Omar Vargas	0	0	0	11	17970	7765	1	814
 snorby	root	0	0	0	11	17970	7765	1	814
-lovd-by-less	Matthew Peychich	12	9585	10137	45	99077	57760	5	154
-lovd-by-less	James Rosen	1	324	340	45	99077	57760	22	154
-lovd-by-less	Greg Weber	0	9	7	45	99077	57760	1	154
-lovd-by-less	Carlos Brando	0	4	0	45	99077	57760	1	154
-lovd-by-less	Tair	0	38	12	45	99077	57760	5	154
-lovd-by-less	Jonathon Brenner	0	23754	30251	45	99077	57760	16	154
-lovd-by-less	Dejan Simic	0	24	0	45	99077	57760	1	154
-lovd-by-less	Jeremy Luebke	0	4	3	45	99077	57760	4	154
-lovd-by-less	aditya	0	13	3	45	99077	57760	2	154
-lovd-by-less	Dustin Schneider	0	2	2	45	99077	57760	2	154
-lovd-by-less	steve	29	52301	6710	45	99077	57760	56	154
-lovd-by-less	Tair Assimov	0	29	7	45	99077	57760	3	154
-lovd-by-less	mwilliams	0	0	0	45	99077	57760	1	154
-lovd-by-less	Christopher Redinger	0	9387	9430	45	99077	57760	2	154
-lovd-by-less	Federico Ramallo	0	35	2	45	99077	57760	2	154
-lovd-by-less	Les Freeman	3	2278	406	45	99077	57760	16	154
-lovd-by-less	Dr Nic	0	1290	450	45	99077	57760	15	154
+lovd-by-less	Matthew Peychich	7	9585	10137	30	99077	57760	5	154
+lovd-by-less	James Rosen	1	324	340	30	99077	57760	22	154
+lovd-by-less	Greg Weber	0	9	7	30	99077	57760	1	154
+lovd-by-less	Carlos Brando	0	4	0	30	99077	57760	1	154
+lovd-by-less	Tair	0	38	12	30	99077	57760	5	154
+lovd-by-less	Jonathon Brenner	0	23754	30251	30	99077	57760	16	154
+lovd-by-less	Dejan Simic	0	24	0	30	99077	57760	1	154
+lovd-by-less	Jeremy Luebke	0	4	3	30	99077	57760	4	154
+lovd-by-less	aditya	0	13	3	30	99077	57760	2	154
+lovd-by-less	Dustin Schneider	0	2	2	30	99077	57760	2	154
+lovd-by-less	steve	19	52301	6710	30	99077	57760	56	154
+lovd-by-less	Tair Assimov	0	29	7	30	99077	57760	3	154
+lovd-by-less	mwilliams	0	0	0	30	99077	57760	1	154
+lovd-by-less	Christopher Redinger	0	9387	9430	30	99077	57760	2	154
+lovd-by-less	Federico Ramallo	0	35	2	30	99077	57760	2	154
+lovd-by-less	Les Freeman	3	2278	406	30	99077	57760	16	154
+lovd-by-less	Dr Nic	0	1290	450	30	99077	57760	15	154
 opencongress	Andy Ross	0	13	15	56	152474	167027	5	3817
 opencongress	aross	0	19127	46534	56	152474	167027	784	3817
 opencongress	Rob Chekaluk	0	6	2	56	152474	167027	2	3817
@@ -904,11 +904,6 @@ canvas-lms	Wesley Smith	0	68	1	366	831334	382001	1	13362
 canvas-lms	Phil McGachey	0	177	60	366	831334	382001	6	13362
 canvas-lms	Brian Finney	0	39	26	366	831334	382001	2	13362
 canvas-lms	Sean Lewis	0	1	1	366	831334	382001	2	13362
-invoicing	Ryan Heneise	0	1	0	2	39923	29157	1	360
-invoicing	Jiri Kubicek	0	0	0	2	39923	29157	1	360
-invoicing	Rob Sanheim	0	3	0	2	39923	29157	3	360
-invoicing	Martin Kleppmann	2	19779	14534	2	39923	29157	172	360
-invoicing	martin	0	20140	14623	2	39923	29157	183	360
 ror_ecommerce	Grégory Marcilhacy	0	15	11	220	79778	33462	5	3052
 ror_ecommerce	Devin	0	0	0	220	79778	33462	1	3052
 ror_ecommerce	Chris McCord	0	1	1	220	79778	33462	1	3052
@@ -1689,22 +1684,22 @@ piggybak	Steph	0	6487	4188	51	13457	8629	322	703
 piggybak	Brian Buchalter	0	106	29	51	13457	8629	6	703
 piggybak	Gudata	0	2	2	51	13457	8629	1	703
 piggybak	Jason Montalto	0	1	1	51	13457	8629	1	703
-insoshi	Piotr Jakubowski	7	2475	350	416	510243	357873	30	1316
-insoshi	U-ADEN\Administrator	0	0	0	416	510243	357873	0	1316
-insoshi	Ruben Gomez	0	4	0	416	510243	357873	1	1316
-insoshi	Steven Fines	0	0	0	416	510243	357873	3	1316
-insoshi	Evan Dorn	0	36	21	416	510243	357873	20	1316
-insoshi	Kevin Ansfield	0	351	320	416	510243	357873	4	1316
-insoshi	blazar	0	1593	995	416	510243	357873	31	1316
-insoshi	William Lazar	0	1917	1461	416	510243	357873	6	1316
-insoshi	Long Nguyen	0	56	69	416	510243	357873	22	1316
-insoshi	Tim Reinke	0	19	4	416	510243	357873	5	1316
-insoshi	Jorge Calás Lozano	0	18	9	416	510243	357873	1	1316
-insoshi	Jorge Dias	4	2032	216	416	510243	357873	35	1316
-insoshi	Michael Hartl	404	501560	354343	416	510243	357873	1143	1316
-insoshi	Tom Brown	1	153	37	416	510243	357873	12	1316
-insoshi	Raul Parolari	0	22	43	416	510243	357873	2	1316
-insoshi	=	0	7	5	416	510243	357873	1	1316
+insoshi	Piotr Jakubowski	7	2475	350	73	510243	357873	30	1316
+insoshi	U-ADEN\Administrator	0	0	0	73	510243	357873	0	1316
+insoshi	Ruben Gomez	0	4	0	73	510243	357873	1	1316
+insoshi	Steven Fines	0	0	0	73	510243	357873	3	1316
+insoshi	Evan Dorn	0	36	21	73	510243	357873	20	1316
+insoshi	Kevin Ansfield	0	351	320	73	510243	357873	4	1316
+insoshi	blazar	0	1593	995	73	510243	357873	31	1316
+insoshi	William Lazar	0	1917	1461	73	510243	357873	6	1316
+insoshi	Long Nguyen	0	56	69	73	510243	357873	22	1316
+insoshi	Tim Reinke	0	19	4	73	510243	357873	5	1316
+insoshi	Jorge Calás Lozano	0	18	9	73	510243	357873	1	1316
+insoshi	Jorge Dias	4	2032	216	73	510243	357873	35	1316
+insoshi	Michael Hartl	61	501560	354343	73	510243	357873	1143	1316
+insoshi	Tom Brown	1	153	37	73	510243	357873	12	1316
+insoshi	Raul Parolari	0	22	43	73	510243	357873	2	1316
+insoshi	=	0	7	5	73	510243	357873	1	1316
 juvia	Felix Eckhofer	0	6	1	11	10181	3781	2	365
 juvia	Olafur Egilsson	0	0	0	11	10181	3781	1	365
 juvia	Stefan Bühler	0	0	0	11	10181	3781	2	365
@@ -1713,10 +1708,10 @@ juvia	Daniel Mayer	0	0	0	11	10181	3781	1	365
 juvia	Ian Renton	0	102	60	11	10181	3781	19	365
 juvia	Steve Schwartz	0	529	254	11	10181	3781	5	365
 juvia	Hongli Lai	0	4772	1733	11	10181	3781	171	365
-fedena	projectfedena	0	0	0	189	87297	24682	1	1472
-fedena	Foradian	0	0	0	189	87297	24682	2	1472
-fedena	foradian	189	87297	24682	189	87297	24682	1463	1472
-fedena	Muhammad Moosa	0	0	0	189	87297	24682	6	1472
+fedena	projectfedena	0	0	0	165	87297	24682	1	1472
+fedena	Foradian	0	0	0	165	87297	24682	2	1472
+fedena	foradian	165	87297	24682	165	87297	24682	1463	1472
+fedena	Muhammad Moosa	0	0	0	165	87297	24682	6	1472
 teambox	Steve Smith	4	1068	88	71	142397	108882	25	5134
 teambox	Saimon Moore	2	4454	1130	71	142397	108882	141	5134
 teambox	Andrew Brown	2	22119	8439	71	142397	108882	221	5134
@@ -1771,95 +1766,95 @@ monocle	Alex MacCaw	8	2681	188	8	2690	191	17	28
 monocle	Pascal Borreli	0	1	1	8	2690	191	1	28
 monocle	Mario Alberto Chavez	0	0	0	8	2690	191	1	28
 monocle	Olivier Lacan	0	0	0	8	2690	191	2	28
-tracks	Thorben Went	0	0	0	25	3097313	2894419	1	4656
-tracks	Benjamin Dabelow	0	0	0	25	3097313	2894419	1	4656
-tracks	Erik Ordway	0	188	67	25	3097313	2894419	14	4656
-tracks	jacqui	0	17	1	25	3097313	2894419	1	4656
-tracks	Xavi Vila	0	0	0	25	3097313	2894419	1	4656
-tracks	Christof Spies	0	1	1	25	3097313	2894419	1	4656
-tracks	Sebastian Fischmeister	0	115	42	25	3097313	2894419	6	4656
-tracks	Piotr Jakubowski	0	0	0	25	3097313	2894419	3	4656
-tracks	Marcus Ilgner	2	139	129	25	3097313	2894419	6	4656
-tracks	Renaud AUBIN	0	0	0	25	3097313	2894419	7	4656
-tracks	Patrice Neff	0	66	2	25	3097313	2894419	2	4656
-tracks	sfischme	0	333	112	25	3097313	2894419	31	4656
-tracks	Pavel Župa	0	0	0	25	3097313	2894419	2	4656
-tracks	Hans de Graaff	0	11	0	25	3097313	2894419	29	4656
-tracks	Brett A. Rogers	0	52	17	25	3097313	2894419	2	4656
-tracks	Andrew Nesbitt	0	0	0	25	3097313	2894419	1	4656
-tracks	Henrik Bohre	0	389	191	25	3097313	2894419	43	4656
-tracks	Jason Penney	0	0	0	25	3097313	2894419	1	4656
-tracks	Daniel Rice	0	0	0	25	3097313	2894419	7	4656
-tracks	AlexStein	0	0	0	25	3097313	2894419	1	4656
-tracks	Tim Madden	0	95	94	25	3097313	2894419	11	4656
-tracks	Stefan Hacker	0	16	18	25	3097313	2894419	9	4656
-tracks	Colin Rymer	1	91	146	25	3097313	2894419	6	4656
-tracks	Antonin Blanc	0	0	0	25	3097313	2894419	1	4656
-tracks	eriko	0	85	46	25	3097313	2894419	5	4656
-tracks	Jakub Tesinsky	0	0	0	25	3097313	2894419	2	4656
-tracks	Andrius Janauskas	0	16	19	25	3097313	2894419	1	4656
-tracks	Mindaugas Mozūras	0	37	49	25	3097313	2894419	3	4656
-tracks	Reinier Balt	15	602520	630458	25	3097313	2894419	1213	4656
-tracks	Jan Stępień	0	146	38	25	3097313	2894419	13	4656
-tracks	Marcus ilgner	0	0	0	25	3097313	2894419	1	4656
-tracks	Katrina Owen	0	1578	872	25	3097313	2894419	58	4656
-tracks	waltercruz	0	36	18	25	3097313	2894419	4	4656
-tracks	lrbalt	0	606143	633309	25	3097313	2894419	1357	4656
-tracks	Stefan Richter	0	2769	847	25	3097313	2894419	29	4656
-tracks	Vitalie Lazu	0	87	58	25	3097313	2894419	3	4656
-tracks	Simon Rozet	0	3672	310	25	3097313	2894419	11	4656
-tracks	Carsten Otto	0	0	0	25	3097313	2894419	2	4656
-tracks	Piotr Adamski	0	1	0	25	3097313	2894419	4	4656
-tracks	chris erway	0	11	0	25	3097313	2894419	6	4656
-tracks	Taybin Rutkin	0	0	0	25	3097313	2894419	1	4656
-tracks	Ramón Cahenzli	0	5	2	25	3097313	2894419	1	4656
-tracks	Demian Gemperli	0	64	40	25	3097313	2894419	8	4656
-tracks	MHarris	0	19	934	25	3097313	2894419	2	4656
-tracks	Jaime Hernandez	0	0	0	25	3097313	2894419	1	4656
-tracks	Ignacio Huerta	0	0	0	25	3097313	2894419	1	4656
-tracks	lukemelia	5	905843	732293	25	3097313	2894419	364	4656
-tracks	piglop	0	91	6	25	3097313	2894419	2	4656
-tracks	Don Cruse	0	157	122	25	3097313	2894419	11	4656
-tracks	Devin Weaver	0	35	3	25	3097313	2894419	4	4656
-tracks	Luke Melia	0	145493	38395	25	3097313	2894419	14	4656
-tracks	Ulf Klose	0	0	0	25	3097313	2894419	2	4656
-tracks	mike	0	165	14	25	3097313	2894419	17	4656
-tracks	Michael Witrant	0	19	8	25	3097313	2894419	12	4656
-tracks	Walter Cruz	0	17	0	25	3097313	2894419	2	4656
-tracks	Andreas Brandl	0	0	0	25	3097313	2894419	1	4656
-tracks	Farzad FARID	0	4	5	25	3097313	2894419	1	4656
-tracks	maqiv	0	0	0	25	3097313	2894419	1	4656
-tracks	Jakub A.Tesinsky	0	112	9	25	3097313	2894419	7	4656
-tracks	Dan Rice	0	771	594	25	3097313	2894419	192	4656
-tracks	Ian Young	0	101	15	25	3097313	2894419	3	4656
-tracks	Craig Maloney	0	3	2	25	3097313	2894419	2	4656
-tracks	jkebinger	0	5	6	25	3097313	2894419	2	4656
-tracks	Michaël Witrant	0	37	0	25	3097313	2894419	2	4656
-tracks	bsag	0	563253	477036	25	3097313	2894419	305	4656
-tracks	root	0	0	0	25	3097313	2894419	8	4656
-tracks	Ted Smith	0	0	0	25	3097313	2894419	1	4656
-tracks	Albert Sellarès	0	0	0	25	3097313	2894419	1	4656
-tracks	Eric Allen	0	129169	65475	25	3097313	2894419	240	4656
-tracks	Matt Rogers & Katrina Owen	0	104	45	25	3097313	2894419	2	4656
-tracks	Darren Cato	2	120	12	25	3097313	2894419	5	4656
-tracks	Greg Sutcliffe	0	273	26	25	3097313	2894419	3	4656
-tracks	eric	0	129404	65483	25	3097313	2894419	247	4656
-tracks	epall	0	235	8	25	3097313	2894419	6	4656
-tracks	popsch	0	0	0	25	3097313	2894419	1	4656
-tracks	David Abdemoulaie	0	0	0	25	3097313	2894419	1	4656
-tracks	Evan McLean	0	0	0	25	3097313	2894419	1	4656
-tracks	rverchere	0	9	1	25	3097313	2894419	2	4656
-tracks	nic	0	876	504	25	3097313	2894419	1	4656
-tracks	Mickey Reiss	0	0	0	25	3097313	2894419	1	4656
-tracks	Ingo Weseloh	0	0	0	25	3097313	2894419	1	4656
-tracks	Clinton Forbes	0	0	0	25	3097313	2894419	2	4656
-tracks	Stacy Vlasits	0	1	1	25	3097313	2894419	1	4656
-tracks	Heiko Reincke	0	0	0	25	3097313	2894419	1	4656
-tracks	Matt Rogers	0	1598	246166	25	3097313	2894419	210	4656
-tracks	Matt Bridges	0	290	183	25	3097313	2894419	4	4656
-tracks	Heraldo Esquiche	0	0	0	25	3097313	2894419	1	4656
-tracks	sf	0	333	112	25	3097313	2894419	31	4656
-tracks	tim madden	0	93	75	25	3097313	2894419	28	4656
+tracks	Thorben Went	0	0	0	24	3097313	2894419	1	4656
+tracks	Benjamin Dabelow	0	0	0	24	3097313	2894419	1	4656
+tracks	Erik Ordway	0	188	67	24	3097313	2894419	14	4656
+tracks	jacqui	0	17	1	24	3097313	2894419	1	4656
+tracks	Xavi Vila	0	0	0	24	3097313	2894419	1	4656
+tracks	Christof Spies	0	1	1	24	3097313	2894419	1	4656
+tracks	Sebastian Fischmeister	0	115	42	24	3097313	2894419	6	4656
+tracks	Piotr Jakubowski	0	0	0	24	3097313	2894419	3	4656
+tracks	Marcus Ilgner	2	139	129	24	3097313	2894419	6	4656
+tracks	Renaud AUBIN	0	0	0	24	3097313	2894419	7	4656
+tracks	Patrice Neff	0	66	2	24	3097313	2894419	2	4656
+tracks	sfischme	0	333	112	24	3097313	2894419	31	4656
+tracks	Pavel Župa	0	0	0	24	3097313	2894419	2	4656
+tracks	Hans de Graaff	0	11	0	24	3097313	2894419	29	4656
+tracks	Brett A. Rogers	0	52	17	24	3097313	2894419	2	4656
+tracks	Andrew Nesbitt	0	0	0	24	3097313	2894419	1	4656
+tracks	Henrik Bohre	0	389	191	24	3097313	2894419	43	4656
+tracks	Jason Penney	0	0	0	24	3097313	2894419	1	4656
+tracks	Daniel Rice	0	0	0	24	3097313	2894419	7	4656
+tracks	AlexStein	0	0	0	24	3097313	2894419	1	4656
+tracks	Tim Madden	0	95	94	24	3097313	2894419	11	4656
+tracks	Stefan Hacker	0	16	18	24	3097313	2894419	9	4656
+tracks	Colin Rymer	1	91	146	24	3097313	2894419	6	4656
+tracks	Antonin Blanc	0	0	0	24	3097313	2894419	1	4656
+tracks	eriko	0	85	46	24	3097313	2894419	5	4656
+tracks	Jakub Tesinsky	0	0	0	24	3097313	2894419	2	4656
+tracks	Andrius Janauskas	0	16	19	24	3097313	2894419	1	4656
+tracks	Mindaugas Mozūras	0	37	49	24	3097313	2894419	3	4656
+tracks	Reinier Balt	15	602520	630458	24	3097313	2894419	1213	4656
+tracks	Jan Stępień	0	146	38	24	3097313	2894419	13	4656
+tracks	Marcus ilgner	0	0	0	24	3097313	2894419	1	4656
+tracks	Katrina Owen	0	1578	872	24	3097313	2894419	58	4656
+tracks	waltercruz	0	36	18	24	3097313	2894419	4	4656
+tracks	lrbalt	0	606143	633309	24	3097313	2894419	1357	4656
+tracks	Stefan Richter	0	2769	847	24	3097313	2894419	29	4656
+tracks	Vitalie Lazu	0	87	58	24	3097313	2894419	3	4656
+tracks	Simon Rozet	0	3672	310	24	3097313	2894419	11	4656
+tracks	Carsten Otto	0	0	0	24	3097313	2894419	2	4656
+tracks	Piotr Adamski	0	1	0	24	3097313	2894419	4	4656
+tracks	chris erway	0	11	0	24	3097313	2894419	6	4656
+tracks	Taybin Rutkin	0	0	0	24	3097313	2894419	1	4656
+tracks	Ramón Cahenzli	0	5	2	24	3097313	2894419	1	4656
+tracks	Demian Gemperli	0	64	40	24	3097313	2894419	8	4656
+tracks	MHarris	0	19	934	24	3097313	2894419	2	4656
+tracks	Jaime Hernandez	0	0	0	24	3097313	2894419	1	4656
+tracks	Ignacio Huerta	0	0	0	24	3097313	2894419	1	4656
+tracks	lukemelia	4	905843	732293	24	3097313	2894419	364	4656
+tracks	piglop	0	91	6	24	3097313	2894419	2	4656
+tracks	Don Cruse	0	157	122	24	3097313	2894419	11	4656
+tracks	Devin Weaver	0	35	3	24	3097313	2894419	4	4656
+tracks	Luke Melia	0	145493	38395	24	3097313	2894419	14	4656
+tracks	Ulf Klose	0	0	0	24	3097313	2894419	2	4656
+tracks	mike	0	165	14	24	3097313	2894419	17	4656
+tracks	Michael Witrant	0	19	8	24	3097313	2894419	12	4656
+tracks	Walter Cruz	0	17	0	24	3097313	2894419	2	4656
+tracks	Andreas Brandl	0	0	0	24	3097313	2894419	1	4656
+tracks	Farzad FARID	0	4	5	24	3097313	2894419	1	4656
+tracks	maqiv	0	0	0	24	3097313	2894419	1	4656
+tracks	Jakub A.Tesinsky	0	112	9	24	3097313	2894419	7	4656
+tracks	Dan Rice	0	771	594	24	3097313	2894419	192	4656
+tracks	Ian Young	0	101	15	24	3097313	2894419	3	4656
+tracks	Craig Maloney	0	3	2	24	3097313	2894419	2	4656
+tracks	jkebinger	0	5	6	24	3097313	2894419	2	4656
+tracks	Michaël Witrant	0	37	0	24	3097313	2894419	2	4656
+tracks	bsag	0	563253	477036	24	3097313	2894419	305	4656
+tracks	root	0	0	0	24	3097313	2894419	8	4656
+tracks	Ted Smith	0	0	0	24	3097313	2894419	1	4656
+tracks	Albert Sellarès	0	0	0	24	3097313	2894419	1	4656
+tracks	Eric Allen	0	129169	65475	24	3097313	2894419	240	4656
+tracks	Matt Rogers & Katrina Owen	0	104	45	24	3097313	2894419	2	4656
+tracks	Darren Cato	2	120	12	24	3097313	2894419	5	4656
+tracks	Greg Sutcliffe	0	273	26	24	3097313	2894419	3	4656
+tracks	eric	0	129404	65483	24	3097313	2894419	247	4656
+tracks	epall	0	235	8	24	3097313	2894419	6	4656
+tracks	popsch	0	0	0	24	3097313	2894419	1	4656
+tracks	David Abdemoulaie	0	0	0	24	3097313	2894419	1	4656
+tracks	Evan McLean	0	0	0	24	3097313	2894419	1	4656
+tracks	rverchere	0	9	1	24	3097313	2894419	2	4656
+tracks	nic	0	876	504	24	3097313	2894419	1	4656
+tracks	Mickey Reiss	0	0	0	24	3097313	2894419	1	4656
+tracks	Ingo Weseloh	0	0	0	24	3097313	2894419	1	4656
+tracks	Clinton Forbes	0	0	0	24	3097313	2894419	2	4656
+tracks	Stacy Vlasits	0	1	1	24	3097313	2894419	1	4656
+tracks	Heiko Reincke	0	0	0	24	3097313	2894419	1	4656
+tracks	Matt Rogers	0	1598	246166	24	3097313	2894419	210	4656
+tracks	Matt Bridges	0	290	183	24	3097313	2894419	4	4656
+tracks	Heraldo Esquiche	0	0	0	24	3097313	2894419	1	4656
+tracks	sf	0	333	112	24	3097313	2894419	31	4656
+tracks	tim madden	0	93	75	24	3097313	2894419	28	4656
 lobsters	Kurtis Rainbolt-Greene	0	0	0	20	10565	4506	2	623
 lobsters	Sam Hasler	0	0	0	20	10565	4506	1	623
 lobsters	Serge Paquet	1	711	721	20	10565	4506	30	623
@@ -1884,69 +1879,69 @@ lobsters	Ante Salinovic	0	0	0	20	10565	4506	1	623
 lobsters	Anton Nikishaev	0	0	0	20	10565	4506	1	623
 lobsters	Andrey Chernih	0	583	162	20	10565	4506	3	623
 lobsters	Alan P. Laudicina	0	0	0	20	10565	4506	2	623
-openproject	Greg Mefford	0	1	1	139	485626	342940	1	12227
-openproject	Jens Ulferts	0	31970	30134	139	485626	342940	784	12227
-openproject	Tim Felgentreff	0	1023	2665	139	485626	342940	87	12227
-openproject	Christoph Zierz - zzmedia	0	0	0	139	485626	342940	32	12227
-openproject	Sebastian Schuster	0	2541	1524	139	485626	342940	189	12227
-openproject	Felix Schäfer	0	504	5196	139	485626	342940	112	12227
-openproject	delinde	0	0	0	139	485626	342940	1	12227
-openproject	Jean-Baptiste Barth	0	510	254	139	485626	342940	52	12227
-openproject	Eric Davis	4	63433	19168	139	485626	342940	977	12227
-openproject	cratz	0	0	0	139	485626	342940	74	12227
-openproject	Christian Rijke	0	608	499	139	485626	342940	79	12227
-openproject	et	0	2749	1205	139	485626	342940	209	12227
-openproject	Pieter Nicolai	0	0	0	139	485626	342940	1	12227
-openproject	Erdem Kabadayi	0	0	0	139	485626	342940	2	12227
-openproject	Michael Frister	0	3741	1549	139	485626	342940	179	12227
-openproject	Toshi MARUYAMA	0	17313	5723	139	485626	342940	385	12227
-openproject	Jan Sandbrink	0	0	0	139	485626	342940	1	12227
-openproject	Azamat Hackimov	0	11	11	139	485626	342940	109	12227
-openproject	Philipp Tessenow	10	21773	5066	139	485626	342940	702	12227
-openproject	John Goerzen	0	1	1	139	485626	342940	12	12227
-openproject	Hugo Ferreira	0	86	20	139	485626	342940	1	12227
-openproject	Felix Schäfer	0	31	13	139	485626	342940	9	12227
-openproject	Felix Bruckner	0	0	0	139	485626	342940	2	12227
-openproject	tmaruyama	0	112	99	139	485626	342940	1	12227
-openproject	Markus Kahl	0	553	197	139	485626	342940	36	12227
-openproject	Nicolas Chuche	0	112	29	139	485626	342940	8	12227
-openproject	Hagen Schink	4	22038	15839	139	485626	342940	813	12227
-openproject	Nick Peelman	0	0	0	139	485626	342940	2	12227
-openproject	Romano Licker	2	1291	351	139	485626	342940	525	12227
-openproject	ulferts	0	31970	30134	139	485626	342940	860	12227
-openproject	Wieland Lindenthal	0	8	3	139	485626	342940	1	12227
-openproject	Enderson Maia	0	0	0	139	485626	342940	2	12227
-openproject	lindenthal	0	8	3	139	485626	342940	18	12227
-openproject	Holger Just	1	7900	6324	139	485626	342940	95	12227
-openproject	zzmedia	0	0	0	139	485626	342940	33	12227
-openproject	Simon COURTOIS	0	16	15	139	485626	342940	2	12227
-openproject	Stefan Frank	8	6562	6004	139	485626	342940	196	12227
-openproject	sschu	0	0	0	139	485626	342940	115	12227
-openproject	Jean-Philippe Lang	85	152038	99750	139	485626	342940	3070	12227
-openproject	Thibaut Deloffre	0	40	0	139	485626	342940	1	12227
-openproject	Emilio Carlos da Palma	0	0	0	139	485626	342940	1	12227
-openproject	meeee	0	0	0	139	485626	342940	53	12227
-openproject	Liwiusz Ociepa	0	0	0	139	485626	342940	2	12227
-openproject	Rodrigo Rosenfeld Rosas	0	0	0	139	485626	342940	1	12227
-openproject	Gregor Schmidt	0	1188	13610	139	485626	342940	141	12227
-openproject	Johannes Wollert	0	0	0	139	485626	342940	11	12227
-openproject	Tom Kersten	0	0	1	139	485626	342940	2	12227
-openproject	Ivan Evtuhovich	0	7	7	139	485626	342940	1	12227
-openproject	winterheart	0	5	5	139	485626	342940	95	12227
-openproject	dooda	0	10	0	139	485626	342940	1	12227
-openproject	b.russmeyer	0	0	0	139	485626	342940	1	12227
-openproject	Martin Linkhorst	7	64592	63178	139	485626	342940	548	12227
-openproject	Christian Ratz	1	2151	792	139	485626	342940	219	12227
-openproject	Stephan Eckardt	0	134	20	139	485626	342940	13	12227
-openproject	Tom Rochette	0	15	4	139	485626	342940	3	12227
-openproject	Gary Verhaegen	0	0	0	139	485626	342940	1	12227
-openproject	Dennis Schmidt	0	298	273	139	485626	342940	27	12227
-openproject	Nils Kenneweg	0	1252	1665	139	485626	342940	226	12227
-openproject	Till Breuer	1	2265	1019	139	485626	342940	170	12227
-openproject	Martin Czuchra	15	41523	29304	139	485626	342940	541	12227
-openproject	jwollert	1	3243	1285	139	485626	342940	376	12227
-openproject	Niels Lindenthal	0	0	0	139	485626	342940	15	12227
-openproject	Adam Soltys	0	0	0	139	485626	342940	1	12227
+openproject	Greg Mefford	0	1	1	138	485626	342940	1	12227
+openproject	Jens Ulferts	0	31970	30134	138	485626	342940	784	12227
+openproject	Tim Felgentreff	0	1023	2665	138	485626	342940	87	12227
+openproject	Christoph Zierz - zzmedia	0	0	0	138	485626	342940	32	12227
+openproject	Sebastian Schuster	0	2541	1524	138	485626	342940	189	12227
+openproject	Felix Schäfer	0	504	5196	138	485626	342940	112	12227
+openproject	delinde	0	0	0	138	485626	342940	1	12227
+openproject	Jean-Baptiste Barth	0	510	254	138	485626	342940	52	12227
+openproject	Eric Davis	4	63433	19168	138	485626	342940	977	12227
+openproject	cratz	0	0	0	138	485626	342940	74	12227
+openproject	Christian Rijke	0	608	499	138	485626	342940	79	12227
+openproject	et	0	2749	1205	138	485626	342940	209	12227
+openproject	Pieter Nicolai	0	0	0	138	485626	342940	1	12227
+openproject	Erdem Kabadayi	0	0	0	138	485626	342940	2	12227
+openproject	Michael Frister	0	3741	1549	138	485626	342940	179	12227
+openproject	Toshi MARUYAMA	0	17313	5723	138	485626	342940	385	12227
+openproject	Jan Sandbrink	0	0	0	138	485626	342940	1	12227
+openproject	Azamat Hackimov	0	11	11	138	485626	342940	109	12227
+openproject	Philipp Tessenow	10	21773	5066	138	485626	342940	702	12227
+openproject	John Goerzen	0	1	1	138	485626	342940	12	12227
+openproject	Hugo Ferreira	0	86	20	138	485626	342940	1	12227
+openproject	Felix Schäfer	0	31	13	138	485626	342940	9	12227
+openproject	Felix Bruckner	0	0	0	138	485626	342940	2	12227
+openproject	tmaruyama	0	112	99	138	485626	342940	1	12227
+openproject	Markus Kahl	0	553	197	138	485626	342940	36	12227
+openproject	Nicolas Chuche	0	112	29	138	485626	342940	8	12227
+openproject	Hagen Schink	4	22038	15839	138	485626	342940	813	12227
+openproject	Nick Peelman	0	0	0	138	485626	342940	2	12227
+openproject	Romano Licker	2	1291	351	138	485626	342940	525	12227
+openproject	ulferts	0	31970	30134	138	485626	342940	860	12227
+openproject	Wieland Lindenthal	0	8	3	138	485626	342940	1	12227
+openproject	Enderson Maia	0	0	0	138	485626	342940	2	12227
+openproject	lindenthal	0	8	3	138	485626	342940	18	12227
+openproject	Holger Just	1	7900	6324	138	485626	342940	95	12227
+openproject	zzmedia	0	0	0	138	485626	342940	33	12227
+openproject	Simon COURTOIS	0	16	15	138	485626	342940	2	12227
+openproject	Stefan Frank	8	6562	6004	138	485626	342940	196	12227
+openproject	sschu	0	0	0	138	485626	342940	115	12227
+openproject	Jean-Philippe Lang	84	152038	99750	138	485626	342940	3070	12227
+openproject	Thibaut Deloffre	0	40	0	138	485626	342940	1	12227
+openproject	Emilio Carlos da Palma	0	0	0	138	485626	342940	1	12227
+openproject	meeee	0	0	0	138	485626	342940	53	12227
+openproject	Liwiusz Ociepa	0	0	0	138	485626	342940	2	12227
+openproject	Rodrigo Rosenfeld Rosas	0	0	0	138	485626	342940	1	12227
+openproject	Gregor Schmidt	0	1188	13610	138	485626	342940	141	12227
+openproject	Johannes Wollert	0	0	0	138	485626	342940	11	12227
+openproject	Tom Kersten	0	0	1	138	485626	342940	2	12227
+openproject	Ivan Evtuhovich	0	7	7	138	485626	342940	1	12227
+openproject	winterheart	0	5	5	138	485626	342940	95	12227
+openproject	dooda	0	10	0	138	485626	342940	1	12227
+openproject	b.russmeyer	0	0	0	138	485626	342940	1	12227
+openproject	Martin Linkhorst	7	64592	63178	138	485626	342940	548	12227
+openproject	Christian Ratz	1	2151	792	138	485626	342940	219	12227
+openproject	Stephan Eckardt	0	134	20	138	485626	342940	13	12227
+openproject	Tom Rochette	0	15	4	138	485626	342940	3	12227
+openproject	Gary Verhaegen	0	0	0	138	485626	342940	1	12227
+openproject	Dennis Schmidt	0	298	273	138	485626	342940	27	12227
+openproject	Nils Kenneweg	0	1252	1665	138	485626	342940	226	12227
+openproject	Till Breuer	1	2265	1019	138	485626	342940	170	12227
+openproject	Martin Czuchra	15	41523	29304	138	485626	342940	541	12227
+openproject	jwollert	1	3243	1285	138	485626	342940	376	12227
+openproject	Niels Lindenthal	0	0	0	138	485626	342940	15	12227
+openproject	Adam Soltys	0	0	0	138	485626	342940	1	12227
 spree	Will Binns-Smith	0	0	0	105	784795	709213	1	15732
 spree	ron	0	321	59	105	784795	709213	27	15732
 spree	Michael Sevestre	0	234	21	105	784795	709213	6	15732
@@ -3559,52 +3554,52 @@ squaresquash	skyisle	0	1	1	87	32581	6122	1	232
 squaresquash	Loren Segal	0	0	0	87	32581	6122	1	232
 squaresquash	Douglas Himself	0	0	0	87	32581	6122	1	232
 squaresquash	Jason Vasquez	0	14	2	87	32581	6122	1	232
-spot-us	Jacqui Maher	0	38662	49939	150	1164038	708321	232	11672
-spot-us	Desi McAdam and Jon Larkowski	0	1325	986	150	1164038	708321	19	11672
-spot-us	Veez (Matt Remsik)	0	33314	85510	150	1164038	708321	678	11672
-spot-us	Les Hill	0	520	96	150	1164038	708321	70	11672
-spot-us	Rogelio Samour and Veezus Kreist	0	0	0	150	1164038	708321	2	11672
-spot-us	Tim Pope and Veez (Matt Remsik)	0	235	160	150	1164038	708321	16	11672
-spot-us	jacqui	0	181525	247130	150	1164038	708321	1150	11672
-spot-us	erik	21	221945	72165	150	1164038	708321	3334	11672
-spot-us	Pairing Workstation	0	60	8	150	1164038	708321	4	11672
-spot-us	Tim Pope	0	333	317	150	1164038	708321	29	11672
-spot-us	Stephen Caudill	0	61169	30937	150	1164038	708321	226	11672
-spot-us	Jim Remsik and Stephen Caudill	0	20	17	150	1164038	708321	3	11672
-spot-us	Jon Larkowski and Tim Pope	0	65	22	150	1164038	708321	4	11672
-spot-us	Daniel Newman	0	160	75	150	1164038	708321	2	11672
-spot-us	Tammer Saleh	0	295	295	150	1164038	708321	2	11672
-spot-us	Obie Fernandez	0	110	66	150	1164038	708321	10	11672
-spot-us	Steffen Hiller and Veez (Matt Remsik)	0	39	7	150	1164038	708321	5	11672
-spot-us	Veez (Matt Remsik) and Stephen Caudill	0	210	27	150	1164038	708321	20	11672
-spot-us	Desi McAdam	0	28548	7205	150	1164038	708321	296	11672
-spot-us	dan newman	4	1944	15195	150	1164038	708321	159	11672
-spot-us	Corey Haines and Les Hill and Tim Pope and Veez (Matt Remsik) and Stephen Caudill	0	60	10	150	1164038	708321	8	11672
-spot-us	Obed Fernandez	0	56	10	150	1164038	708321	6	11672
-spot-us	Dung Nguyen	0	2	2	150	1164038	708321	36	11672
-spot-us	laurenmichell	0	8	1	150	1164038	708321	160	11672
-spot-us	Desi McAdam a.k.a The Chick	0	24006	2918	150	1164038	708321	194	11672
-spot-us	David Cohn	0	566	51	150	1164038	708321	239	11672
-spot-us	Jacqui Maher and Stephen Caudill	0	24472	10360	150	1164038	708321	69	11672
-spot-us	Les Hill and Veez (Matt Remsik)	0	438	84	150	1164038	708321	60	11672
-spot-us	Jon Larkowski	0	88206	4080	150	1164038	708321	255	11672
-spot-us	GIT_AUTHOR_NAME	123	184568	66512	150	1164038	708321	1591	11672
-spot-us	Carmelyne Thompson	0	55	11	150	1164038	708321	151	11672
-spot-us	GIT_COMMITTER_NAME	0	184568	66512	150	1164038	708321	1591	11672
-spot-us	Desi McAdam and Les Hill and Veez (Matt Remsik)	0	268	54	150	1164038	708321	16	11672
-spot-us	cavis	0	0	8	150	1164038	708321	1	11672
-spot-us	Tien Dung	0	90	40	150	1164038	708321	14	11672
-spot-us	Jacqui Maher and Veez (Matt Remsik)	0	11647	39037	150	1164038	708321	149	11672
-spot-us	DAVID COHN	0	6	2	150	1164038	708321	1	11672
-spot-us	neo	0	78	50	150	1164038	708321	60	11672
-spot-us	Peter Karman	0	12	11	150	1164038	708321	27	11672
-spot-us	Corey Grusden and Veez (Matt Remsik)	0	41	5	150	1164038	708321	4	11672
-spot-us	Jim Remsik and Desi McAdam	0	43	29	150	1164038	708321	1	11672
-spot-us	Desi McAdam and Veez (Matt Remsik)	0	2680	3188	150	1164038	708321	53	11672
-spot-us	Big Tiger	0	0	0	150	1164038	708321	4	11672
-spot-us	Dan Newman	2	32999	1343	150	1164038	708321	436	11672
-spot-us	David Cohn and Jon Larkowski	0	529	29	150	1164038	708321	9	11672
-spot-us	The Chick	0	38161	3817	150	1164038	708321	276	11672
+spot-us	Jacqui Maher	0	38662	49939	130	1164038	708321	232	11672
+spot-us	Desi McAdam and Jon Larkowski	0	1325	986	130	1164038	708321	19	11672
+spot-us	Veez (Matt Remsik)	0	33314	85510	130	1164038	708321	678	11672
+spot-us	Les Hill	0	520	96	130	1164038	708321	70	11672
+spot-us	Rogelio Samour and Veezus Kreist	0	0	0	130	1164038	708321	2	11672
+spot-us	Tim Pope and Veez (Matt Remsik)	0	235	160	130	1164038	708321	16	11672
+spot-us	jacqui	0	181525	247130	130	1164038	708321	1150	11672
+spot-us	erik	21	221945	72165	130	1164038	708321	3334	11672
+spot-us	Pairing Workstation	0	60	8	130	1164038	708321	4	11672
+spot-us	Tim Pope	0	333	317	130	1164038	708321	29	11672
+spot-us	Stephen Caudill	0	61169	30937	130	1164038	708321	226	11672
+spot-us	Jim Remsik and Stephen Caudill	0	20	17	130	1164038	708321	3	11672
+spot-us	Jon Larkowski and Tim Pope	0	65	22	130	1164038	708321	4	11672
+spot-us	Daniel Newman	0	160	75	130	1164038	708321	2	11672
+spot-us	Tammer Saleh	0	295	295	130	1164038	708321	2	11672
+spot-us	Obie Fernandez	0	110	66	130	1164038	708321	10	11672
+spot-us	Steffen Hiller and Veez (Matt Remsik)	0	39	7	130	1164038	708321	5	11672
+spot-us	Veez (Matt Remsik) and Stephen Caudill	0	210	27	130	1164038	708321	20	11672
+spot-us	Desi McAdam	0	28548	7205	130	1164038	708321	296	11672
+spot-us	dan newman	4	1944	15195	130	1164038	708321	159	11672
+spot-us	Corey Haines and Les Hill and Tim Pope and Veez (Matt Remsik) and Stephen Caudill	0	60	10	130	1164038	708321	8	11672
+spot-us	Obed Fernandez	0	56	10	130	1164038	708321	6	11672
+spot-us	Dung Nguyen	0	2	2	130	1164038	708321	36	11672
+spot-us	laurenmichell	0	8	1	130	1164038	708321	160	11672
+spot-us	Desi McAdam a.k.a The Chick	0	24006	2918	130	1164038	708321	194	11672
+spot-us	David Cohn	0	566	51	130	1164038	708321	239	11672
+spot-us	Jacqui Maher and Stephen Caudill	0	24472	10360	130	1164038	708321	69	11672
+spot-us	Les Hill and Veez (Matt Remsik)	0	438	84	130	1164038	708321	60	11672
+spot-us	Jon Larkowski	0	88206	4080	130	1164038	708321	255	11672
+spot-us	GIT_AUTHOR_NAME	103	184568	66512	130	1164038	708321	1591	11672
+spot-us	Carmelyne Thompson	0	55	11	130	1164038	708321	151	11672
+spot-us	GIT_COMMITTER_NAME	0	184568	66512	130	1164038	708321	1591	11672
+spot-us	Desi McAdam and Les Hill and Veez (Matt Remsik)	0	268	54	130	1164038	708321	16	11672
+spot-us	cavis	0	0	8	130	1164038	708321	1	11672
+spot-us	Tien Dung	0	90	40	130	1164038	708321	14	11672
+spot-us	Jacqui Maher and Veez (Matt Remsik)	0	11647	39037	130	1164038	708321	149	11672
+spot-us	DAVID COHN	0	6	2	130	1164038	708321	1	11672
+spot-us	neo	0	78	50	130	1164038	708321	60	11672
+spot-us	Peter Karman	0	12	11	130	1164038	708321	27	11672
+spot-us	Corey Grusden and Veez (Matt Remsik)	0	41	5	130	1164038	708321	4	11672
+spot-us	Jim Remsik and Desi McAdam	0	43	29	130	1164038	708321	1	11672
+spot-us	Desi McAdam and Veez (Matt Remsik)	0	2680	3188	130	1164038	708321	53	11672
+spot-us	Big Tiger	0	0	0	130	1164038	708321	4	11672
+spot-us	Dan Newman	2	32999	1343	130	1164038	708321	436	11672
+spot-us	David Cohn and Jon Larkowski	0	529	29	130	1164038	708321	9	11672
+spot-us	The Chick	0	38161	3817	130	1164038	708321	276	11672
 jobsworth	zsbalogh	0	906	83	87	442255	543323	92	9613
 jobsworth	Rodolfo	0	3	3	87	442255	543323	4	9613
 jobsworth	Grant	0	54	65	87	442255	543323	9	9613
@@ -4634,15 +4629,15 @@ gitlabhq	Kevin Lynch	0	9	6	133	146969	83540	2	12752
 gitlabhq	Felix Gilcher	0	31	2	133	146969	83540	8	12752
 gitlabhq	nathanvda	0	0	0	133	146969	83540	2	12752
 gitlabhq	Pierre de La Morinerie	0	543	238	133	146969	83540	21	12752
-redmine	Toshi MARUYAMA	5	54357	45969	135	357202	251373	4597	11041
-redmine	Azamat Hackimov	0	11	11	135	357202	251373	109	11041
-redmine	Etienne Massip	0	10305	10413	135	357202	251373	96	11041
-redmine	John Goerzen	0	1	1	135	357202	251373	12	11041
-redmine	Jean-Baptiste Barth	1	1208	373	135	357202	251373	106	11041
-redmine	Eric Davis	2	45913	8545	135	357202	251373	561	11041
-redmine	Nicolas Chuche	0	112	29	135	357202	251373	8	11041
-redmine	Jean-Philippe Lang	127	245290	186027	135	357202	251373	5455	11041
-redmine	Liwiusz Ociepa	0	0	0	135	357202	251373	2	11041
-redmine	winterheart	0	5	5	135	357202	251373	95	11041
-saasy	Liam Monahan	0	0	0	407	247791	16755	1	20
-saasy	Alex MacCaw	407	247791	16755	407	247791	16755	19	20
+redmine	Toshi MARUYAMA	5	54357	45969	132	357202	251373	4597	11041
+redmine	Azamat Hackimov	0	11	11	132	357202	251373	109	11041
+redmine	Etienne Massip	0	10305	10413	132	357202	251373	96	11041
+redmine	John Goerzen	0	1	1	132	357202	251373	12	11041
+redmine	Jean-Baptiste Barth	0	1208	373	132	357202	251373	106	11041
+redmine	Eric Davis	2	45913	8545	132	357202	251373	561	11041
+redmine	Nicolas Chuche	0	112	29	132	357202	251373	8	11041
+redmine	Jean-Philippe Lang	125	245290	186027	132	357202	251373	5455	11041
+redmine	Liwiusz Ociepa	0	0	0	132	357202	251373	2	11041
+redmine	winterheart	0	5	5	132	357202	251373	95	11041
+saasy	Liam Monahan	0	0	0	57	247791	16755	1	20
+saasy	Alex MacCaw	57	247791	16755	57	247791	16755	19	20

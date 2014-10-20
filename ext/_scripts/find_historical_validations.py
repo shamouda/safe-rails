@@ -19,7 +19,9 @@ outfile.write(",".join(["name",
                        "num_associations",
                        "num_before_validator_callbacks",
                        "num_after_validator_callbacks",
-                       "num_models"])+"\n")
+                        "num_models",
+                        "num_locks",
+                        "num_transactions"])+"\n")
 
 for proj in listdir('.'):
     if proj == "_scripts":
@@ -37,8 +39,10 @@ for proj in listdir('.'):
     else:
         to_check = range(0, len(hashes))
 
+    cnt = 0
     for i in to_check:
-        print proj, i, "of", len(to_check)
+        cnt += 1
+        print "%s %d/%d (commit number %d)" % (proj, cnt, len(to_check), i)
         githash = hashes[i]
         switch_hash(proj, githash)
         p = analyze_project(proj)
@@ -54,5 +58,7 @@ for proj in listdir('.'):
                                len(p.associations),
                                len(p.before_validator_callbacks),
                                len(p.after_validator_callbacks),
-                                                 str(p.num_models)]])+"\n")
+                                                 p.num_models,
+                                                 p.num_locks,
+                                                 p.num_transactions]])+"\n")
         outfile.flush

@@ -118,7 +118,7 @@ if DO_CHECK_AUTHORS:
 
 if DO_CHECK_LINES:
     proj_stats = open("_scripts/project_stats.txt", 'w')
-    proj_stats.write("project, num_authors, num_lines_ruby, num_validations, num_builtin_validations, num_custom_validations, num_associations, num_before_validator_callbacks, num_after_validator_callbacks,num_commits,num_models\n")
+    proj_stats.write("project, num_authors, num_lines_ruby, num_validations, num_builtin_validations, num_custom_validations, num_associations, num_before_validator_callbacks, num_after_validator_callbacks,num_commits,num_models,num_locks,num_transactions\n")
 
     for p in projects:
         proj_stats.write(",".join([str(i) for i in [p.name,
@@ -131,5 +131,7 @@ if DO_CHECK_LINES:
                                len(p.before_validator_callbacks),
                                                     len(p.after_validator_callbacks),
                                                     p.num_commits,
-                                                    p.num_models]])+"\n")
+                                                    p.num_models,
+                                                    p.num_locks,
+                                                    p.num_transactions]])+"\n")
     proj_stats.close()

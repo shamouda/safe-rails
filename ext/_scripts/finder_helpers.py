@@ -18,7 +18,7 @@ def find_files(directory, pattern):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 filename = path.join(root, basename)
-                if True:#filename.find("/test/") == -1:
+                if filename.find("/test/") == -1:
                     yield filename
 
 def numlines_rails(project_dir):
@@ -119,6 +119,8 @@ def analyze_project(proj):
     projectStat.num_commits = len(get_githashes(proj))
 
     projectStat.num_models = 0
+    projectStat.num_transactions = 0
+    projectStat.num_locks = 0
 
     ruby_files = find_files(proj, "*.rb")
     for f in ruby_files:
@@ -150,6 +152,12 @@ def analyze_project(proj):
             if line.replace(" ", "").find("<ActiveRecord::Base") != -1 and line.find("class") != -1:
                 projectStat.num_models += 1
             
+            if line.find(".lock.") != -1 or line.find(".lock!") != -1:
+                projectStat.num_locks += 1
+
+            if line.find(".transaction do") != -1:
+                projectStat.num_transactions += 1
+
             if line.find("ActiveModel::Validator") != -1:
                 blame = True
                 name = line.split()[1]

@@ -38,7 +38,7 @@ for proj in listdir('.'):
         to_check = range(0, len(hashes))
 
     for i in to_check:
-        print proj, i/len(to_check)
+        print proj, i, "of", len(to_check)
         githash = hashes[i]
         switch_hash(proj, githash)
         p = analyze_project(proj)

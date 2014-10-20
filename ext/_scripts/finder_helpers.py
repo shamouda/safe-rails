@@ -122,7 +122,12 @@ def analyze_project(proj):
 
     ruby_files = find_files(proj, "*.rb")
     for f in ruby_files:
-        all_lines = open(f).read().split('\n')
+        try:
+            all_lines = open(f).read().split('\n')
+        except IOError as e:
+            print "Error opening file "+f, e, "skipping!"
+            continue
+
         lineno = 0
         line = ""
         while lineno < len(all_lines):

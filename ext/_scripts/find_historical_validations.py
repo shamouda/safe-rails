@@ -42,17 +42,17 @@ for proj in listdir('.'):
         githash = hashes[i]
         switch_hash(proj, githash)
         p = analyze_project(proj)
-        outfile.write(",".join([p.name,
+        outfile.write(",".join([str(i) for i in [p.name,
                                i,
                                len(hashes),
                                githash,                               
                                len(p.authors),
-                               p.num_lines_ruby,
+                               str(p.num_lines_ruby),
                                len(p.customs)+len(p.builtins),
                                len(p.builtins),
                                len(p.customs),
                                len(p.associations),
                                len(p.before_validator_callbacks),
                                len(p.after_validator_callbacks),
-                                p.num_models])+"\n")
+                                                 str(p.num_models)]])+"\n")
         outfile.flush

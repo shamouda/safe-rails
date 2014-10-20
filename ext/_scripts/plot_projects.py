@@ -3,6 +3,7 @@ import pickle
 from collections import defaultdict
 from pylab import *
 from glob import glob
+from itertools import groupby
 
 lw=1
 ms=6
@@ -64,3 +65,4 @@ tick_params(axis='x',which='both',bottom='off')
 savefig("normalized-project-bar.pdf", pad_inches=.25)
 
 print sum([int(p[2]) for p in projects])
+

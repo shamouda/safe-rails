@@ -54,7 +54,8 @@ def blame_line(project, f, line):
 
     # git blame line numbers are indexed from 1, we are indexed by 0
     system("cd "+project+"; git blame -c -L %d,%d %s > /tmp/blame.txt" % (line+1, line+1, f.split("/", 1)[-1]))
-    return open("/tmp/blame.txt").read().split('\t')[1][1:].replace(",", "cmma")
+    ret = open("/tmp/blame.txt").read().split('\t')[1][1:]
+    return ret.strip()
                     
 class ProjectStats:
     def __init__(self, name):
@@ -122,6 +123,7 @@ for proj in listdir('.'):
         line = ""
         while lineno < len(all_lines):
             blame = False
+            validations_this_line = 0
             curline = all_lines[lineno].strip()
             
             if len(curline) == 0 or (len(curline) > 0 and curline[0] == "#"):
@@ -139,6 +141,7 @@ for proj in listdir('.'):
             if line.find("ActiveModel::Validator") != -1:
                 blame = True
                 name = line.split()[1]
+                validations_this_line += 1                
                 projectStat.customs[name].append(CustomValidator(f, lineno, line))
             if line.find("before_validation") != -1:
                 blame = True
@@ -169,46 +172,56 @@ for proj in listdir('.'):
                     s = False
                     if line.find(":presence") != -1 or line.find("presence:") != -1:
                         projectStat.builtins["validates_presence"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                
                         s = True
                     if line.find(":inclusion") != -1 or line.find("inclusion:") != -1:
                         projectStat.builtins["validates_inclusion"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1
                         s = True
                     if line.find(":numericality") != -1 or line.find("numericality:") != -1:
                         projectStat.builtins["validates_numericality"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if line.find(":date") != -1 or line.find("date:") != -1:
                         projectStat.builtins["validates_date"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if line.find(":file_size") != -1 or line.find("file_size:") != -1:
                         projectStat.builtins["vaildates_file_size"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if line.find(":format") != -1 or line.find("format:") != -1:
                         projectStat.builtins["validates_format"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if line.find(":uniqueness") != -1 or line.find("uniqueness:") != -1:
                         projectStat.builtins["validates_uniqueness"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if line.find(":length") != -1 or line.find("length:") != -1:
                         projectStat.builtins["validates_length"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True                        
                     if line.find(":email") != -1 or line.find("email:") != -1:
                         projectStat.builtins["validates_email"].append(BuiltInValidator(f, lineno, line))
+                        validations_this_line += 1                        
                         s = True
                     if ((line.find('it "validates') != -1 and line.find(" do") != -1) or
                         ((line.find("it '") != -1 or line.find('it "') != -1) and line.find(" do") != -1)):
+                        validations_this_line += 1                        
                         s = True
                     if not s:
                         print f, lineno, line
                                          
                 else:
+                    validations_this_line += 1                    
                     projectStat.builtins[name].append(BuiltInValidator(f, lineno, line))
             if blame:
-                projectStat.authored_invariant[blame_line(proj, f, lineno)] += 1
+                projectStat.authored_invariant[blame_line(proj, f, lineno)] += validations_this_line
 
             lineno += 1
             totlines +=1
             line = ""
-
 
     projectStat.total_lines_measured = totlines
 
@@ -292,7 +305,16 @@ if DO_CHECK_AUTHORS:
     print "TOTAL AUTHORS :", sum([len(p.authors) for p in projects])
     
     author_scatter = open("_scripts/authors.txt", 'w')
-    author_scatter.write("project, author, invariants_written, author_lines_inserted, author_lines_deleted, total_invariants, total_lines_inserted, total_lines_deleted, author_commits, total_commits\n")
+    author_scatter.write("\t".join(["project",
+                                    "author",
+                                    "invariants_written",
+                                    "author_lines_inserted",
+                                    "author_lines_deleted",
+                                    "total_invariants",
+                                    "total_lines_inserted",
+                                    "total_lines_deleted",
+                                    "author_commits",
+                                    "total_commits"])+"\n")
     for p in projects:
         tot_lines_inserted = sum([a[0] for a in p.authors.values()])
         tot_lines_deleted = sum([a[1] for a in p.authors.values()])
@@ -303,7 +325,7 @@ if DO_CHECK_AUTHORS:
 
         #print p.name, tot_lines
         for a in p.authors:
-            author_scatter.write("%s, %s, %d, %d, %d, %d, %d, %d, %d, %d\n" % (p.name, a, p.authored_invariant[a], p.authors[a][0], p.authors[a][1], tot_blames, tot_lines_inserted, tot_lines_deleted, p.authors[a][2], tot_commits))
+            author_scatter.write("\t".join([str(i) for i in [p.name, a, p.authored_invariant[a], p.authors[a][0], p.authors[a][1], tot_blames, tot_lines_inserted, tot_lines_deleted, p.authors[a][2], tot_commits]])+"\n")
     author_scatter.close()
 
 

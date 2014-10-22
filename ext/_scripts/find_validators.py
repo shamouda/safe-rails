@@ -12,8 +12,6 @@ for proj in listdir('.'):
     switch_hash(proj, "master")
     projects.append(analyze_project(proj))
 
-    p = projects[0]
-    print p.num_validations
 
 # number of custom validators
 print "TOTAL CUSTOM VALIDATORS", sum([len(p.customs) for p in projects])

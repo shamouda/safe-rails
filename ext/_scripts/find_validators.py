@@ -5,13 +5,15 @@ projects = []
 for proj in listdir('.'):
     if proj == "_scripts":
         continue
-
+        
     if DO_CHECK_AUTHORS:
         print proj
 
     switch_hash(proj, "master")
     projects.append(analyze_project(proj))
 
+    p = projects[0]
+    print p.num_validations
 
 # number of custom validators
 print "TOTAL CUSTOM VALIDATORS", sum([len(p.customs) for p in projects])

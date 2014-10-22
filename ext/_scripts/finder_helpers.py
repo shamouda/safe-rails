@@ -18,7 +18,7 @@ def find_files(directory, pattern):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 filename = path.join(root, basename)
-                if filename.find("/test/") == -1:
+                if filename.find("/test/") == -1 and filename.find("vendor/plugins") == -1:
                     yield filename
 
 def numlines_rails(project_dir):
@@ -69,6 +69,8 @@ def get_lastcommit_date(project_dir):
 
 def switch_hash(project_dir, which):
     system("cd "+project_dir+"; git checkout "+which)
+    if which == "master":
+        system("cd "+project_dir+"; git pull")
 
 def blame_line(project, f, line):
     if not DO_CHECK_AUTHORS:
@@ -83,7 +85,7 @@ def nild(d):
     return num_items_lists_in_dict(d)
 
 def num_items_lists_in_dict(d):
-    return sum([len(l) for l in d.items()])
+    return sum([len(l) for l in d.values()])
         
                     
 class ProjectStats:
@@ -200,6 +202,7 @@ def analyze_project(proj):
                 projectStat.associations[name].append(Association(f, lineno, line))
             if line.find("validates") != -1:
                 blame = True
+                print line, projectStat.num_validations, nild(projectStat.customs), nild(projectStat.builtins)
                 name = "validates"+line.split('validates')[1].split(' ')[0].split("(:")[0].split("')")[0].split("(")[0].split("+.")[0].split(",")[0].split("/")[0].split('_#')[0].split('\"')[0].split('.')[0].split(":")[0].split("'")[0].split("?")[0].split("+")[0].split("[")[0].split("=")[0]
                 if name == "validates":
                     s = False

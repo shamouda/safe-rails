@@ -100,9 +100,6 @@
 [submodule "ext/sprintapp"]
 	path = ext/sprintapp
 	url = https://github.com/macfanatic/SprintApp
-[submodule "ext/wagn"]
-	path = ext/wagn
-	url = https://github.com/wagn/wagn
 [submodule "ext/alchemy_cms"]
 	path = ext/alchemy_cms
 	url = https://github.com/magiclabs/alchemy_cms

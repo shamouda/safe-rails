@@ -18,7 +18,7 @@ def find_files(directory, pattern):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 filename = path.join(root, basename)
-                if filename.find("/test/") == -1 and filename.find("vendor/plugins") == -1:
+                if filename.find("/spec/") == -1 and filename.find("/test/") == -1 and filename.find("vendor/plugins") == -1:
                     yield filename
 
 def numlines_rails(project_dir):
@@ -121,7 +121,6 @@ class ValidatorCallback:
         self.lineNo = lineNo
         self.line = line
 
-
 def analyze_project(proj):
     projectStat = ProjectStats(proj)
     totlines = 0
@@ -164,7 +163,10 @@ def analyze_project(proj):
                 totlines +=1
                 continue
 
-            if line.replace(" ", "").find("<ActiveRecord::Base") != -1 and line.find("class") != -1:
+            if ((line.replace(" ", "").find("<ActiveRecord::Base") != -1 or
+                 line.replace(" ","").find("<Spree::Base") != -1 or
+                 line.replace(" ","").find("<Refinery::Core::BaseModel") != -1)
+                and line.find("class") != -1):
                 projectStat.num_models += 1
             
             if line.find(".lock.") != -1 or line.find(".lock!") != -1:

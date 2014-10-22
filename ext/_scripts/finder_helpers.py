@@ -63,6 +63,10 @@ def get_githashes(project_dir):
     system("cd "+project_dir+"; git log --oneline > /tmp/hashes.txt")
     return [line.split(' ')[0] for line in open("/tmp/hashes.txt").read().split('\n')]
 
+def get_lastcommit_date(project_dir):
+    system("cd "+project_dir+"; git log -1 --format=%cd . > /tmp/date.txt")
+    return open("/tmp/date.txt").read().strip()
+
 def switch_hash(project_dir, which):
     system("cd "+project_dir+"; git checkout "+which)
 
@@ -74,6 +78,13 @@ def blame_line(project, f, line):
     system("cd "+project+"; git blame -c -L %d,%d %s > /tmp/blame.txt" % (line+1, line+1, f.split("/", 1)[-1]))
     ret = open("/tmp/blame.txt").read().split('\t')[1][1:]
     return ret.strip()
+
+def nild(d):
+    return num_items_lists_in_dict(d)
+
+def num_items_lists_in_dict(d):
+    return sum([len(l) for l in d.items()])
+        
                     
 class ProjectStats:
     def __init__(self, name):
@@ -117,10 +128,12 @@ def analyze_project(proj):
     projectStat.authors = get_authors(proj)
     projectStat.authored_invariant = defaultdict(int)
     projectStat.num_commits = len(get_githashes(proj))
+    projectStat.last_commit_date = get_lastcommit_date(proj)
 
     projectStat.num_models = 0
     projectStat.num_transactions = 0
     projectStat.num_locks = 0
+    projectStat.num_validations = 0
 
     ruby_files = find_files(proj, "*.rb")
     for f in ruby_files:
@@ -229,6 +242,8 @@ def analyze_project(proj):
                     if ((line.find('it "validates') != -1 and line.find(" do") != -1) or
                         ((line.find("it '") != -1 or line.find('it "') != -1) and line.find(" do") != -1)):
                         validations_this_line += 1                        
+                        projectStat.builtins['unknown'].append(BuiltInValidator(f, lineno, line))
+                        print "Extra", line
                         s = True
                     if not s:
                         print f, lineno, line
@@ -239,6 +254,7 @@ def analyze_project(proj):
             if blame:
                 projectStat.authored_invariant[blame_line(proj, f, lineno)] += validations_this_line
 
+            projectStat.num_validations += validations_this_line
             lineno += 1
             totlines +=1
             line = ""

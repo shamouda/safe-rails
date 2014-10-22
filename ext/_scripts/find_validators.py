@@ -12,6 +12,7 @@ for proj in listdir('.'):
     switch_hash(proj, "master")
     projects.append(analyze_project(proj))
 
+
 # number of custom validators
 print "TOTAL CUSTOM VALIDATORS", sum([len(p.customs) for p in projects])
 
@@ -118,20 +119,22 @@ if DO_CHECK_AUTHORS:
 
 if DO_CHECK_LINES:
     proj_stats = open("_scripts/project_stats.txt", 'w')
-    proj_stats.write("project, num_authors, num_lines_ruby, num_validations, num_builtin_validations, num_custom_validations, num_associations, num_before_validator_callbacks, num_after_validator_callbacks,num_commits,num_models,num_locks,num_transactions\n")
+    proj_stats.write("project, num_authors, num_lines_ruby, num_validations, num_builtin_validations, num_custom_validations, num_associations, num_before_validator_callbacks, num_after_validator_callbacks,num_commits,num_models,num_locks,num_transactions,num_validations_check,last_commit\n")
 
     for p in projects:
         proj_stats.write(",".join([str(i) for i in [p.name,
                                 len(p.authors),
                                 p.num_lines_ruby,
-                                len(p.customs)+len(p.builtins),
-                               len(p.builtins),
-                               len(p.customs),
-                               len(p.associations),
-                               len(p.before_validator_callbacks),
-                                                    len(p.after_validator_callbacks),
+                                nild(p.customs)+nild(p.builtins),
+                                nild(p.builtins),
+                               nild(p.customs),
+                               nild(p.associations),
+                               nild(p.before_validator_callbacks),
+                                                    nild(p.after_validator_callbacks),
                                                     p.num_commits,
                                                     p.num_models,
                                                     p.num_locks,
-                                                    p.num_transactions]])+"\n")
+                                                    p.num_transactions,
+                                                    p.num_validations,
+                                                    p.last_commit_date]])+"\n")
     proj_stats.close()

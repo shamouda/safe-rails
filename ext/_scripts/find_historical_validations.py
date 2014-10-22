@@ -21,7 +21,8 @@ outfile.write(",".join(["name",
                        "num_after_validator_callbacks",
                         "num_models",
                         "num_locks",
-                        "num_transactions"])+"\n")
+                        "num_transactions",
+                        "last_commit_date"])+"\n")
 
 for proj in listdir('.'):
     if proj == "_scripts":
@@ -52,13 +53,14 @@ for proj in listdir('.'):
                                githash,                               
                                len(p.authors),
                                str(p.num_lines_ruby),
-                               len(p.customs)+len(p.builtins),
-                               len(p.builtins),
-                               len(p.customs),
-                               len(p.associations),
-                               len(p.before_validator_callbacks),
-                               len(p.after_validator_callbacks),
+                               nild(p.customs)+nilp(p.builtins),
+                               nild(p.builtins),
+                               nild(p.customs),
+                               nild(p.associations),
+                               nild(p.before_validator_callbacks),
+                               nild(p.after_validator_callbacks),
                                                  p.num_models,
                                                  p.num_locks,
-                                                 p.num_transactions]])+"\n")
+                                                 p.num_transactions,
+                                                 p.last_commit_date]])+"\n")
         outfile.flush

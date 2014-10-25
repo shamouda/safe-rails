@@ -81,6 +81,7 @@ xmarks = [i/100. for i in range(1, 101)]
 all_txn_pcts = []
 all_invariant_pcts = []
 all_association_pcts = []
+all_model_pcts = []
 
 for p in projects:
     commits = projects[p]
@@ -99,6 +100,11 @@ for p in projects:
                            [int(i[14])/tot_txns*int(i[12])/tot_models for i in commits])
         all_txn_pcts.append(txn_pcts)
 
+    model_pcts = interpolate(xmarks,
+                            commit_pcts,
+                           [int(i[12])/tot_models for i in commits])
+    all_model_pcts.append(txn_pcts)
+        
     tot_invariants = max(float(commits[-1][6]), 1)
     if tot_invariants != 0:
         invariant_pcts = interpolate(xmarks,
@@ -118,9 +124,10 @@ metric = median
 plot(xmarks, [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], label="Associations per Model")
 plot(xmarks, [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], label="Transactions per Model")
 plot(xmarks, [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], label="Validations per Model")
+plot(xmarks, [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], label="Models")
 
 ylabel("% of Final Occurrences")
-xlabel("Normalized History (Commits)")
+xlabel("Normalized Application History (Commits)")
 
 legend(loc="lower right", frameon=False)
 

@@ -2,7 +2,7 @@ http://lesscode.org/2005/09/29/should-database-manage-the-meaning/
 "Why should we tolerate RDBMS opinions on our data? We’re the masters, RDBMS is the servant, it should shut up and serve."
 
 http://david.heinemeierhansson.com/arc/2005_09.html -- Choose a single layer of cleverness
-"opinionated software" "I don't \textit{want} my database to be clever! ...I consider stored procedures and constraints vile and reckless destroyers of coherence. No, Mr. Database, you can not have my business logic. Your procedural ambitions will bear no fruit and you'll have to pry that logic from my dead, cold object-oriented hands...I want a single layer of cleverness: My domain model"
+"opinionated software" 
 
 https://www.youtube.com/watch?v=9LfmrkyP81M
 "Computer science in itself just didn't really appeal to me, didn't make sense to me."
@@ -19,3 +19,13 @@ Everyone cool seems to agree: Ruby on Rails is an amazing way to build web appli
 Ruby on Rails: Up and Running, 2006
 The Ruby on Rails phenomenon is sweeping through our industry with reckless disregard for established programming languages, longstanding conventions, or commercial support. 
 
+https://github.com/rails/rails/issues/13234#issuecomment-30092363
+This is not a bug but documented and inherent behavior of validates_uniqueness_of.
+
+https://github.com/rails/rails/commit/3d6eea0221f0092cb3c3270c2a9bdf31745d1b2d
+Update the validates_uniqueness_of documentation to tell you to use a
+unique index. The other options mentioned were not good ideas and disclaimed as such in the documentation.
+
+
+Document concurrency issues in validates_uniqueness_of.
+https://github.com/rails/rails/commit/adacd9451877d3c195da7f1935353b1cb3fed368

@@ -2,13 +2,40 @@
 \section{Background}
 \label{sec:motivation}
 
-% short: basic mechanics: model, view, controller
+In this section, we provide a brief overview of Rails and describe standard deployment models.
 
-% convention over configuration, DRY
+\subsection{Basic Model and MVC}
 
-% concurrency and deployment
+Rails was developed in order to maximize developer programmability. This focus is captured by two core architectural principles. First, Rails adopts a ``Don't Repeat Yourself'' (DRY) philosophy: ``every piece of knowledge should be expressed in just one place'' in the code. Data modeling and schema descriptions are relegated to one portion of the system, while presentation and business logic are relegated to two others. Rails attempts to minimize the amount of boilerplate code required to achieve this functionality. Second, Rails adopts a philosophy of ``Convention over Configuration,'' aiming for sensible defaults and allowing easy deployment without much---if any---modifications to configuration~\cite{rails-book}.
 
-% surprisingly, problems with DB
-% why hate on DBs? --> revisit in later section
+A natural corollary to the above principles is that Rails encourages an idiomatic style of programming. Rails' authors claim ``somehow, [this style] just seems right'' for quickly building responsive web applications~\cite{rails-book}. The framework's success hints that, in fact, its idioms indeed make sense for web developers.
 
-In 2004, David Heinemieir Hansson (DHH) open-sourced Ruby on Rails (``Rails''), a web application framework that would come to power much of ``Web 2.0,'' including sites such as. Rails, which bundles an object-relational mapping (ORM, or, in Rails terms, the \textit{Model}), a presentation layer (the \textit{View}), and business logic (the \textit{Controller}), is focused on web developer productivity. Its design maxims of ``Don't Repeat Yourself'' and ``Convention over Configuration'' proved a popular choice among developers, who took advantage of the framework's  ``agility'': many common tasks, such as adding a new application Model (and performing a schema migration), are easily achieved via a few standard Rails commands.
+More concretely, Rails divides application code into a three-tier architecture called Model-View-Controller:
+
+\begin{itemize}
+\item The \textbf{Model} acts as a basic ORM and is responsible for managing business objects, including schema, querying, and persistence. For example, in a banking application, an account's state could be represented by a Model with a numeric owner ID field and a numeric balance field.
+
+\item The \textbf{View} acts as a presentation layer for application objects, including rendering into HTML and/or other forms such as JSON. In our banking application, the View would be responsible for rendering the page displaying a user's account balance.
+
+\item The \textbf{Controller} encapsulates the remainder of application logic, including actual generation of queries and transformations on the Active Record models. In our banking application, we would write logic for withdrawal and deposit operations within the Controller.
+\end{itemize}
+
+Actually building a Rails application becomes a matter of instantiating a collection of models and writing controller and presentation logic for each.
+
+As we are concerned with how Rails utilizes database back-ends, we largely focus on how Rails applications interact with the Model layer. Rails natively supports a Model implementation called \texttt{Active Record}. Rails' Active Record is an instantiation of the Active Record pattern originally proposed by Martin Fowler, a prominent software design consultant~\cite{fowler-book}. Per Fowler, an Active Record is ``an object that wraps a row in a database or view, encapsulates the database access, and adds domain logic on that data'' (futher references to Active Record will correspond to Rails's implementation). The first two tasks fit squarely in the realm of standard ORM design, and Rails adopts Fowler's recommendation of a one-to-one correlation between object fields and database columns (thus, each declared Active Record class is stored in a separate table in the database). The third component, domain logic, is more complicated. Fowler suggests that ``domain logic that isn't too complex'' is well-suited for encapsulation in an Active Record class. Accordingly, each Rails Model may contain a number of attributes (and must include a special primary-key-backed \texttt{id} field) as well as associated logic including data validation, associations, and other constraints. We will discuss these in greater depth in the next section.
+
+\subsection{Databases and Deployment}
+\label{sec:deployment}
+
+This otherwise benign separation of data and logic becomes interesting when we consider how Rails actually processes requests.
+
+In Rails, the database is---at least for basic usages---simply a place to store bits and is largely divorced from the application logic. All application code is run within the Ruby virtual machine, and Active Record makes appropriate calls to the database in order to materialize collections of models in the VM memory as needed as well as to persist model state. However, from the database's perspective (and per DHH's passionate declaration in Section~\ref{sec:intro}), logic remains in the application layer. Active Record natively provides support for PostgreSQL, MySQL, and SQLite, with extensions for databases including Oracle and, for the most part, is database-agnostic.
+
+Rails deployments typically consist of an HTTP server such as Apache or Nginx that acts as a proxy for a pool of Ruby VMs running the Rails application stack. Depending on the Ruby VM and Rails implementation, the Rails application may or may not be multi-threaded.\footnote{Ruby was not traditionally designed for highly concurrent operations: its standard reference VM---Ruby MRI---contains (like Python's CPython) a ``Global VM Lock'' that prevents multiple OS threads from executing at a given time. While alternative VM implementations provide more concurrent behavior, until Rails 2.2 (released in November 2008), Rails embraced this behavior and was unable to process more than one request at a time (due to state shared state including database connections and logging state)~\cite{rails-threading}. In practice, the choice of multi-process, multi-threaded, or multi-process and multi-threaded deployment depends on the actual application server architecture. For example, three popular servers---Phusion Passenger, Puma, and Unicorn ---each provide a different configuration.} Thus, when an end-user makes a HTTP request on a Rails-powered web site, the request is first accepted by a web server and passed to a Rails worker process (or thread within the process). Based on the HTTP headers and destination, Rails subsequently determines the appropriate Controller logic and runs it, including any database calls via Active Record, and renders a response via the View, which is returned to the HTTP server.
+
+Therefore, in the above environment, the \textit{only} coordination between application requests occurs within the database system. Controllers execution---whether in separate threads or across Ruby VMs (which may be active on different physical servers)---is entirely independent, save for the rendezvous of queries and modifications within the database tier, as triggered by Active Record operations.
+
+This independent execution should give serious pause to disciples of concurrent transaction processing. Is this execution strategy actually safe? Thus far, we have yet to discuss any mechanisms for maintaining correct application data, such as the use of transactions. In fact, Rails has, over its lifetime, introduced several mechanisms for maintaining consistency of application data. In keeping with Rails' focus on keeping application logic within Rails (and not in the database), this has led to several different proposals. In the remainder of this paper, we examine their use and whether, in fact, they are correct.
+
+
+

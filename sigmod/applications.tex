@@ -29,20 +29,118 @@ level. Although we cannot prove that this is the case, this data
 suggests that validations are likely running at Read Committed
 isolation.
 
-Does a lack of serializable isolation actually affect these validations? Just
-because validations effectively run concurrently does not mean that they are
-necessarily incorrect.
+Does a lack of serializable isolation actually affect these
+invariants? Just because validations effectively run concurrently does
+not mean that they are necessarily incorrect. To determine exactly
+which of these invariants are correct under concurrent execution, we
+draw on the recently developed theory of invariant
+confluence~\cite{coord-avoid}.
 
-% dataset and methodology
+Informally, invariant confluence provides a necessary and sufficient
+condition for whether or not invariants can be preserved under
+coordination-free, concurrent execution of transactions. The condition
+effectively captures the property that ``the set of [invariant] valid
+states reachable by executing transactions and merging their results
+is closed (w.r.t. validity) under merge [of divergent states]''. In
+our MySQL and PostgreSQL back-ends, ``merge'' of two concurrent Rails
+validation transactions consists of either $i.)$ in the case of two
+concurrent inserts or updates to model instances with different IDs,
+placing the two models in the same table or, $ii.)$ in the case of two
+concurrent inserts or updates to model instances with the same IDs,
+choosing an arbitrary ``winning'' write. That is, if operations $o_1$
+and $o_2$ attempt to concurrently create new model instances $i_1$ and
+$i_2$ with different IDs, if each of $o_1$ and $o_2$'s validations
+pass, we will end up with two entries in the model table in the
+database. If $i_1$ and $i_2$ have the same ID, we will end up with
+only one of the models in the database. In the latter case, we end up
+with a Lost Update, but, in general, we find that most invariants
+(below) are more sensitive to the former operation.
 
-% simple static test
+Per~\cite{coord-avoid}, the state of the art in invariant confluence
+analysis currently relies on a combination of manual proofs and simple
+static analysis. Given a set of invariant and operation pairs
+classified as providing the invariant confluence property, we can
+iterate through all operations and declarated invariants and check
+whether or not they appear in the set of invariant confluent pairs. If
+so, we can label the pair as invariant confluent. If not, we can
+conservatively label the pair as unsafe under concurrent execution.
 
-% num txns, num invariants
+Returning to our task of classifying Rails validations and
+associations, we applied this invariant confluence analysis to the
+validations in the corpus we examined. As~\cite{coord-avoid} observed,
+many applications re-use a common set of invariants. We observed a
+similar trend in our analysis of Rails applications. Recall that Rails
+provides support for arbitrary, user-defined validation functions. In
+fact, in our analysis, we found that only 82 out of 3551 validations
+were expressed as user-defined functions. The remainder were drawn
+from the standard set of validations supported by Rails core.\footnote{It is
+  unclear exactly why this is the case. It is possible that, because
+  these invariants are standardized (in our case, in Rails, and,
+  in~\cite{coord-avoid}, in SQL), they are more accessible to
+  users. It is also possible that SQL and Rails have simply done a
+  good job of codifying common patterns that programmers have
+  used. This chicken-and-egg problem is an interesting area for
+  further methodological study.} Accordingly, we begin by considering
+built-in validations, then examine each of these custom validations.
 
-% custom UDFs
+\subsection{Built-In Validations}
 
-% who writes invariants?
+Table~\ref{table:builtins} presents the eleven most common built-in
+validations by usage and their occurences in our application
+corpus. The most popular, \texttt{presence} is multi-modal: its basic
+behavior is to simply check for empty values in a model before
+saving. However, it can also be used to enforce that the opposite end
+of an association is, in fact, present in the database. The former use
+case is I-confluent, while the latter depends on whether or not the
+codebase uses deletions or not. The second most popular invariant,
+\texttt{uniqueness} is \textit{not} invariant confluent. That is, if
+two users concurrently insert or modify records, they can 
+introduce duplicates. Eight of the next nine invariants are largely
+concerned with data formatting---for example, \texttt{numericality}
+ensures that the field contains a number rather than an alphanumeric
+string. These invariants are indeed invariant confluent under
+concurrent update. Finally, \texttt{associated} depends on whether or
+not the current updates are both insertions (safe) or mixed
+insertion-delections (unsafe). Ignoring \texttt{presence} and
+\texttt{associated}, we can label 74.7\% of validation occurrences as
+invariant confluent. Including these two invariants, if we mark them
+as non invariant confluent (i.e., consider mixed deletions and
+insertions), we have 35.2\% occurrence of invariant confluence, and,
+optimistically (only considering insertions), a 87.3\% occurence of
+invariant confluence invariants.
+
+Notably, among the built-in validations, it is associations and
+multi-record uniqueness that cause us problems. In the next section,
+we examine these invariants in greater detail.
+
+\begin{table}
+\begin{tabular}{|l l l |}
+\hline
+Name & Occurrences & I-Confluence\\\hline
+\texttt{validates\_presence\_of} & 1764 & Depends\\
+\texttt{validates\_uniqueness\_of} & 442 & No \\
+\texttt{validates\_length\_of} & 302 & Yes \\
+\texttt{validates\_inclusion\_of} & 167 & Yes\\
+\texttt{validates\_length} & 138 & Yes \\
+\texttt{validates\_format\_of} & 118 & Yes\\
+\texttt{validates\_numericality\_of} & 137 & Yes \\
+\texttt{validates\_format} & 69 & Yes \\
+\texttt{validates\_associated} & 41 & Depends\\
+\texttt{validates\_inclusion} & 36 & Yes \\
+\texttt{validates\_email} & 34 & Yes \\
+Other & 303 & \\\hline
+\end{tabular}
+\caption{Use of and invariant confluence of non-UDF validations}
+\label{table:builtins}
+\end{table}
+
+\subsection{Custom Invariants}
+
+We also manually inspected the coordination requirements 82 (2.3\%) of
+invariants that consisted of UDF validations. Many of these
+validations were custom formatting routines. However, several were
+more interesting. For example, the \texttt{TODO} routine of the Spree
+shopping application was used to ensure that sufficient stock is
+available before placing an order. This is not I-confluent.
 
 
-
-% i-confluence results

@@ -490,6 +490,17 @@ booktitle={OSDI 2010}}
  booktitle = {OSDI 2012}
 }
 
+@article{bernstein-orm,
+  title={A vision for management of complex models},
+  author={Bernstein, Phillip A and Halevy, Alon Y and Pottinger, Rachel A},
+  journal={ACM Sigmod Record},
+  volume={29},
+  number={4},
+  pages={55--63},
+  year={2000},
+  publisher={ACM}
+}
+
 
 @phdthesis{adya-isolation,
   title={Weak consistency: a generalized theory and optimistic implementations for distributed transactions},
@@ -585,10 +596,48 @@ booktitle = {SIGMOD 2010}}
   year={2014}
 }
 
+@article{semantic-isolation,
+  title={Correct execution of transactions at different isolation levels},
+  author={Lu, Shiyong and Bernstein, Arthur and Lewis, Philip},
+  journal={IEEE TKDE},
+  year={2004}
+}
+
+@inproceedings{shore,
+  title={Shoring up persistent applications},
+  author={Carey, Michael J and DeWitt, David J and Franklin, Michael J and Hall, Nancy E and McAuliffe, Mark L and Naughton, Jeffrey F and Schuh, Daniel T and Solomon, Marvin H and Tan, CK and Tsatalos, Odysseas G and others},
+booktitle={SIGMOD 1994}
+}
+
+@article{objectstore,
+  title={The ObjectStore database system},
+  author={Lamb, Charles and Landis, Gordon and Orenstein, Jack and Weinreb, Dan},
+  journal={Communications of the ACM},
+  volume={34},
+  number={10},
+  pages={50--63},
+  year={1991},
+  publisher={ACM}
+}
+
 @inproceedings{ms-sql-impl,
  author = {Campbell, David G. and Kakivaya, Gopal and Ellis, Nigel},
  title = {Extreme scale with full {SQL} language support in {Microsoft SQL Azure}},
  booktitle = {SIGMOD 2010}}
+
+@misc{jsr-bean,
+title={JSR-000303 Bean Validation 1.0 Final Release Specification},
+author={{Bean Validation Expert Group}},
+year={2009},
+note={\url{http://download.oracle.com/otndocs/jcp/bean_validation-1.0-fr-oth-JSpec/}}}
+
+@online{unique-bean,
+author={Hardy Ferentschik},
+title={{Accessing the Hibernate Session within a ConstraintValidator}},
+year={2010},
+month={May},
+day={10},
+note={\url{https://developer.jboss.org/wiki/AccessingtheHibernateSessionwithinaConstraintValidator}}}
 
 @inproceedings{hat-vldb,
  author   = {Peter Bailis and Aaron Davidson and Alan Fekete and Ali Ghodsi and Joseph M. Hellerstein and Ion Stoica},
@@ -658,14 +707,49 @@ year = {2012},
 month = {July},
 note = {\url{http://ur1.ca/av6s4}}}
 
-                  
+@inproceedings{statusquo,
+  title={StatusQuo: {Making} Familiar Abstractions Perform Using Program Analysis.},
+  author={Cheung, Alvin and Arden, Owen and Madden, Samuel and Solar-Lezama, Armando and Myers, Andrew C},
+  booktitle={CIDR 2013}
+}         
+
+@inproceedings{si-analysis,
+  title={Automating the detection of snapshot isolation anomalies},
+  author={Jorwekar, Sudhir and Fekete, Alan and Ramamritham, Krithi and Sudarshan, S},
+  booktitle={Proceedings of the 33rd international conference on Very large data bases},
+  pages={1263--1274},
+  year={2007},
+  organization={VLDB Endowment}
+}
+
+@inproceedings{zellag-real,
+  title={Real-time quantification and classification of consistency anomalies in multi-tier architectures},
+  author={Zellag, Kamal and Kemme, Bettina},
+  booktitle={ICDE 2011}
+}
+
+@inproceedings{caveat,
+  title={CAVEAT: Facilitating Interactive and Secure Client-Side Validators for Ruby on Rails applications},
+  author={Hinrichs, Timothy and Cueno, Michael and Ruiz, Daniel and Venkatakrishnan, Venkat and Zuck, Lenore},
+  booktitle={SECURWARE 2013}
+}  
+
+@inproceedings{waves,
+  title={Waves: Automatic synthesis of client-side validation code for web applications},
+  author={Skrupsky, Nazari and Monshizadeh, Maliheh and Bisht, Prithvi and Hinrichs, Timothy and Venkatakrishnan, VN and Zuck, Lenore},
+  booktitle={IEEE CyberSecurity 2012}
+}       
 
 @inproceedings{pbs,
 title = {{Probabilistically Bounded Staleness} for Practical Partial Quorums},
 author = {Peter Bailis and Shivaram Venkataraman and Michael J. Franklin and Joseph M. Hellerstein and Ion Stoica},
 booktitle = {VLDB 2012}}.
 
-
+@inproceedings{fekete-quantifying,
+  title={Quantifying isolation anomalies},
+  author={Fekete, Alan and Goldrei, Shirley N and Asenjo, Jorge P{\'e}rez},
+  booktitle={VLDB 2009}
+}
 
 @article{web20,
   title={What is Web 2.0: Design patterns and business models for the next generation of software},
@@ -1107,6 +1191,84 @@ note = {\url{https://dev.twitter.com/docs/counting-characters#General_Concepts}}
   year={1986},
   publisher={ACM}
 }
+
+@inproceedings{wada-data,
+  title={Data Consistency Properties and the Trade-offs in Commercial Cloud Storage: the Consumers' Perspective.},
+  author={Wada, Hiroshi and Fekete, Alan and Zhao, Liang and Lee, Kevin and Liu, Anna},
+  booktitle={CIDR 2011}
+}
+
+@inproceedings{golab-analyzing,
+  title={Analyzing consistency properties for fun and profit},
+  author={Golab, Wojciech and Li, Xiaozhou and Shah, Mehul A},
+  booktitle={PODC 2011}
+}
+
+@inproceedings{zellag-consistent,
+  title={How consistent is your cloud application?},
+  author={Zellag, Kamal and Kemme, Bettina},
+  booktitle={SoCC 2012}
+}
+
+@inproceedings{bermbach-eventual,
+  title={Eventual consistency: How soon is eventual? An evaluation of Amazon S3's consistency behavior},
+  author={Bermbach, David and Tai, Stefan},
+  booktitle={6th Workshop on Middleware for Service Oriented Computing},
+  pages={1},
+  year={2011},
+  organization={ACM}
+}
+
+@inproceedings{rails-xss,
+  title={Symbolic security analysis of ruby-on-rails web applications},
+  author={Chaudhuri, Avik and Foster, Jeffrey S},
+  booktitle={Proceedings of the 17th ACM conference on Computer and communications security},
+  pages={585--594},
+  year={2010},
+  organization={ACM}
+}
+
+@inproceedings{db-to-model,
+  title={Reverse engineering models from databases to bootstrap application development},
+  author={Malpani, Ankit and Bernstein, Philip A and Melnik, Sergey and Terwilliger, James F},
+  booktitle={Data Engineering (ICDE), 2010 IEEE 26th International Conference on},
+  pages={1177--1180},
+  year={2010},
+  organization={IEEE}
+}
+
+@inproceedings{invariant-web,
+ author = {Boci\'{c}, Ivan and Bultan, Tevfik},
+ title = {Inductive Verification of Data Model Invariants for Web Applications},
+ booktitle = {Proceedings of the 36th International Conference on Software Engineering},
+ series = {ICSE 2014},
+ year = {2014},
+ isbn = {978-1-4503-2756-5},
+ location = {Hyderabad, India},
+ pages = {620--631},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/2568225.2568281},
+ doi = {10.1145/2568225.2568281},
+ acmid = {2568281},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Automated verification, Ruby on Rails, data model, inductive invariants},
+} 
+
+
+@inproceedings{rails-bounded,
+  title={Bounded verification of Ruby on Rails data models},
+  author={Nijjar, Jaideep and Bultan, Tevfik},
+  booktitle={Proceedings of the 2011 International Symposium on Software Testing and Analysis},
+  pages={67--77},
+  year={2011},
+  organization={ACM}
+}
+
+@inproceedings{coord-avoid,
+title={Coordination Avoidance in Database Systems},
+author={Peter Bailis and Alan Fekete and Michael J. Franklin and Joseph M. Hellerstein and Ali Ghodsi and Ion Stoica},
+booktitle={VLDB 2015}}
 
 @inproceedings{blazes,
 title={Blazes: Coordination Analysis for Distributed Programs},

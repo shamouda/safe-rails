@@ -16,9 +16,6 @@
 [submodule "ext/selfstarter"]
 	path = ext/selfstarter
 	url = https://github.com/lockitron/selfstarter
-[submodule "ext/errbit"]
-	path = ext/errbit
-	url = https://github.com/errbit/errbit
 [submodule "ext/fat_free_crm"]
 	path = ext/fat_free_crm
 	url = https://github.com/fatfreecrm/fat_free_crm
@@ -34,9 +31,6 @@
 [submodule "ext/browsercms"]
 	path = ext/browsercms
 	url = https://github.com/browsermedia/browsercms
-[submodule "ext/engine"]
-	path = ext/engine
-	url = https://github.com/locomotivecms/engine
 [submodule "ext/insoshi"]
 	path = ext/insoshi
 	url = https://github.com/insoshi/insoshi
@@ -49,9 +43,6 @@
 [submodule "ext/comfortable-mexican-sofa"]
 	path = ext/comfortable-mexican-sofa
 	url = https://github.com/comfy/comfortable-mexican-sofa
-[submodule "ext/monocle"]
-	path = ext/monocle
-	url = https://github.com/maccman/monocle
 [submodule "ext/fulcrum"]
 	path = ext/fulcrum
 	url = https://github.com/fulcrum-agile/fulcrum
@@ -61,9 +52,6 @@
 [submodule "ext/publify"]
 	path = ext/publify
 	url = https://github.com/publify/publify
-[submodule "ext/barkeep"]
-	path = ext/barkeep
-	url = https://github.com/ooyala/barkeep
 [submodule "ext/canvas-lms"]
 	path = ext/canvas-lms
 	url = https://github.com/instructure/canvas-lms
@@ -82,9 +70,6 @@
 [submodule "ext/ror_ecommerce"]
 	path = ext/ror_ecommerce
 	url = https://github.com/drhenner/ror_ecommerce
-[submodule "ext/rstat.us"]
-	path = ext/rstat.us
-	url = https://github.com/hotsh/rstat.us
 [submodule "ext/copycopter-server"]
 	path = ext/copycopter-server
 	url = https://github.com/copycopter/copycopter-server
@@ -100,9 +85,6 @@
 [submodule "ext/saasy"]
 	path = ext/saasy
 	url = https://github.com/maccman/saasy
-[submodule "ext/snorby"]
-	path = ext/snorby
-	url = https://github.com/Snorby/snorby
 [submodule "ext/jobsworth"]
 	path = ext/jobsworth
 	url = https://github.com/ari/jobsworth
@@ -118,15 +100,9 @@
 [submodule "ext/sprintapp"]
 	path = ext/sprintapp
 	url = https://github.com/macfanatic/SprintApp
-[submodule "ext/wagn"]
-	path = ext/wagn
-	url = https://github.com/wagn/wagn
 [submodule "ext/alchemy_cms"]
 	path = ext/alchemy_cms
 	url = https://github.com/magiclabs/alchemy_cms
-[submodule "ext/invoicing"]
-	path = ext/invoicing
-	url = https://github.com/ept/invoicing
 [submodule "ext/calagator"]
 	path = ext/calagator
 	url = https://github.com/calagator/calagator
@@ -142,9 +118,6 @@
 [submodule "ext/opencongress"]
 	path = ext/opencongress
 	url = https://github.com/opencongress/opencongress
-[submodule "ext/portlandcrime"]
-	path = ext/portlandcrime
-	url = https://github.com/Caged/portlandcrime
 [submodule "ext/nimbleshop"]
 	path = ext/nimbleshop
 	url = https://github.com/nimbleshop/nimbleshop
@@ -157,3 +130,78 @@
 [submodule "rails"]
 	path = rails
 	url = https://github.com/rails/rails.git
+[submodule "ext/bucketwise"]
+	path = ext/bucketwise
+	url = https://github.com/jamis/bucketwise.git
+[submodule "ext/bostonrb"]
+	path = ext/bostonrb
+	url = https://github.com/bostonrb/bostonrb.git
+[submodule "ext/chiliproject"]
+	path = ext/chiliproject
+	url = https://github.com/chiliproject/chiliproject.git
+[submodule "ext/SprintApp"]
+	path = ext/SprintApp
+	url = https://github.com/macfanatic/SprintApp.git
+[submodule "ext/amahi"]
+	path = ext/amahi
+	url = https://github.com/amahi/platform.git
+[submodule "ext/brevidy"]
+	path = ext/brevidy
+	url = https://github.com/iwasrobbed/Brevidy.git
+[submodule "ext/inkwell"]
+	path = ext/inkwell
+	url = https://github.com/salkar/inkwell.git
+[submodule "ext/railscollab"]
+	path = ext/railscollab
+	url = https://github.com/jamesu/railscollab.git
+[submodule "ext/enki"]
+	path = ext/enki
+	url = https://github.com/xaviershay/enki.git
+[submodule "ext/govsgo"]
+	path = ext/govsgo
+	url = https://github.com/ryanb/govsgo.git
+[submodule "ext/opal"]
+	path = ext/opal
+	url = https://github.com/hulihanapplications/Opal.git
+[submodule "ext/salor-retail"]
+	path = ext/salor-retail
+	url = https://github.com/jasonknight/salor-retail.git
+[submodule "ext/skyline"]
+	path = ext/skyline
+	url = https://github.com/DigitPaint/skyline.git
+[submodule "ext/zena"]
+	path = ext/zena
+	url = https://github.com/zena/zena.git
+[submodule "ext/comas"]
+	path = ext/comas
+	url = https://github.com/gwolf/comas.git
+[submodule "ext/sharetribe"]
+	path = ext/sharetribe
+	url = https://github.com/sharetribe/sharetribe.git
+[submodule "ext/rucksack"]
+	path = ext/rucksack
+	url = https://github.com/jamesu/rucksack.git
+[submodule "ext/wallgig"]
+	path = ext/wallgig
+	url = https://github.com/jianyuan/wallgig.git
+[submodule "ext/danbooru"]
+	path = ext/danbooru
+	url = https://github.com/r888888888/danbooru.git
+[submodule "ext/adopt-a-hydrant"]
+	path = ext/adopt-a-hydrant
+	url = https://github.com/codeforamerica/adopt-a-hydrant
+[submodule "ext/boxroom"]
+	path = ext/boxroom
+	url = https://github.com/mischa78/boxroom.git
+[submodule "ext/tryshoppe"]
+	path = ext/tryshoppe
+	url = https://github.com/tryshoppe/core.git
+[submodule "ext/heaven"]
+	path = ext/heaven
+	url = https://github.com/atmos/heaven.git
+[submodule "ext/sugar"]
+	path = ext/sugar
+	url = https://github.com/elektronaut/sugar.git
+[submodule "ext/linuxfr.org"]
+	path = ext/linuxfr.org
+	url = https://github.com/linuxfrorg/linuxfr.org.git

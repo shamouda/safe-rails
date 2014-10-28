@@ -1,0 +1,48 @@
+
+\section{Safety and Correctness: Theory}
+\label{sec:apps}
+
+We now turn our attention to understanding which of Rails' feral
+validations and associations are actually correct under the execution
+model discussed in Section~\ref{sec:deployment}. 
+
+Recall that each of a model's declared validations is run before a model instance is saved to
+the database. To correctly enforce a validation requires either that
+\textit{i.)} the validations are isolated from one another or
+that \textit{ii.)} the validations are somehow ``safe'' to run
+concurrently.
+
+Are validations isolated? Given that each sequence of
+validations is wrapped within a transaction, under serializable
+isolation, validations would appear to execute correctly. However, as
+is common in relational database engines~\cite{hat-vldb}, neither
+MySQL nor PostgreSQL actually default to serializable isolation, and
+instead provide the weaker Read Committed isolation. Under this
+isolation level, as we will see shortly, the validations effectively
+run concurrently. While Rails 4 does provide support for changing the
+isolation level on a per-transaction basis, Rails does not actually
+change the isolation level for validations. Similarly, none of the
+application code or configurations actually modified the default
+isolation level. Moreover, we did not encounter any application
+deployment documentation that suggested changing the isolation
+level. Although we cannot prove that this is the case, this data
+suggests that validations are likely running at Read Committed
+isolation.
+
+Does a lack of serializable isolation actually affect these validations? Just
+because validations effectively run concurrently does not mean that they are
+necessarily incorrect.
+
+% dataset and methodology
+
+% simple static test
+
+% num txns, num invariants
+
+% custom UDFs
+
+% who writes invariants?
+
+
+
+% i-confluence results

@@ -18,63 +18,63 @@ class Worker:
         self.headers = {"Content-type": "application/x-www-form-urlencoded",
                         "Accept": "text/plain"}
 
-    def insert_kvp(self, key, value, model="indexed_key_value"):
+    def insert_kvp(self, key, value, model):
         self.conn.request("POST",
                     "/"+model+"s",
                           urlencode({model+"[key]":key, model+"[value]":value}),
                     self.headers)
         return self.conn.getresponse()
 
-    def insert_user(self, dept_id, model="simple_user"):
+    def insert_user(self, dept_id, model):
         self.conn.request("POST",
                           "/"+model+"s",
                           urlencode({model+"["+model.split("_user")[0]+"_department_id]":dept_id}),
                     self.headers)
         return self.conn.getresponse()
 
-    def insert_department(self, which_id, model="simple_user"):
+    def insert_department(self, which_id, model):
         self.conn.request("POST",
                           "/"+model+"s",
                           urlencode({model+"[id]":which_id}),
                     self.headers)
         return self.conn.getresponse()
 
-    def destroy_user_or_department(self, which_id, model="simple_user"):
+    def destroy_user_or_department(self, which_id, model):
         self.conn.request("DELETE",
                           "/"+model+"s/"+str(which_id),
                           "",
                           self.headers)
         return self.conn.getresponse()
 
-    def delete_id(self, which_id, model="indexed_key_value"):
+    def delete_id(self, which_id, model):
         self.conn.request("DELETE",
                           "/"+model+"s/"+str(which_id),
                           "",
                           self.headers)
         return self.conn.getresponse()
 
-    def delete_kvp(self, key, model="indexed_key_value"):
+    def delete_kvp(self, key, model):
         self.conn.request("POST",
                           "/"+model+"s/delete_key",
                           urlencode({model+"[key]":key}),
                           self.headers)
         return self.conn.getresponse()
 
-    def destroy_kvp(self, key, model="indexed_key_value"):
+    def destroy_kvp(self, key, model):
         self.conn.request("POST",
                           "/"+model+"s/delete_key",
                           urlencode({model+"[key]":key}),
                           self.headers)
         return self.conn.getresponse()
 
-    def update_kvp(self, key, value, model="indexed_key_value"):
+    def update_kvp(self, key, value, model):
         self.conn.request("POST",
                           "/"+model+"s/update_key",
                           urlencode({model+"[key]":key, model+"[value]":value}),
                           self.headers)
         return self.conn.getresponse()
 
-    def get_kvp(self, key, model="indexed_key_value"):
+    def get_kvp(self, key, model):
         self.conn.request("POST",
                           "/"+model+"s/get_key",
                           urlencode({model+"[key]":key}),
@@ -90,7 +90,7 @@ class Result():
         self.requestType = reqType
         self.key = key
         self.value = value
-        self.raw_response = raw_response
+        self.raw_response = None#raw_response
         self.success = raw_response.find("ERROR") == -1
         self.lat_ms = lat_ms
         
@@ -110,7 +110,7 @@ def pk_stress_task(tup):
     rails_host, port, key, value, model = tup
     w = Worker(rails_host+":"+str(port))
     st = datetime.now()
-    raw_result = w.insert_kvp(key, value, model=model).read()
+    raw_result = w.insert_kvp(key, value, model).read()
     et = datetime.now()
     
     lat_ms = (et-st).total_seconds()*1000.
@@ -129,9 +129,9 @@ def pk_stress(rails_host, nclients=100, trials=10, port=3000, model="indexed_key
     #warm up rails
     for i in range(0, nclients):
         w = Worker(rails_host+":"+str(port))
-        w.insert_kvp("-1", "dummy", model=model).read()
+        w.insert_kvp("-1", "dummy", model).read()
         w = Worker(rails_host+":"+str(port))
-        w.delete_kvp("-1", model=model).read()
+        w.delete_kvp("-1", model).read()
 
     fails = []
     allresults = []
@@ -153,6 +153,7 @@ def pk_stress(rails_host, nclients=100, trials=10, port=3000, model="indexed_key
 
         fails.append(f)
     
+    p.terminate()
     allresults.append(results)
     return fails, results
 
@@ -164,14 +165,14 @@ def fk_stress_task(tup, doLog=True):
     
     if dept_no:
         if optype == INSERT:
-            raw_result = w.insert_user(dept_no, model=model).read()
+            raw_result = w.insert_user(dept_no, model).read()
         else:
-            raw_result = w.destroy_user_or_department(which_id, model=model).read()
+            raw_result = w.destroy_user_or_department(which_id, model).read()
     else:
         if optype == INSERT:
-            raw_result = w.insert_department(which_id, model=model).read()
+            raw_result = w.insert_department(which_id, model).read()
         else:
-            raw_result = w.destroy_user_or_department(which_id, model=model).read()
+            raw_result = w.destroy_user_or_department(which_id, model).read()
     et = datetime.now()
     
     #print raw_result
@@ -201,13 +202,21 @@ def chunkIt(seq, num):
 
 
 
-def fk_stress(rails_host, nworkers=100, trials=10, port=3000, model="simple"):
+def fk_stress(rails_host, n_clients=100, trials=10, port=3000, model="simple"):
     w = Worker(rails_host+":"+str(port))
-    p = Pool(nworkers)
+    p = Pool(n_clients)
 
     user_model = model+"_user"
     dept_model = model+"_department"
     
+    print "Warming up..."
+    for i in range(0, n_clients):
+        w = Worker(rails_host+":"+str(port))
+        print w.insert_department(-1, model+"_department").read()
+        w = Worker(rails_host+":"+str(port))
+        w.destroy_user_or_department(-1, model+"_department").read()
+    print "... running!"
+
     fails = []
     allresults = []
     for nameit in range(0, trials):
@@ -218,19 +227,20 @@ def fk_stress(rails_host, nworkers=100, trials=10, port=3000, model="simple"):
         
         # first task is to delete the "ones"
         workers = [(rails_host, port, k, DELETE, None, dept_model)]
-        workers += [(rails_host, port, None, INSERT, k, user_model) for i in range(0, nworkers)]
+        workers += [(rails_host, port, None, INSERT, k, user_model) for i in range(0, n_clients)]
 
         p.map(fk_stress_task, workers)
 
         results = []
-        for i in range(0, nworkers+1):
+        for i in range(0, n_clients+1):
             results.append(resultQueue.get())
 
         f = sum(1 for r in results if r.success and r.requestType == INSERT)
         print nameit, f, average([r.lat_ms for r in results])
 
         fails.append(f)
-    
+
+    p.terminate()    
     allresults.append(results)
     return fails, results
     
@@ -295,6 +305,8 @@ def gen_random(num_samples, total_num_records):
 
 def ssh(host, cmd, user='ubuntu', bg=False):
     cmd = "ssh -o StrictHostKeyChecking=no %s@%s \"%s\" %s" % (user, host, cmd, "&" if bg else "")
+    if bg:
+        print cmd
     system(cmd)
 
 def reset_postgres(host):
@@ -303,8 +315,10 @@ def reset_postgres(host):
 
 def start_passenger(host, nprocs):
     ssh(host, "cd ~/safe-rails/demo; passenger stop")
-    ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start -d --log-file /tmp/phusion-log.out --max-pool-size %d --min-instances %d &> /tmp/passenger.out & disown" % (nprocs, nprocs), bg=True)
+    ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start -d --log-file /tmp/phusion-log.out --max-pool-size %d --min-instances %d &> /tmp/passenger.out" % (nprocs, nprocs), bg=True)
 
+def start_unicorn(host, nprocs):
+    ssh(host, "sudo /etc/init.d/nginx stop; cd ~/safe-rails/demo; rm /tmp/*.out; passenger stop &> /dev/null; sudo pkill -9 unicorn_rails; pkill -9 unicorn_rails; killall unicorn_rails; sleep 1; git checkout config/unicorn.rb; rm log/*.log; sudo rm -rf /tmp/*; echo \"worker_processes %d\" >> config/unicorn.rb; unicorn_rails -c config/unicorn.rb -D & sudo /etc/init.d/nginx start;" % (nprocs), bg=True)
 
 def pk_workload_task(tup):
     rails_host, port, model, keys = tup
@@ -312,7 +326,7 @@ def pk_workload_task(tup):
     for key in keys:
         w = Worker(rails_host+":"+str(port))
         st = datetime.now()
-        raw_result = w.insert_kvp(key, value, model=model).read()
+        raw_result = w.insert_kvp(key, value, model).read()
         et = datetime.now()
     
         lat_ms = (et-st).total_seconds()*1000.
@@ -330,12 +344,17 @@ def pk_workload(rails_host, workload="uniform", records=100, model="simple_key_v
     w = Worker(rails_host+":"+str(port))
     p = Pool(n_clients)
 
+    print "Warming up..."
+
     #warm up rails
     for i in range(0, n_clients):
         w = Worker(rails_host+":"+str(port))
-        w.insert_kvp("-1", "dummy", model=model).read()
+        w.insert_kvp("-1", "dummy", model).read()
         w = Worker(rails_host+":"+str(port))
-        w.delete_kvp("-1", model=model).read()
+        w.delete_kvp("-1", model).read()
+
+
+    print "... running!"
 
     results = []
 
@@ -358,6 +377,77 @@ def pk_workload(rails_host, workload="uniform", records=100, model="simple_key_v
         results.append(resultQueue.get())
 
     f = sum(1 for r in results if r.success)
+
+    p.terminate()
+
+    print workload, f, average([r.lat_ms for r in results])
+
+    return f, results
+
+
+def fk_workload_task(tup):
+    rails_host, port, model, ops, users_to_depts, num_depts = tup
+
+    chance_user = float(users_to_depts)/(users_to_depts+1)
+
+    user_model = model+"_user"
+    dept_model = model+"_department"
+
+    for i in range(0, ops):
+        w = Worker(rails_host+":"+str(port))
+        st = datetime.now()
+        dept_id = randint(1, num_depts)
+        if random() < chance_user:
+            raw_result = w.insert_user(dept_id, user_model).read()
+            optype = INSERT
+        else:
+            # delete department
+            raw_result = w.destroy_user_or_department(dept_id, dept_model).read()
+            optype = DELETE
+
+        et = datetime.now()
+        lat_ms = (et-st).total_seconds()*1000.
+        
+        result = Result(optype,
+                        dept_id,
+                        None,
+                        raw_result,
+                        lat_ms)
+        resultQueue.put(result)
+
+    return 1
+
+def fk_workload(rails_host, workload="uniform", records=100, model="simple", ops_per_client=100, n_clients=100, port=3000, users_to_dept=10):
+    w = Worker(rails_host+":"+str(port))
+    p = Pool(n_clients)
+
+    print "Warming up..."
+    for i in range(0, n_clients):
+        w = Worker(rails_host+":"+str(port))
+        print w.insert_department(-1, model+"_department").read()
+        w = Worker(rails_host+":"+str(port))
+        w.destroy_user_or_department(-1, model+"_department").read()
+    print "... running!"
+
+    # populate all of the departments
+    n_depts = records
+    print "populating ", n_depts, "departments"
+    for d in range(1, n_depts+1):
+        print "populating department", d
+        w = Worker(rails_host+":"+str(port))
+        w.insert_department(d, model+"_department")
+    print "populated!"
+
+    results = []
+    workers = [(rails_host, port, model, ops_per_client, users_to_dept, records) for i in range(0, n_clients)]
+
+    p.map(fk_workload_task, workers)
+
+    for i in range(0, n_clients*ops_per_client):
+        results.append(resultQueue.get())
+
+    f = sum(1 for r in results if r.success)
+    p.terminate()
 
     print workload, f, average([r.lat_ms for r in results])
 

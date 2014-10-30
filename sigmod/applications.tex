@@ -116,7 +116,7 @@ we examine these invariants in greater detail.
 \begin{table}
 \begin{tabular}{|l l l |}
 \hline
-Name & Occurrences & I-Confluence\\\hline
+Name & Occurrences & I-Confluent?\\\hline
 \texttt{validates\_presence\_of} & 1764 & Depends\\
 \texttt{validates\_uniqueness\_of} & 442 & No \\
 \texttt{validates\_length\_of} & 302 & Yes \\
@@ -145,7 +145,7 @@ while the remaining 18 were not. For brevity, we omit a discussion of
 each validator (following double-blind review, we plan to open-source
 all analysis; for the time being, it \textit{is} possible to view
 these validators in the wild using the open source projects and hashes
-from Table~\cite{table:app-summary}) we discuss several trends and
+from Table~\ref{table:app-summary}) we discuss several trends and
 notable examples below.
 
 Among the invariant confluent custom validations, many consisted of

@@ -1,0 +1,10 @@
+
+\section*{APPENDIX}
+
+\subsection*{Analysis Methodology}
+
+To determine the occurrences and number of models, transactions, locks, validations, and associations in Rails, we used a very simple set of custom code analysis scripts. We do not consider the analysis techniques here a contribution; rather, our interest is in the output of the analysis.  (Though we hesitate to term this process ``program analysis,'' the scripts embody a very simple syntactic static analysis.) The syntatic approach proved portable between the many versions of Rails against which each application is linked; otherwise, porting between non-backwards-compatible Rails versions was difficult and, in fact, unsupported by several of the Rails code analysis tools we considered using as alternatives. The choice to use syntax as a means of distinguishing code constructs led to some ambiguity. To compensate, we introduced custom logic to handle esoteric syntaxes that arose in particular projects (e.g., some projects extend \texttt{ActiveRecord::Base} with a separate, project-specific base class, while some validation usages vary between constructs like \texttt{:validates\_presence} and \texttt{:validates\_presence\_of}).
+
+To determine commit and project authorship, we used the output of \texttt{git log} and did not attempt any form of sophisticated entity resolution.
+
+Given double-blind constraints, we cannot release this code at this time. However, once double-blind restrictions have lifted, we plan to release the analysis scripts as to facilitate reproducibility of our results.

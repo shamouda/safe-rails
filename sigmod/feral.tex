@@ -7,7 +7,7 @@ requests entirely independently, with the database acting as a point
 of rendezvous for concurrent operations. Given Rails's design goals of
 maintaining application logic at the user level, this appears---on its
 face---a somewhat cavalier proposition with respect to application
-correctness. In response, Rails has developed a range of
+integrity. In response, Rails has developed a range of
 concurrency control strategies that largely operate external to the
 database and at the application level, which we term \textit{feral
   concurrency control}.
@@ -15,7 +15,7 @@ database and at the application level, which we term \textit{feral
 In this section, we outline four major mechanisms for guarding against
 correctness anomalies under concurrent execution in Rails. We
 subsequently begin our study of 67 open source applications to
-determine which of these mechanisms are used in practice. In the next
+determine which of these mechanisms are used in practice. In the following
 section, we will determine which are are sufficient to maintain
 correct data---and when they are not.
 
@@ -23,15 +23,16 @@ correct data---and when they are not.
 
 Broadly, Rails contains four mechanisms for concurrency control.
 
-First, Rails provides support for \textbf{transactions} by wrapping a
-sequence of operations within a special transaction block. The
-operations within each block are backed by an actual database
-transaction. The database transaction either runs at the database's
-configured default isolation level or, as of Rails 4, the isolation
-level configured on a per-transaction
-basis\footnote{https://github.com/rails/rails/commit/392eeecc11a291e406db927a18b75f41b2658253}.
+\begin{myenumerate}
+\item Rails provides support for \textbf{transactions}. By wrapping a
+sequence of operations within a special \texttt{transaction} block,
+Rails operations will execute transactionally, backed by an actual
+database transaction. The database transaction either runs at the
+database's configured default isolation level or, as of Rails 4, can
+be configured on a per-transaction
+basis.\footnote{https://github.com/rails/rails/commit/392eeecc11a291e406db927a18b75f41b2658253}
 
-Second, Rails provides support for both optimistic and pessimistic
+\item Rails provides support for both optimistic and pessimistic
 \textbf{locking}. Applications invoke pessimistic locks on an Active
 Record object by calling its \texttt{lock} method, which invokes a
 \texttt{SELECT FOR UPDATE} statement in the database. Optimistic
@@ -42,7 +43,7 @@ update, Active Record atomically checks that an object's
 object and, if it has not changed, increments \texttt{lock\_version}
 and saves the object.
 
-Third, Rails provides support for application-level
+\item Rails provides support for application-level
 \textbf{validations}. Each Model has a set of zero or more
 validations, or boolean-valued functions that should be run before the
 object is actually saved to the database. These validations ensure,
@@ -52,20 +53,25 @@ of built-in validators but also allows arbitrary user-defined
 validations (we discuss actual validations further in subsequent
 sections). Validations are performed at model save time, and each
 validation declared for a given model is run sequentially within a
-database-backed transaction. If and only if all validations pass is
-the model actually saved to the database.
+database-backed transaction.\footnote{The practice of wrapping
+  validations in a transaction dates to the earliest Rails
+  commit (albeit, in 2004, transactions were supported via a per-Ruby VM
+  global lock: \url{https://github.com/rails/rails/blob/db045dbbf60b53dbe013ef25554fd013baf88134/activerecord/lib/active_record/transactions.rb#L6}). However,
+  as late as 2010, updates were only partially protected by transactions
+  (\url{https://github.com/rails/rails/commit/f4fbc2c1f943ff11776b2c7c34df6bcbe655a4e5}).} If and only if all validations pass is the
+model actually saved to the database.\\[-2mm]
 
 In contrast with the prior two mechanisms, Rails validations are a
-prominent feature of the Active Record model (e.g., neither
+prominent feature of the Active Record model (i.e., neither
 transactions nor locks are actually discussed in the official ``Rails
 Guides''). Per the Rails documentation, validations ``are database
 agnostic, cannot be bypassed by end users, and are convenient to test
-and maintain...Database constraints and/or stored procedures make the
+and maintain.'' In contrast, ``[d]atabase constraints and/or stored procedures make the
 validation mechanisms database-dependent and can make testing and
 maintenance more difficult.'' As we will see in the next section,
-validations are prominently used by many actual applications.
+validations are widely used by many actual applications.
 
-Finally, Rails provides support for application-level
+\item Rails provides support for application-level
 \textbf{associations}. Like validations, associations are a core
 concept of the Active Record model. As the name suggests, ``an
 association is a connection between two Active Record models,''
@@ -80,6 +86,7 @@ validation (e.g., \texttt{:presence}) ensures that the association is
 indeed valid (and is, via the validation, backed by a database
 transaction). Rails does not provide native support for
 database-backed foreign key constraints.
+\end{myenumerate}
 
 Overall, these four mechanisms provide a range of options for
 developers. The first two are squarely in the realm of traditional
@@ -98,8 +105,8 @@ concurrency control mechanisms and determine which deserved more
 study, we examined their usage in a portfolio of publicly available
 open source applications.
 
-\minihead{Application corpus} We selected 67 applications built using
-Ruby on Rails and Active Record from GitHub representing a variety of
+\minihead{Application corpus} We selected 67 open source applications
+built using Ruby on Rails and Active Record, representing a variety of
 application domains, including eCommerce, customer relationship
 management, retail point of sale, conference management, content
 management, build management, project management, personal task
@@ -203,14 +210,15 @@ While several of these applications are indeed projects undertaken by
 hobbyists, many are either commercially supported (e.g., Canvas LMS,
 Discourse, Spree, GitLab) and/or have a large open source community
 (e.g., Radiant, Comfortable Mexican Sofa, Diaspora). Undoubtedly, a
-larger-scale commercial, closed-source project such as Twitter,
+larger-scale commercial, closed-source Rails projects such as Twitter,
 GitHub, or Airbnb might exhibit different trends than those we observe
 here. However, in the open source domain, we believe these
 applications represent a diverse selection of use cases.
 
 \minihead{Mechanism usage} We performed a simple analysis of the
 applications to determine how each of the concurrency control
-mechanisms from each application were used.
+mechanisms from each application were used (see Appendix for
+methodological details).
 
 Overwhelmingly, applications used validators and associations instead
 of transactions or locks (Figure~\ref{fig:usages} and

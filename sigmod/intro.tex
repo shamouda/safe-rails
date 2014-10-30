@@ -13,8 +13,8 @@ the most recent realization of the vision of object-relational mapping
 programmer adoption.
 
 A central player in modern frameworks is Ruby on Rails (or, simply
-``Rails'')~\cite{rails-book,rails-computer}, an open source system (at one point) powering sites
-including Twitter~\cite{twitter-rails}, Airbnb~\cite{airbnb-rails},
+``Rails'')~\cite{rails-book,rails-computer}, an open source codebase powering sites
+including (at one point) Twitter~\cite{twitter-rails}, Airbnb~\cite{airbnb-rails},
 GitHub~\cite{github-rails}, Hulu~\cite{hulu-rails}, Shopify~\cite{shopify-rails},
 Groupon~\cite{groupon-rails}, SoundCloud~\cite{soundcloud-rails}, Twitch~\cite{twitch-rails},
 Goodreads~\cite{goodreads-rails}, and Zendesk~\cite{zendesk-rails}. From the perspective of database systems
@@ -53,13 +53,13 @@ community, we can positively engage with these criticisms to better
 serve the needs of these developers.
 
 We begin by surveying the state of Rails' application-tier concurrency
-control primitives and examining their use in 52 open source
+control primitives and examining their use in 67 open source
 applications representing a variety of use cases from e-Commerce to
 Customer Relationship Management and social networking. We find that,
 overwhelmingly---instead of using traditional mechanisms like
 transactions---these applications use Rails' built-in support for
 declarative invariants, or \textit{validations}, to protect data
-integrity. We find over $7000$ uses of application-level constraints
+integrity. We find over $9700$ uses of application-level constraints
 across the applications used to guard against referential integrity,
 uniqueness, and data formatting violations.
 
@@ -68,12 +68,12 @@ correct? Do they work in practice? Under concurrent execution, Rails
 will execute validation checks in parallel, and any validation logic
 that is susceptible to races may lead to data corruption. Accordingly,
 we apply invariant confluence analysis and show that, in fact, over
-$90.4\%$ of Rails validations by volume of use are actually
-safe. However, the remaining $9.6\%$, which include uniqueness
-violations under insertion and integrity constraint violations under
-deletion, are not. Hence, we quantify the impact of concurrency on
-data corruption for Rails uniqueness and foreign key constraints under
-both Monte Carlo analysis and via actual application deployment. We
+$74.7\%$ of Rails validations by volume of use are actually
+safe. However, the remaining, which include uniqueness violations
+under insertion and foreign key constraint violations under deletion,
+are not. Hence, we quantify the impact of concurrency on data
+corruption for Rails uniqueness and foreign key constraints under both
+Monte Carlo analysis and via actual application deployment. We
 demonstrate that, for pathological workloads, validations reduce the
 severity of data corruption by orders of magnitude but, nevertheless,
 still permit incorrect state.
@@ -89,3 +89,31 @@ programming and the relational model, we see considerable opportunity
 in adapting existing database concurrency control to better serve
 these communities---via both increased native support for declarative invariants
 and server-side code execution.
+
+In summary, this paper makes the following contributions:
+\begin{myitemize}
+\item We analyze 67 open source Ruby on Rails applications to
+  determine their use of both database-backed and feral concurrency
+  control mechanisms.
+
+\item We analytically and experimentally quantify the degree of
+  inconsistency allowed by Rails's built-in uniqueness and association
+  validations.
+
+\item We survey six additional popular frameworks for similarly unsafe
+  validations and discuss the implications of feral concurrency
+  control for future database system designs.
+\end{myitemize}
+
+The remainder of this paper proceeds as
+follows. Section~\ref{sec:motivation} briefly provides background on
+Rails MVC and deployment, while Section~\ref{sec:rails-cc} surveys
+Rails's supported concurrency control
+mechanisms. Section~\ref{sec:apps} presents analysis of mechanism
+usage in open source applications as well as safety under weak
+isolation.  Section~\ref{sec:evaluation} experimentally quantifies the
+degree of inconsistency allowed by these mechanisms in a Rails
+deployment. Section~\ref{sec:other-orms} discusses additional web
+frameworks, and Section~\ref{sec:discussion} presents recommendations
+for better supporting these framework demands. Section~\ref{sec:relatedwork}
+presents related work and Section~\ref{sec:conclusion} concludes.

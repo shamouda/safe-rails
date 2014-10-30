@@ -1,12 +1,6 @@
 
-\section{Design Revisited}
-\label{sec:discussion}
-
-% how many back-ends support indexes?
-% out of box:mysql, postgres, sqlllite
-% also: jdbc, sqlserver, oracle
-
 \section{Other ORMs}
+\label{sec:other-orms}
 
 While our focus in this paper is on Rails, we briefly investigated the
 incidence of (problematic, in Rails) uniqueness and foreign key
@@ -28,7 +22,7 @@ uniqueness validations:
 ``Question: should we add @Unique that would map to @Column(unique=true)?
 @Unique cannot be tested at the Java level reliably but could generate
 a database unique constraint generation. @Unique is not part
-of the BV spec today.''~\cite{jsr-bean}
+of the [Bean Validation] spec today.''~\cite{jsr-bean}
 \end{quote}
 An author of some of the code specification notes on a separate blog
 post:
@@ -38,6 +32,9 @@ post:
   [sic] is opening yourself up for potenital phantom reads. Think
   twice before you go for [a UDF-based] approach.''~\cite{unique-bean}
 \end{quote}
+%http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1414639627_4654729130380ec6809634192c3faacb
+By default, JPA Validations are triggered pre-commit upon model
+change and therefore run in a transaction.
 
 \orm{Hibernate} (version 4.3.5), a Java ORM based on JPA, does
 not automatically back declared relationships. For uniqueness and
@@ -217,3 +214,110 @@ uses db foreign keys
 
 % what can we learn?
 % udfs
+
+
+\section{Design Revisited}
+\label{sec:discussion}
+
+In this section, we discuss the implications of th
+
+\subsection{Feral Invariants}
+
+In Rails and, across the other ORMs we studied, the use of
+application-enforced invariants was surprisingly common. Notably, the
+inclusion of validations in the Java EE JPA specification (including
+effort from with 41 representatives from companies including Google,
+Oracle, and Red Hat), suggests that validations are, in fact, a common
+way to express domain logic.
+
+The second part of our study here hints at the \textit{challenges}
+inherent in actually providing correct invariant-based concurrency
+control. Despite the fact that ORMs such as Rails and JPA wrap
+validations within the scope of a transaction, the pervasive use of
+weak isolation thwarts the benefit of non-I-confluent
+validations. (When default database isolation is non-serializable,
+expect ``convention over configuration'' to lead to isolation
+anomalies.) A small but notable portion of these validations cannot be
+sufficiently enforced under non-serializable isolation. Moreover,
+there is compelling evidence that the framework authors \textit{are}
+aware of this issue (e.g., Footnote~\ref{fn:si-rails}, the JPA
+comments in Section~\ref{sec:other-orms}). While serializable
+isolation is conceptually sufficient to correctly enforce isolation,
+its lack of support in databases such as Oracle 12c and implementation
+bugs such as the error we encountered in PostgreSQL are often enough
+to compromise validator integrity. The complete divorce of validation
+annotations from schema declaration in both PHP frameworks we examined
+is even more perplexing. These trends hint at, on the one hand, a
+desire for greater flexibility, and, on the other hand, a disregard of
+database safety mechanisms such as built-in uniqueness and referential
+integrity constraints.
+
+We see considerable opportunity in bridging this gap and better
+facilitating these application-level validations. Doing so has not
+only correctness implications but also performance implications: in a
+tiered application deployment, native integration of user-defined
+validations with the database can help eliminate database
+RTTs~\cite{pyxis}---which, in particular, can assist with reducing the
+duration for which locks are held. While the best of these validation
+implementations rely on transactions for isolation, we see opportunity
+for invariant- or validation-based concurrency control, thus allowing
+higher concurrency and avoiding the cost of serializable isolation
+that these data stores and users have evidently eschewed. This hints
+at the possibility of a revival of concepts from active and rule-based
+databases~\cite{activedb-book} and, broadly, semantic concurrency
+control. The challenge of declaring semantic criteria for correctness
+is already being performed by database users---at least for some
+correctness criteria. It remains to be seen whether, in fact, these
+validations can be treated as a complete specification for
+correctness. Nevertheless, we see the fact that they are being used
+organically and have been produced by database users (in lieu of
+standard transaction model) as ample cause for re-evaluating the
+decades of work on semantic concurrenty control.
+
+\subsection{Usability and ``Correctness''}
+
+Returning, finally, to the Rails central goal of programmer
+productivity, our results ultimately hint at a triumph of convenience
+over formal---and, in some cases, practical---correctness
+guarantees. Nevertheless, we have observed that the ``convenient''
+feral validations actually do serve a purpose in reducing worst-case
+data integrity errors. In a sense, this suggests that, in fact, these
+validations are somehow sufficient for most applications, or,
+alternatively, other errors loom larger for developers.
+
+The takeaway for the database community here is, in a sense, somewhat
+sobering. Ultimately, under the hypothesis that Rails has succeeded
+due to its usability and productivity, conventional databases have
+largely failed to provide the same end-user efficiency. As we noted in
+Section~\ref{sec:intro}, this echoes many strains of the NoSQL
+movement; per Basho's Justin Sheehy: ``What does a first-time user of
+your system experience in their first five
+minutes?''~\cite{marcus-talk} Rails simplifies this process and makes
+the process of getting started remarkably straightforward, with a
+plethora of documentation online. Proper database configuration is
+less so, and understanding, for example, the slew of anomalies that
+characterize each isolation level (which also vary between stores),
+remains a subject of graduate-level study within
+databases~\cite{adya-isolation,hat-vldb}. Moreover, a first-time user
+is unlikely to run a highly concurrent workload and experience such
+integrity violations; rather, it is only at scale that they might
+encounter them.
+
+The opportunity here is to develop database systems that provide
+usability at both the early stages and, subsequently, at later
+stages. We are by no means the first to make this
+observation. However, in the context of modern web frameworks, it is
+our perogative to better support these users who, otherwise, appear
+content to ignore much of the technological advances within the
+database community of the last four decades.
+
+
+% Use of weak isolation
+
+ % Pivotal moment: ignore these use cases, or better support them?
+ % Java EE!?!?
+ % To do so, active database systems?
+ % Drop into serializable transactions is a non-starter
+
+ % Do not claim completeness, but nevertheless striking trends
+ % Productivity-oriented programming and usability

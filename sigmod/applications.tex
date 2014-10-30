@@ -136,11 +136,40 @@ Other & 303 & \\\hline
 
 \subsection{Custom Invariants}
 
-We also manually inspected the coordination requirements 82 (2.3\%) of
-invariants that consisted of UDF validations. Many of these
-validations were custom formatting routines. However, several were
-more interesting. For example, the \texttt{TODO} routine of the Spree
-shopping application was used to ensure that sufficient stock is
-available before placing an order. This is not I-confluent.
+We also manually inspected the coordination requirements of the 60
+(1.71\%) invariants (from 17 projects) that were declared as UDFs. 52
+of these were declared inline via Rails's \texttt{validates\_each}
+syntax, while 8 were custom validator classes that implemented Rails's
+validator interface. 42 of 60 validations were invariant confluent,
+while the remaining 18 were not. For brevity, we omit a discussion of
+each validator (following double-blind review, we plan to open-source
+all analysis; for the time being, it \textit{is} possible to view
+these validators in the wild using the open source projects and hashes
+from Table~\cite{table:app-summary}) we discuss several trends and
+notable examples below.
+
+Among the invariant confluent custom validations, many consisted of
+simple format checks or other domain-specific validation, including
+credit card formatting and username blacklisting.
+
+The non-invariant confluent validations took on a range of
+forms. Three validations performed the equivalent of foreign key
+checking, which, as we have discussed, is unsafe under deletion. Three
+validations checked database-backed configuration options including
+the maximum allowed file upload size and default tax rate; while
+configuration updates are ostensibly rare, the outcome of each
+validation could be affected under a configuration change. Two
+validations were especially interesting. Spree's
+\texttt{AvailabilityValidator} checks whether an eCommerce inventory
+has sufficient stock available to fulfill an order; concurrent order
+placement might result in negative stock. Discourse's
+\texttt{PostValidator} checks whether a user has been spamming the
+forum; while not necessarily critical, a spammer could technically
+foil this validation by concurrently issuing posts.
+
+Again, it is possible---even likely---that there is considerable
+validation logic that is not exposed via these APIs. Nevertheless,
+these few examples highlight the importance of protecting against
+these anomalies.
 
 

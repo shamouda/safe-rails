@@ -80,6 +80,26 @@
     \vspace{-.5em}
 }
 
+
+\newenvironment{myenumerate}
+{
+
+   \vspace{-.5em}
+   \newcounter{qdcounter}
+    \begin{list}{\arabic{qdcounter}.~}{\usecounter{qdcounter}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+    \vspace{-.5em}
+}
+
+
 \usepackage[leftmargin=0em]{quoting}
 
 \begin{document}
@@ -114,12 +134,14 @@
 
 \input{conclusion}
 
-\scriptsize
-\linespread{.98}
-\selectfont
+%\scriptsize
+%\linespread{.98}
+%\selectfont
 
 
 \bibliography{feral-cc} \bibliographystyle{abbrv}
+
+\input{appendix}
 
 \balance
 

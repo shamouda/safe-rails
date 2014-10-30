@@ -29,9 +29,19 @@ serializable isolation. However, under Read Committed isolation, no
 such mutual exclusion will be performed, leading to potential
 inconsistency. Moreover, under Snapshot Isolation and Repeatable Read,
 insertions to different records will similarly result in
-inconsistency. Thus, unless the database is configured for
-serializable isolation, inconsistency may result and the feral
-validation will fail.
+inconsistency.\footnote{The first reference to the potential integrity
+  violations resulting from this implementation in the Rails code that
+  we are aware of dates to December 2007, in Rails v.2.0.0
+  (\url{https://github.com/rails/rails/commit/c01c28c3047bbf0be2861c7ae1146723cf4ff7a9})
+  In September 2008, another user added additional discussion
+  (\url{https://github.com/rails/rails/commit/adacd9451877d3c195da7f1935353b1cb3fed368}),
+  noting that ``this could even happen if you use transactions with
+  the 'serializable' isolation level.'' Without reading too closely,
+  the use of ``'serializable''' possibly suggests familiarity with the
+  common, erroneous labeling of Snapshot Isolation as ``serializable''
+  (as in Oracle 12c documentation)\label{fn:si-rails}. } Thus, unless the database is
+configured for serializable isolation, inconsistency may result and
+the feral validation will fail.
 
 As we have discussed, MySQL and PostgreSQL each support serializable
 isolation but default to Read Committed isolation. However, in our

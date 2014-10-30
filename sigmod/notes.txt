@@ -24,7 +24,14 @@ This is not a bug but documented and inherent behavior of validates_uniqueness_o
 
 https://github.com/rails/rails/commit/3d6eea0221f0092cb3c3270c2a9bdf31745d1b2d
 Update the validates_uniqueness_of documentation to tell you to use a
-unique index. The other options mentioned were not good ideas and disclaimed as such in the documentation.
+unique index. The other options mentioned were not good ideas and
+disclaimed as such in the documentation.
+
+proposal to add index in database:
+https://github.com/rails/rails/issues/645
+
+commenting about validations being for integrity or n
+https://github.com/rails/rails/issues/1507#issuecomment-5398553
 
 
 Document concurrency issues in validates_uniqueness_of.

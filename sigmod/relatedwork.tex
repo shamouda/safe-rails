@@ -1,3 +1,85 @@
 
 \section{Related Work}
 \label{sec:relatedwork}
+
+There is a large body of related work that we consider in
+three categories: object relational mapping systems, study of weak
+isolation and applications, and the quantification of isolation behavior.
+
+\minihead{ORMs} Database systems and application programming
+frameworks have a long
+history~\cite{objectstore,shore,bernstein-orm}. The ``impedance
+mismatch'' between object-oriented programming and the relational
+model is a perennial problem in data management systems. Ruby on Rails
+is no exception, and the concurrency control issues we study here are
+endemic to this mismatch---namely, disuse of common concurrency
+control mechanisms like database-backed constraints. Bridging this gap
+remains an active area of research~\cite{db-to-model}.
+
+The latest wave of web programming frameworks has inspired diverse
+research spanning databases, verification, and security. StatusQuo
+uses program analysis and synthesis to transform imperative ORM code
+into SQL, leveraging the efficiency of database-backed web
+applications written in the Spring framework~\cite{statusquo}. Rails
+has been the subject of study in the verification of cross-site
+scripting attacks, ~\cite{rails-xss} scripting attacks, errors in data
+modeling of associations~\cite{rails-bounded}, and arbitrary,
+user-specified (non-validation) invariants~\cite{invariant-web}.
+Rails-style ORM validations have been used to improve systems security
+via client-side execution~\cite{waves,caveat}. Our focus here is on
+the concurrency control requirements and usages of applications
+written in Rails.
+
+\minihead{Applications and weak isolation} The issues we examine here
+are fundamental to the use of weak isolation in data management
+systems. Non-serializable isolation dates to the
+mid-1970s~\cite{gray-isolation} and has a colorful
+history~\cite{adya-isolation}; today, by volume, most data stores are
+non-serializable by default~\cite{hat-vldb}. The isolation anomalies
+surfaced by the stores we study here are directly responsible for
+corrupting the application data we study.
+
+However, serializable isolation is not strictly necessary for
+maintaining Rails application integrity. Semantic-based concurrency
+control criteria has almost as long a lineage as
+serializability~\cite{eswaran-consistency,ic-survey-two} and suggests
+that, with additional, non-syntactic knowledge about applications
+(e.g., integrity constraints)~\cite{kung1979optimality}, correctness
+is achievable without serializability. This use of invariants has
+enjoyed recent popularity in work by Li et al.~\cite{redblue-new}, Roy
+et al.~\cite{writes-forest}, and Bailis et al.~\cite{coord-avoid}. We
+use the concept of invariant confluence from~\cite{coord-avoid} to
+determine whether Rails's built-in validators and applications written
+in Rails are indeed safe under any coordination-free execution. Our
+methodology is closest in spirit to~\cite{coord-avoid}, but, here, we
+examine real applications instead of industrial benchmarks.
+
+\minihead{Quantifying anomalies} A range of research similarly
+quantifies the effect of non-serializable isolation in a variety of
+ways.
+
+Perhaps closest to our work is a study by Fekete et al., which
+quantitatively analyzed data inconsistencies arising from
+non-serializable schedules~\cite{fekete-quantifying}. This study used
+a hand-crafted benchmark for analysis but is nevertheless of the only
+studies of actual application inconsistencies. Here, we focus on Rails
+applications.
+
+A larger body of work examines isolation anomalies at the read-write
+interface (that is, measures deviations from properties such as
+serializability or linearizability but \textit{not} the end effect of
+these deviations on actual application behavior). Wada et al. evaluated the
+staleness of Amazon's SimpleDB using end-user request
+tracing~\cite{wada-data}, while Bermbach and Tai evaluated Amazon
+S3~\cite{bermbach-eventual}, each showing various forms of
+non-serializable behavior. Golab et al. provide algorithms for
+verifying the linearizability of and sequential consistency arbitrary
+data stores~\cite{golab-analyzing} and Zellag and Kemme provide
+algorithms for verifying their
+serializability~\cite{zellag-consistent} and other cycle-based
+isolation anomalies~\cite{zellag-real}. Probabilistically Bounded
+Staleness provides time- and version-based staleness predictions for
+eventually consistent data stores~\cite{pbs}. Our focus here is on
+application-level anomalies rather than particular isolation levels.
+
+

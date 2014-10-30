@@ -1,18 +1,219 @@
 
-\section{Design Revisited, and Other ORM{s}}
+\section{Design Revisited}
 \label{sec:discussion}
-
 
 % how many back-ends support indexes?
 % out of box:mysql, postgres, sqlllite
 % also: jdbc, sqlserver, oracle
 
-%also, custom persistence without ActiveRecord! MongoDB, etc.
+\section{Other ORMs}
 
-% backlash within rails community
+While our focus in this paper is on Rails, we briefly investigated the
+incidence of (problematic, in Rails) uniqueness and foreign key
+constraints in several other frameworks.
 
-% other ORMs: Django, Spring, CakePHP, Laravel, node.js?
-% do they appear susceptible to the same problems?
+\newcommand{\orm}[1]{{\vspace{.45em}\noindent\textit{#1}}}
+
+\orm{Java Persistence API}
+(JPA; version EE 7)\footnote{\url{http://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html}}
+is a standard Java Object persistence interface and supports both
+uniqueness and primary key constraints in the database via specialized
+object annotations. Thus, when JPA is used to create a table, it will
+use the database to enforce these constraints. In 2009, JPA introduced
+support for UDF validations via a JavaBean interface.\footnote{Most
+  recent update: \url{https://jcp.org/en/jsr/detail?id=349}} Interestingly,
+the Bean validation proposal specifically addresses the use of
+uniqueness validations:
+\begin{quote}
+``Question: should we add @Unique that would map to @Column(unique=true)?
+@Unique cannot be tested at the Java level reliably but could generate
+a database unique constraint generation. @Unique is not part
+of the BV spec today.''~\cite{jsr-bean}
+\end{quote}
+An author of some of the code specification notes on a separate blog
+post:
+\begin{quote}
+  ``The reason @Unique is not part of the built-in constraints is the
+  fact that accessing the Session/EntityManager during a valiation
+  [sic] is opening yourself up for potenital phantom reads. Think
+  twice before you go for [a UDF-based] approach.''~\cite{unique-bean}
+\end{quote}
+
+\orm{Hibernate} (version 4.3.5), a Java ORM based on JPA, does
+not automatically back declared relationships. For uniqueness and
+foreign key constraints, it relies on JPA annotations for
+correctness. However, it also has an extensive user-level validation
+framework.\footnote{\url{http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/}}
+
+\orm{CakePHP} (version 2.5.5), a PHP-based web
+framework,\footnote{\url{http://cakephp.org/}} supports uniqueness,
+foreign key, and UDF validations via user-level checks. It does not
+back any of its validation checking with a database transaction and
+relies on the user to correctly specify the schema.
+
+\orm{Django} (version 1.7), a popular Python-based
+framework,\footnote{\url{https://www.djangoproject.com/}} backs declared
+uniqueness and foreign key constraints with database-level
+invariants. It also supports custom validations.
+
+\orm{Laravel} (version 4.2), another PHP-based web framework,\footnote{\url{http://laravel.com/}} supports the same
+set of functionality as CakePHP. Any database-backed constraints must
+be specified manually in the schema. The authors note that
+``database-level validations can efficiently handle some things (such
+as uniqueness of a column in heavily-used tables) that can be
+difficult to implement otherwise...The other big downside to this
+approach is that your validations would be database- and
+schema-specific, which makes migrations or switching to another
+database backend more difficult in the future.''
+
+\orm{Waterline} (version 0.10), a persistence layer for
+node.js\footnote{\url{https://github.com/balderdashy/waterline}} (backing
+Sails.js, a popular MVC
+framework\footnote{\url{https://github.com/balderdashy/sails}}),
+provides support for in-DB foreign key and uniqueness constraints
+where supported. We found several reports of bugs in early support of
+uniqueness
+constraints\footnote{\url{https://github.com/balderdashy/sails-mongo/issues/152}
+  \url{https://github.com/balderdashy/waterline/issues/55}
+  \url{https://github.com/balderdashy/waterline/issues/236}}.
+
+\minihead{Summary} The use of validations appears to be common
+practice; the inclusion of validations in (and associated review
+processes associated with) a mature, Enterprise-grade programming
+environment as Java EE suggests that, in fact, users appreciate
+domain-specific validation. The care with which validations are
+applied, however, is domain-dependent. While the Java EE developers
+appear familiar with database anomalies, as we have seen, their more
+lackadaisical Rails implementation can cause serious issues. While
+frameworks such as Django indeed follow suit, enforcing constraints in
+the database as appropriate, it is surprising to see both PHP-based
+frameworks rely on the user to declare in-database constraints
+\textit{while still} supporting totally feral application-level
+constraints. This again suggests an enforcement strategy similar to
+that of Rails. However, while Rails automatically generates schemas,
+the onus in these frameworks is potentially greater on the end-user as
+she is responsible for ultimately declaring schema migrations.
+
+
+\begin{comment}
+
+Name & PK & FK & UDF Validations
+DJANGO & Automatic & Automatic & Yes
+JPA & Yes, annotation & Yes, annotation & Yes, via Beans
+CakePHP & 
+
+% Django
+
+Supports validations
+https://docs.djangoproject.com/en/dev/ref/validators/
+
+Broken online: http://stackoverflow.com/a/5690705
+
+
+1.9 (not yet released) deprecating in favor of checks
+https://docs.djangoproject.com/en/1.7/internals/deprecation/
+
+checks:
+https://docs.djangoproject.com/en/1.7/topics/checks/
+
+
+
+%FK 
+
+does it right
+https://docs.djangoproject.com/en/1.7/ref/models/fields/#django.db.models.ForeignKey
+
+%PK
+
+does it right, by default declares an index
+https://docs.djangoproject.com/en/1.7/_modules/django/db/backends/schema/
+
+
+'''
+If True, this field must be unique throughout the table.
+
+This is enforced at the database level and by model validation. If you try to save a model with a duplicate value in a unique field, a django.db.IntegrityError will be raised by the model’s save() method.
+
+This option is valid on all field types except ManyToManyField, OneToOneField, and FileField.
+
+Note that when unique is True, you don’t need to specify db_index, because unique implies the creation of an index.
+'''
+a
+
+% Hibernate/JPA
+
+
+%FK 
+
+no FK by default, relies on JPA
+http://docs.jboss.org/hibernate/orm/4.3/manual/en-US/html/ch08.html
+
+JoinColumn
+http://docs.oracle.com/javaee/6/api/javax/persistence/OneToMany.html
+
+%PK
+
+``The reason @Unique is not part of the built-in constraints is the fact that accessing the Session/EntityManager during a valiation is opening yourself up for potenital phantom reads. Think twice before you go for the following approach.''
+https://developer.jboss.org/wiki/AccessingtheHibernateSessionwithinaConstraintValidator?_sscc=t
+http://stackoverflow.com/questions/17092601/validate-unique-username-in-spring
+
+http://docs.oracle.com/javaee/6/api/javax/persistence/UniqueConstraint.html
+
+BEAN supported
+https://jcp.org/en/jsr/detail?id=303
+
+%CakePHP
+supports udf validations
+http://book.cakephp.org/2.0/en/models/data-validation.html
+
+basically you set up your own schema, but default validations don't
+appear to be transactional
+
+%FK 
+
+
+%PK
+
+https://github.com/cakephp/cakephp/blob/50b3893e6507979427e1aaeb435494aed1af4f52/lib/Cake/Model/Model.php#L3303
+
+
+% Laravel
+
+Manually define database schema!
+
+%FK 
+%PK
+
+http://laravel.com/docs/4.2/validation#rule-unique
+https://github.com/laravel/framework/blob/75b1dff27778354e44511556171cf6ae466c8b59/src/Illuminate/Validation/Validator.php#L940
+
+
+http://laravelbook.com/laravel-input-validation/
+
+% Node -- Sail.js
+%FK 
+%PK
+
+Validations are handled by Anchor, a thin layer on top of Validator, one of the most robust validation libraries for Node.js. Sails supports most of the validations available in Validator, as well as a few extras that require database integration, like unique.
+
+http://sailsjs.org/#/documentation/concepts/ORM/Validations.html
+https://github.com/balderdashy/sails/issues/832
+
+https://github.com/balderdashy/waterline
+
+Broken in Mongo
+https://github.com/balderdashy/sails-mongo/issues/152
+
+Broken in dev
+https://github.com/balderdashy/waterline/issues/55
+
+Because you have migrate: safe set the indexes will not be created when you start the ORM.
+https://github.com/balderdashy/waterline/issues/236
+
+uses db foreign keys
+
+\end{comment}
+
 
 % what can we learn?
 % udfs

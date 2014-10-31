@@ -11,8 +11,8 @@ violations.
 
 \subsection{Uniqueness Constraints and Isolation}
 
-To begin, we consider Rails's uniqueness validations (12.7\%) of the
-built-in validations.
+To begin, we consider Rails's uniqueness validations: 12.7\% of the
+built-in validations we encountered.
 
 When a Model field is declared with a \texttt{:validates\_uniqueness}
 annotation, any instance of that model is checked against all other
@@ -25,9 +25,12 @@ the exact isolation level of the transaction affects its
 correctness. For correct execution, the \texttt{SELECT} query must
 effectively attain a predicate lock on the validated column for the
 duration of the transaction. This behavior \textit{is} supported under
-serializable isolation. However, under Read Committed isolation, no
-such mutual exclusion will be performed, leading to potential
-inconsistency. Moreover, under Snapshot Isolation and Repeatable Read,
+serializable isolation. However, under Read Committed or Repeatable
+Read isolation, no such mutual exclusion will be performed, leading to
+potential inconsistency.\footnote{Using \texttt{SELECT FOR UPDATE}
+  under these weaker models would be safe, but Rails does not
+  implement its predicate-based lookups as such (i.e., it instead opts
+  for a simple \texttt{SELECT}).}  Moreover, under Snapshot Isolation,
 insertions to different records will similarly result in
 inconsistency.\footnote{The first reference to the potential integrity
   violations resulting from this implementation in the Rails code that
@@ -39,48 +42,54 @@ inconsistency.\footnote{The first reference to the potential integrity
   the 'serializable' isolation level.'' Without reading too closely,
   the use of ``'serializable''' possibly suggests familiarity with the
   common, erroneous labeling of Snapshot Isolation as ``serializable''
-  (as in Oracle 12c documentation)\label{fn:si-rails}. } Thus, unless the database is
-configured for serializable isolation, inconsistency may result and
-the feral validation will fail.
+  (as in Oracle 12c documentation and PostgreSQL documentation prior
+  to the introduction of SSI in version 9.1.1 in September 2011.)\label{fn:si-rails}. }
+Thus, unless the database is configured for serializable isolation,
+inconsistency may result and the feral validation will fail.
 
 As we have discussed, MySQL and PostgreSQL each support serializable
-isolation but default to Read Committed isolation. However, in our
+isolation but default to weaker isolation. Notably, in our
 investigation, we discovered a bug in PostgreSQL's implementation of
 Serializable Snapshot Isolation that allowed duplicate records to be
 created under serializable isolation when running a set of
 transactions derived from the Rails primary key validator. We omit
 further details due to double-blind reviewing requirements but as of
-October 2014 (PostgreSQL 9.3.5) have an outstanding investigation of
-this behavior with the core PostgreSQL developers. Thus, any
-discussion of weak isolation levels aside, whether PostgreSQL's
-implementation of serializablility actually provides serializability
-for the above uniqueness validations is in question. We note
+October 2014 (PostgreSQL 9.3.5) have confirmed this behavior with the
+core PostgreSQL developers who are currently working on a patch. Thus,
+any discussion of weak isolation levels aside, PostgreSQL's
+implementation of serializablility is not actually sufficient to
+provide correct behavior for the above uniqueness validations. We note
 that ``serializable'' databases such as Oracle 13g that actually
 provide Snapshot Isolation will similarly fall prey to duplicate
 validations.
 
 Interestingly, the Rails documentation actually warns that duplicate
-records may be inserted even despite uniqueness validations. However,
-despite the existence of patches that remedy this behavior by the use
-of an in-database constraint and/or index, Rails provides this
-incorrect behavior out of the box. To quote one Rails issue: ``this is
-not a bug but documented and inherent behavior of
-validates\_uniqueness\_of''. In an apparent departure from the Rails's
-stated philosophy, a core committer follows up, noting that ``the only
-way to handle this properly is at the database layer with a unique
-constraint on the column.''
+records may be inserted even despite uniqueness
+validations~\cite{rails-guide}. However, despite the existence of
+patches that remedy this behavior by the use of an in-database
+constraint and/or index, Rails provides this incorrect behavior out of
+the box.\footnote{\url{https://github.com/rails/rails/issues/645}} To
+quote one Rails issue: ``this is not a bug but documented and inherent
+behavior of
+validates\_uniqueness\_of''.\footnote{\url{https://github.com/rails/rails/issues/13234#issuecomment-30092363}} In an apparent departure from the Rails's stated philosophy, a
+core committer follows up, noting that ``the only way to handle this
+properly is at the database layer with a unique constraint on the
+column.'' We further discuss this mismatch between framework and database
+guarantees in Section~\ref{sec:discussion}
 
-Given that entirely feral mechanisms can introduce duplicates, how
-many duplicates can be introduced? Once a record is written, any later
-validations will observe it via \texttt{SELECT} calls. However,
-\textit{while} a record is being validated, any number of concurrent
-validations can (un)safely proceed. In practice, the number of
-concurrent validations is dependent on the Rails environment. In a
-Rails deployment permitting $P$ concurrent validations (e.g., a
-single-threaded, multi-process environment with $P$ processes), each
-value in the domain of the uniqueness validation can be inserted no
-more than $P$ times. Thus, validations---at least
-theoretically---reduce the worst-case number of duplicate records.
+\minihead{Understanding validation behavior} Given that entirely feral
+mechanisms can introduce duplicates, how many duplicates can be
+introduced? Once a record is written, any later validations will
+observe it via \texttt{SELECT} calls. However, \textit{while} a record
+is being validated, any number of concurrent validations can
+(un)safely proceed. In practice, the number of concurrent validations
+is dependent on the Rails environment. In a Rails deployment
+permitting $P$ concurrent validations (e.g., a single-threaded,
+multi-process environment with $P$ processes), each value in the
+domain of the uniqueness validation can be inserted no more than $P$
+times. Thus, validations---at least theoretically---reduce the
+worst-case number of duplicate records for each unique value in the
+column.
 
 \subsection{Quantifying Uniqueness Anomalies}
 
@@ -92,33 +101,35 @@ benefits in an actual production environment. Accordingly, we wrote
 and deployed a custom Rails 4 application that exercised uniqueness
 validations and observed its behavior under various workloads.
 
-Specifically, we wrote a simple web application that performed
-insertions to a non-indexed string column and compared the degree of
-violations both with and without a uniqueness validator. We deployed
-this application across two Amazon EC2 \texttt{m2.4xlarge} instances,
-offering 68.4 GB RAM, 8 CPU cores, and 1680GB local storage, running
-Ubuntu 14.04 LTS. On one instance, we deployed our application, using
-nginx 1.6.2 as a web frontend proxied to a set of Unicorn 4.8.3
-workers. That is, nginx acts as a HTTP frontend and proxies incoming
-requests to a variably sized pool of Rails VMs (managed by Unicorn, in
-a multi-process single-threaded concurrency model) that, in effect,
-\texttt{epoll} on a shared Linux file descriptor. On the other
-application instance, we deployed PostgreSQL 9.3.5 and configured it
-to run on the instance local storage. We used a third instance to
-direct traffic to the front-end instance and drive load.
+\minihead{Experimental setup} We developed a Rails 4 application that
+performed insertions to a non-indexed string column and compared the
+degree of violations both with and without a uniqueness validator. We
+deployed this application across two Amazon EC2 \texttt{m2.4xlarge}
+instances, offering 68.4 GB RAM, 8 CPU cores, and 1680GB local
+storage, running Ubuntu 14.04 LTS. On one instance, we deployed our
+application, using nginx 1.6.2 as a web frontend proxied to a set of
+Unicorn 4.8.3 workers. That is, nginx acts as a HTTP frontend and
+forwards incoming requests to a variably sized pool of Rails VMs
+(managed by Unicorn, in a multi-process single-threaded concurrency
+model) that, in effect, \texttt{epoll} on a shared Linux file
+descriptor. On the other EC2 instance, we deployed PostgreSQL 9.3.5
+and configured it to run on the instance local storage. We used a
+third EC2 instance to direct traffic to the front-end instance and
+drive load. We plot the average and standard deviation of three runs
+per experiment.
 
-We began our study by issuing a simple stress test that executed a
-number of concurrent insertion requests against a variable number of
-Unicorn workers. We repeatedly issued a set of 64 concurrent model
-creation (SQL insertion) requests, each with the same validated key
-(e.g., all with field \texttt{key} set to value 1) against the Rails
-application. Across an increasing number of Unicorn workers, we
-repeated this set of requests 100 times (blocking in-between rounds to
-ensure that each round is, in fact, a concurrent set of requests),
-changing the validated key each round.
+\minihead{Stress test} We began our study by issuing a simple stress
+test that executed a number of concurrent insertion requests against a
+variable number of Unicorn workers. We repeatedly issued a set of 64
+concurrent model creation (SQL insertion) requests, each with the same
+validated key (e.g., all with field \texttt{key} set to value 1)
+against the Rails application. Across an increasing number of Unicorn
+workers, we repeated this set of requests 100 times (blocking
+in-between rounds to ensure that each round is, in fact, a concurrent
+set of requests), changing the validated key each round.
 
 Figure~\ref{fig:pk-stress} shows the results. With no validation, all
-concurrent requests succeed, resulting in 6300 duplicate keys (100
+concurrent requests succeed, resulting in 6300 duplicate records (100
 rounds of 64-1 duplicate keys). With validations enabled, the number
 of violations depends on the degree of concurrency allowed by
 Unicorn. With only one process, Unicorn performs the validations
@@ -130,8 +141,8 @@ increases with the number of processes, maximizing at 16 worker
 processes. With additional processes, duplicates slightly decrease,
 which we attribute to thrashing between processes and within
 PostgreSQL (given that each instance has only 8 cores). Nevertheless,
-using validations, the microbenchmark duplicates remains below
-700---nearly an order-of-magnitude fewer duplicates than no
+using validations, the microbenchmark duplicate count remains below
+700---nearly an order-of-magnitude fewer duplicates than without using
 validations. Therefore, even though these validations are, in fact,
 incorrectly implemented, they still result in fewer
 anomalies. However, with a unique index declared on the \texttt{key}
@@ -143,45 +154,47 @@ column, we observed no duplicates, as expected.
 \label{fig:pk-stress}
 \end{figure} 
 
-The preceding experiment stressed a particularly high-contention
-workload---in effect, a worst case for uniqueness validations. In
-practice, such a workload is likely rare.\footnote{In fact, it was in
-  the above workload that we encountered the non-serializable
-  PostgreSQL behavior under serializable isolation. Under serializable
-  isolation, the number of anomlies is reduced, but we still detected
-  duplicate record creation. We confirmed this non-serializable
-  behavior via subsequent implementations of this
-  validation-then-insert in both Python and PostgreSQL PL/pgSQL stored
-  procedures.} Accordingly, we set up another workload meant to
-capture a less pathological access pattern. We ran another insert-only
-workload, with key choice distributed among a fixed set of keys. By
-varying the distribution and number of keys, we were able to both
-capture more realistic workloads and also control the amount of
-contention in the workload. As a basis for comparison, we ran four
-different distributions. First, we considered uniform key
-access. Second, we used YCSB's Zipfian-distributed accesses from
-workloada. Third and fourth, we used the item distribution access from
-Facebook's LinkBench workload, which captures MySQL record access when
-serving Facebook's social graph. Specifically, we
-used---separately---the insert and update traffic from this
-benchmark.
+\minihead{Actual workloads} The preceding experiment stressed a
+particularly high-contention workload---in effect, a worst case
+workload for uniqueness validations. In practice, such a workload is
+likely rare.\footnote{In fact, it was in the above workload that we
+  encountered the non-serializable PostgreSQL behavior under
+  serializable isolation. Under serializable isolation, the number of
+  anomlies is reduced compared to the number under Read Committed
+  isolation (as we report here), but we still detected duplicate
+  record creation. We confirmed this non-serializable behavior via
+  subsequent implementations of this parallel
+  predicate-read-then-conditionally-insert workload in both Python and
+  PostgreSQL PL/pgSQL stored procedures.} Accordingly, we set up
+another workload meant to capture a less pathological access
+pattern. We ran another insert-only workload, with key choice
+distributed among a fixed set of keys. By varying the distribution and
+number of keys, we were able to both capture more realistic workloads
+and also control the amount of contention in the workload. As a basis
+for comparison, we ran four different distributions. First, we
+considered uniform key access. Second, we used YCSB's
+Zipfian-distributed accesses from
+\texttt{workloada}~\cite{ycsb}. Third and fourth, we used the item
+distribution access from Facebook's LinkBench workload, which captures
+MySQL record access when serving Facebook's social
+graph~\cite{linkbench}. Specifically, we used---separately---the
+insert and update traffic from this benchmark.
 
-For each trial in this workload, we used 64 concurrent workers
+For each trial in this workload, we used 64 concurrent clients
 independently issuing a set of 100 requests each, with a fixed number
-of 64 Unicorn workers per process. Again, we report the average of 3
-trials.
+of 64 Unicorn workers per process. 
 
 Figure~\ref{fig:pk-workload} illustrates the number of duplicate
 records observed under each of these workloads. As we increase the
 number of possible keys, there are two opposing effects. With
 more keys, the probability of any two operations colliding
 decreases. However, recall that, once a key is written, all subsequent
-validators will observe it. Therefore, increasing the number of keys
+validators can read it. Therefore, increasing the number of keys
 increases the total number of possible races that might
 occur. Therefore, while the uniform workload observes an average of
-2.33 duplicate records with only one key, it observes an average of 26
-duplicate keys with 1000 keys. Nevertheless, with 1 million possible
-keys, none of the three trials observes any duplicate entries.
+2.33 duplicate records with only one possible key, it observes an average of 26
+duplicate keys with 1000 possible keys. Nevertheless, with 1 million possible
+keys, we do not observe any duplicate records.
 
 The actual ``production'' workloads exhibit different trends. In
 general, YCSB is an extremely high contention workload, with a Zipfian
@@ -189,8 +202,6 @@ constant of 0.99, resulting in one very hot key. This decreases the
 beneficial effect of increasing the number of keys in the
 database. However, LinkBench is less contentious and decreases more
 rapidly with increased numbers of keys.
-
-(TODO:FIX)
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
@@ -201,8 +212,6 @@ rapidly with increased numbers of keys.
 \label{fig:pk-workload}
 \end{figure}
 
-\minihead{Conclusions} 
- 
 \subsection{Associations}
 
 We repeated another set of experiments to test association behavior
@@ -242,7 +251,7 @@ inconsistency. In contrast, when we declare a foreign key constraint
 within the database, we observe no inconsistency.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}
+\includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}\vspace{-1em}
 \caption{Foreign key stress results.}
 \label{fig:fk-stress}
 \end{figure}
@@ -270,7 +279,7 @@ increasing Departments, the number of inconsistent records decreases
 linearly with the number of records.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}
+\includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}\vspace{-1em}
 \caption{Foreign key workload results.}
 \label{fig:fk-workload}
 \end{figure}
@@ -285,21 +294,22 @@ all anomalies.
 
 This raises the question: why declare validations at all? As we
 observe, validations protect against \textit{some} data
-corruption. First, they guard against non-concurrent anomalies such as
-data entry or input errors. For example, if a user attempts to reserve
-a username that was previously chosen, a validation would succeed. The
-failures we observe here are solely due to concurrent
-execution. Without concurrent execution, these validations are
-correct. Second, validations \textit{do} reduce the incidence---if not
-the degree---of inconsistency. Empirically, even under worst-case
-workloads, these validations result in order-of-magnitude reductions
-in inconsistency. Under less pathological workloads, they may reduce
-it almost entirely. It is possible that, in fact, the degree of
+corruption. First, they correctly guard against
+non-concurrency-related anomalies such as data entry or input
+errors. For example, if a user attempts to reserve a username that was
+previously chosen, a validation would succeed. The failures we observe
+here are solely due to concurrent execution. Without concurrent
+execution, validations are correct. Second, validations
+\textit{do} reduce the incidence---if not the degree---of
+inconsistency. Empirically, even under worst-case workloads, these
+validations result in order-of-magnitude reductions in
+inconsistency. Under less pathological workloads, they may reduce it
+almost entirely. It is possible that, in fact, the degree of
 concurrency and data contention within Rails-backed applications
 simply does not lead to these concurrency races---that, in some sense,
 validations are ``good enough'' for many applications.
 
 Nevertheless, Rails's feral mechanisms are a poor substitute for their
-respective database counterparts. We re-examine the Rails community's
+respective database counterparts in both cases. We re-examine the Rails community's
 reluctance to embrace these mechanisms in Section~\ref{sec:discussion}.
 

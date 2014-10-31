@@ -13,23 +13,26 @@ the most recent realization of the vision of object-relational mapping
 programmer adoption.
 
 A central player in modern frameworks is Ruby on Rails (or, simply
-``Rails'')~\cite{rails-book,rails-computer}, an open source codebase powering sites
-including (at one point) Twitter~\cite{twitter-rails}, Airbnb~\cite{airbnb-rails},
-GitHub~\cite{github-rails}, Hulu~\cite{hulu-rails}, Shopify~\cite{shopify-rails},
-Groupon~\cite{groupon-rails}, SoundCloud~\cite{soundcloud-rails}, Twitch~\cite{twitch-rails},
-Goodreads~\cite{goodreads-rails}, and Zendesk~\cite{zendesk-rails}. From the perspective of database systems
+``Rails'')~\cite{rails-book,rails-computer}, an open source codebase
+powering sites including (at one point) Twitter~\cite{twitter-rails},
+Airbnb~\cite{airbnb-rails}, GitHub~\cite{github-rails},
+Hulu~\cite{hulu-rails}, Shopify~\cite{shopify-rails},
+Groupon~\cite{groupon-rails}, SoundCloud~\cite{soundcloud-rails},
+Twitch~\cite{twitch-rails}, Goodreads~\cite{goodreads-rails}, and
+Zendesk~\cite{zendesk-rails}. From the perspective of database systems
 research, Rails is interesting for at least two reasons. First, it
 continues to be a popular means of developing responsive web
 application front-end and business logic, with an active open source
 community and user base. Rails recently celebrated its tenth
 anniversary and enjoys considerable commercial interest, both in terms
-of deploy base and the availability of hosted ``cloud'' deployment environments such as
-Heroku. Second, and perhaps more importantly, Rails is ``opinionated
-software''~\cite{dhh-opinionated}. That is, Rails embodies the strong personal convictions
-of its creator, David Heinemeier Hansson (DHH), and its and user
-community and is particularly opinionated towards the database systems
-that Rails tasks with data storage. To
-quote DHH:
+of deploy base and the availability of hosted ``cloud'' deployment
+environments such as Heroku. Thus, Rails programmers represent a large
+class of consumers of database technology. Second, and perhaps more
+importantly, Rails is ``opinionated
+software''~\cite{dhh-opinionated}. That is, Rails embodies the strong
+personal convictions of its creator, David Heinemeier Hansson (DHH),
+and developer community and is particularly opinionated towards the
+database systems that Rails tasks with data storage. To quote DHH:
 \begin{quote}
 ``I don't \textit{want} my database to be clever! \dots I consider stored procedures and constraints vile and reckless destroyers of coherence. No, Mr. Database, you can not have my business logic. Your procedural ambitions will bear no fruit and you'll have to pry that logic from my dead, cold object-oriented hands \dots I want a single layer of cleverness: My domain model.''~\cite{dhh-clever}
 \end{quote}
@@ -67,28 +70,26 @@ Given this corpus, we subsequently ask: are these validations actually
 correct? Do they work in practice? Under concurrent execution, Rails
 will execute validation checks in parallel, and any validation logic
 that is susceptible to races may lead to data corruption. Accordingly,
-we apply invariant confluence analysis and show that, in fact, over
-$74.7\%$ of Rails validations by volume of use are actually
-safe. However, the remaining, which include uniqueness violations
-under insertion and foreign key constraint violations under deletion,
-are not. Hence, we quantify the impact of concurrency on data
-corruption for Rails uniqueness and foreign key constraints under both
-Monte Carlo analysis and via actual application deployment. We
+we apply invariant confluence analysis~\cite{coord-avoid} and show
+that, in fact, over $74.7\%$ of Rails validations usage by volume is
+actually safe. However, the remainder, which include uniqueness
+violations under insertion and foreign key constraint violations under
+deletion, are not. Hence, we quantify the impact of concurrency on
+data corruption for Rails uniqueness and foreign key constraints under
+both worst-case analysis and via actual Rails deployment. We
 demonstrate that, for pathological workloads, validations reduce the
 severity of data corruption by orders of magnitude but, nevertheless,
-still permit incorrect state.
+still permit integrity violations.
 
-Given these results, we present recommendations for the
-database research community. We survey several additional web
-frameworks and demonstrate that, in fact, they fall prey to many of
-the same feral concurrency control pitfalls as Rails---despite
-widespread in-database support for preventative mechanisms, which we
-also survey. While the success of Rails and its ilk are firm evidence
-of the continued ``impedance mismatch'' between object-oriented
-programming and the relational model, we see considerable opportunity
-in adapting existing database concurrency control to better serve
-these communities---via both increased native support for declarative invariants
-and server-side code execution.
+Given these results, we present recommendations for the database
+research community. We survey several additional web frameworks and
+demonstrate that many also provide a notion of feral validations,
+suggesting an industry-wide trend. While the success of Rails and its
+ilk are firm evidence of the continued ``impedance mismatch'' between
+object-oriented programming and the relational model, we see
+considerable opportunity in adapting existing database concurrency
+control to better serve these communities---via both increased native
+support for declarative invariants and server-side code execution.
 
 In summary, this paper makes the following contributions:
 \begin{myitemize}

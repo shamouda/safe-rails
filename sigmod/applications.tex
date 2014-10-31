@@ -12,22 +12,22 @@ the database. To correctly enforce a validation requires either that
 that \textit{ii.)} the validations are somehow ``safe'' to run
 concurrently.
 
-Are validations isolated? Given that each sequence of
-validations is wrapped within a transaction, under serializable
-isolation, validations would appear to execute correctly. However, as
-is common in relational database engines~\cite{hat-vldb}, neither
-MySQL nor PostgreSQL actually default to serializable isolation, and
-instead provide the weaker Read Committed isolation. Under this
-isolation level, as we will see shortly, the validations effectively
-run concurrently. While Rails 4 does provide support for changing the
-isolation level on a per-transaction basis, Rails does not actually
-change the isolation level for validations. Similarly, none of the
-application code or configurations actually modified the default
-isolation level. Moreover, we did not encounter any application
-deployment documentation that suggested changing the isolation
-level. Although we cannot prove that this is the case, this data
-suggests that validations are likely running at Read Committed
-isolation.
+Are validations isolated? Given that each sequence of validations is
+wrapped within a transaction, under serializable isolation,
+validations would appear to execute correctly. However, as is common
+in relational database engines~\cite{hat-vldb}, neither PostgreSQL nor
+MySQL actually default to serializable isolation, and instead provide,
+respectively, the weaker Read Committed and Repeatable Read isolation
+levels. Under this isolation level, as we will see shortly, many
+validations effectively run concurrently. While Rails 4 does provide
+support for changing the isolation level on a per-transaction basis,
+Rails does not actually change the isolation level for
+validations. Similarly, none of the application code or configurations
+actually changethe default isolation level. Moreover, we did not
+encounter any application deployment documentation that suggested
+changing the isolation level. Although we cannot prove that this is
+the case, this data suggests that validations are likely running at
+default isolation in practice.
 
 Does a lack of serializable isolation actually affect these
 invariants? Just because validations effectively run concurrently does
@@ -41,7 +41,7 @@ condition for whether or not invariants can be preserved under
 coordination-free, concurrent execution of transactions. The condition
 effectively captures the property that ``the set of [invariant] valid
 states reachable by executing transactions and merging their results
-is closed (w.r.t. validity) under merge [of divergent states]''. In
+is closed (w.r.t. validity) under merge [of divergent states].'' In
 our MySQL and PostgreSQL back-ends, ``merge'' of two concurrent Rails
 validation transactions consists of either $i.)$ in the case of two
 concurrent inserts or updates to model instances with different IDs,
@@ -50,11 +50,12 @@ concurrent inserts or updates to model instances with the same IDs,
 choosing an arbitrary ``winning'' write. That is, if operations $o_1$
 and $o_2$ attempt to concurrently create new model instances $i_1$ and
 $i_2$ with different IDs, if each of $o_1$ and $o_2$'s validations
-pass, we will end up with two entries in the model table in the
+pass, we will end up with two new entries in the model table in the
 database. If $i_1$ and $i_2$ have the same ID, we will end up with
 only one of the models in the database. In the latter case, we end up
-with a Lost Update, but, in general, we find that most invariants
-(below) are more sensitive to the former operation.
+with a Lost Update, but, in general, we find that the invariants that
+are subject to violations under update are similarly subject to
+invariants under insertion.
 
 Per~\cite{coord-avoid}, the state of the art in invariant confluence
 analysis currently relies on a combination of manual proofs and simple
@@ -71,17 +72,18 @@ validations in the corpus we examined. As~\cite{coord-avoid} observed,
 many applications re-use a common set of invariants. We observed a
 similar trend in our analysis of Rails applications. Recall that Rails
 provides support for arbitrary, user-defined validation functions. In
-fact, in our analysis, we found that only 82 out of 3551 validations
+fact, in our analysis, we found that only 60 out of 3551 validations
 were expressed as user-defined functions. The remainder were drawn
-from the standard set of validations supported by Rails core.\footnote{It is
-  unclear exactly why this is the case. It is possible that, because
-  these invariants are standardized (in our case, in Rails, and,
-  in~\cite{coord-avoid}, in SQL), they are more accessible to
-  users. It is also possible that SQL and Rails have simply done a
-  good job of codifying common patterns that programmers have
-  used. This chicken-and-egg problem is an interesting area for
-  further methodological study.} Accordingly, we begin by considering
-built-in validations, then examine each of these custom validations.
+from the standard set of validations supported by Rails
+core.\footnote{It is unclear exactly why this is the case. It is
+  possible that, because these invariants are standardized (in our
+  case, in Rails, and, in~\cite{coord-avoid}, in SQL), they are more
+  accessible to users. It is also possible that SQL and Rails have
+  simply done a good job of codifying common patterns that programmers
+  tend to use. This chicken-and-egg problem is an interesting subject
+  for further methodological study.} Accordingly, we begin by
+considering built-in validations, then examine each of these custom
+validations.
 
 \subsection{Built-In Validations}
 
@@ -94,24 +96,26 @@ of an association is, in fact, present in the database. The former use
 case is I-confluent, while the latter depends on whether or not the
 codebase uses deletions or not. The second most popular invariant,
 \texttt{uniqueness} is \textit{not} invariant confluent. That is, if
-two users concurrently insert or modify records, they can 
-introduce duplicates. Eight of the next nine invariants are largely
-concerned with data formatting---for example, \texttt{numericality}
-ensures that the field contains a number rather than an alphanumeric
-string. These invariants are indeed invariant confluent under
-concurrent update. Finally, \texttt{associated} depends on whether or
-not the current updates are both insertions (safe) or mixed
-insertion-delections (unsafe). Ignoring \texttt{presence} and
+two users concurrently insert or modify records, they can introduce
+duplicates. Eight of the next nine invariants are largely concerned
+with data formatting---for example, \texttt{numericality} ensures that
+the field contains a number rather than an alphanumeric string. These
+invariants are indeed invariant confluent under concurrent
+update. Finally, \texttt{associated} depends on whether or not the
+current updates are both insertions (safe) or mixed insertions and
+deletions (unsafe). Ignoring \texttt{presence} and
 \texttt{associated}, we can label 74.7\% of validation occurrences as
 invariant confluent. Including these two invariants, if we mark them
-as non invariant confluent (i.e., consider mixed deletions and
+as not invariant confluent (i.e., consider mixed deletions and
 insertions), we have 35.2\% occurrence of invariant confluence, and,
 optimistically (only considering insertions), a 87.3\% occurence of
 invariant confluence invariants.
 
-Notably, among the built-in validations, it is associations and
-multi-record uniqueness that cause us problems. In the next section,
-we examine these invariants in greater detail.
+Overall, a large number of built-in validations are safe under
+concurrent operation. However, associations and multi-record
+uniqueness are---depending on the workload---not invariant confluent
+and are therefore likely to cause problems. In the next section, we
+examine these invariants in greater detail.
 
 \begin{table}
 \begin{tabular}{|l l l |}
@@ -130,7 +134,7 @@ Name & Occurrences & I-Confluent?\\\hline
 \texttt{validates\_email} & 34 & Yes \\
 Other & 303 & \\\hline
 \end{tabular}
-\caption{Use of and invariant confluence of non-UDF validations}
+\caption{Use of and invariant confluence of built-in validations.}
 \label{table:builtins}
 \end{table}
 
@@ -145,12 +149,12 @@ while the remaining 18 were not. For brevity, we omit a discussion of
 each validator (following double-blind review, we plan to open-source
 all analysis; for the time being, it \textit{is} possible to view
 these validators in the wild using the open source projects and hashes
-from Table~\ref{table:app-summary}) we discuss several trends and
+from Table~\ref{table:app-summary}) but discuss several trends and
 notable examples below.
 
 Among the invariant confluent custom validations, many consisted of
 simple format checks or other domain-specific validation, including
-credit card formatting and username blacklisting.
+credit card formatting and static username blacklisting.
 
 The non-invariant confluent validations took on a range of
 forms. Three validations performed the equivalent of foreign key
@@ -165,11 +169,10 @@ has sufficient stock available to fulfill an order; concurrent order
 placement might result in negative stock. Discourse's
 \texttt{PostValidator} checks whether a user has been spamming the
 forum; while not necessarily critical, a spammer could technically
-foil this validation by concurrently issuing posts.
+foil this validation by attempting to simultaneously author many posts.
 
-Again, it is possible---even likely---that there is considerable
-validation logic that is not exposed via these APIs. Nevertheless,
+In summary, again, a large class of validations appear safe. Nevertheless,
 these few examples highlight the importance of protecting against
-these anomalies.
+these anomalies. 
 
 

@@ -8,7 +8,7 @@
 
 
 \usepackage{color, times, mathptmx, amsmath, amssymb, amsthm, verbatim, 
-  mdwlist, graphicx, footnote, multirow, xspace, tikz, colortbl,dcolumn, mathtools,zi4}
+  mdwlist, graphicx, footnote, multirow, xspace, tikz, colortbl,dcolumn, mathtools,zi4,listings}
 
 
 \usepackage[noadjust]{cite}
@@ -48,6 +48,13 @@
 \renewcommand{\ttdefault}{zi4}
 \usepackage[T1]{fontenc}
 
+\algblock{ParFor}{EndParFor}
+% customising the new block
+\algnewcommand\algorithmicparfor{\textbf{parfor}}
+\algnewcommand\algorithmicpardo{\textbf{do}}
+\algnewcommand\algorithmicendparfor{\textbf{end\ parfor}}
+\algrenewtext{ParFor}[1]{\algorithmicparfor\ #1\ \algorithmicpardo}
+\algrenewtext{EndParFor}{\vspace{-1em}}
 
 
 \newenvironment{myitemize}

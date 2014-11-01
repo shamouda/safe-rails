@@ -50,7 +50,8 @@ relies on the user to correctly specify the schema.
 \orm{Django} (version 1.7), a popular Python-based
 framework,\footnote{\url{https://www.djangoproject.com/}} backs declared
 uniqueness and foreign key constraints with database-level
-invariants. It also supports custom validations.
+invariants. It also supports custom validations, which are not wrapped
+in a transaction (e.g., \footnote{https://github.com/jaylett/django-database-constraints}).
 
 \orm{Laravel} (version 4.2), another PHP-based web framework,\footnote{\url{http://laravel.com/}} supports the same
 set of functionality as CakePHP. Any database-backed constraints must
@@ -63,11 +64,14 @@ schema-specific, which makes migrations or switching to another
 database backend more difficult in the future.''
 
 \orm{Waterline} (version 0.10), a persistence layer for
-node.js\footnote{\url{https://github.com/balderdashy/waterline}} (backing
-Sails.js, a popular MVC
+node.js\footnote{\url{https://github.com/balderdashy/waterline}}
+(backing Sails.js, a popular MVC
 framework\footnote{\url{https://github.com/balderdashy/sails}}),
 provides support for in-DB foreign key and uniqueness constraints
-where supported. We found several reports of bugs in early support of
+(when supported by the database) as well as custom validations (no
+transactions\footnote{``TO-DO: This should all be wrapped in a
+  transaction. That's coming next but for the meantime just hope we
+  don't get in a nasty state where the operation fails!'' \url{https://github.com/balderdashy/waterline/blob/master/lib/waterline/model/lib/defaultMethods/save.js#L29}}). We found several reports of bugs in early support of
 uniqueness
 constraints\footnote{\url{https://github.com/balderdashy/sails-mongo/issues/152}
   \url{https://github.com/balderdashy/waterline/issues/55}

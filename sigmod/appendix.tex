@@ -1,10 +1,108 @@
 
-\section*{APPENDIX}
+\appendix
 
-\subsection*{Analysis Methodology}
+\section{Analysis Methodology}
 
 To determine the occurrences and number of models, transactions, locks, validations, and associations in Rails, we used a very simple set of custom code analysis scripts. We do not consider the analysis techniques here a contribution; rather, our interest is in the output of the analysis.  (Though we hesitate to term this process ``program analysis,'' the scripts embody a very simple syntactic static analysis.) The syntatic approach proved portable between the many versions of Rails against which each application is linked; otherwise, porting between non-backwards-compatible Rails versions was difficult and, in fact, unsupported by several of the Rails code analysis tools we considered using as alternatives. The choice to use syntax as a means of distinguishing code constructs led to some ambiguity. To compensate, we introduced custom logic to handle esoteric syntaxes that arose in particular projects (e.g., some projects extend \texttt{ActiveRecord::Base} with a separate, project-specific base class, while some validation usages vary between constructs like \texttt{:validates\_presence} and \texttt{:validates\_presence\_of}).
 
 To determine commit and project authorship, we used the output of \texttt{git log} and did not attempt any form of sophisticated entity resolution.
 
 Given double-blind constraints, we cannot release this code at this time. However, once double-blind restrictions have lifted, we plan to release the analysis scripts as to facilitate reproducibility of our results.
+
+\section{Detailed Validation Behavior}
+
+\minihead{Uniqueness Validation} When a controller attempts to \texttt{save} an ActiveRecord model instance $i$ of type $M$, if $M$ has a declared \texttt{:validates\_uniqueness} annotation on attribute $a$, the following steps will be performed during validation:
+
+\begin{enumerate} 
+
+\item Assuming that instances of $M$ are stored in database table $T_M$ (with attribute $a$ stored in column $C_a$), Active Record will perform the equivalent of $$\texttt{SELECT 1 FROM $T_M$ where $C_a$ = $i.a$ LIMIT ONE;}$$ (\texttt{SELECT COUNT(*)} would be sufficient here as well, but this is not how the query is actually implemented).
+
+\item If this result set is empty, the validation succeeds.
+
+\item If this result set is not empty, the validation fails. If the validation was called during \texttt{save}, the call returns \texttt{false}. If the validation was called during \texttt{save!}, the call returns an \texttt{ActiveRecord::RecordInvalid} exception.
+
+\end{enumerate}
+
+This is a classic example of the phantom problem. As we mention in Section~\ref{sec:evaluation}, changing this \texttt{SELECT} call to \texttt{SELECT FOR UPDATE} would be sufficient (given an appropriate implementation of next-key locking). However, Rails is not implemented as such.
+
+\minihead{Association Validation} When a controller attempts to \texttt{save} an ActiveRecord model instance $i$ of type $M$, if $M$ has a declared \texttt{:belongs\_to} annotation on attribute $a$ pointing to attribute $b$ of model $N$ \textit{and} $M$ has a declared \texttt{:validates\_presence} annotation on attribute $a$, the following steps will be performed during validation:
+
+\begin{enumerate} 
+
+\item Assuming that instances of $N$ are stored in database table $T_N$ (with attribute $b$ stored in column $C_b$), Active Record will perform the equivalent of $$\texttt{SELECT 1 FROM $T_N$ where $C_b$ = $i.a$ LIMIT ONE;}$$
+
+\item If this result set is not empty, the validation succeeds.
+
+\item If this result set is empty, the validation fails. If the validation was called during \texttt{save}, the call returns \texttt{false}. If the validation was called during \texttt{save!}, the call returns an \texttt{ActiveRecord::RecordInvalid} exception.
+
+\end{enumerate}
+
+\section{Experimental Description}
+
+\lstset{language=Ruby,basicstyle=\ttfamily,columns=fullflexible}
+
+In this section, we describe our applications deployed in Section~\ref{sec:evaluation} in greater detail.
+
+\minihead{Uniqueness Schema} We declare two models, each containing two attributes: \texttt{key}, a string, and \texttt{value}, also a string. The generated schema for each of the models, which we call \texttt{SimpleKeyValue} and \texttt{ValidatedKeyValue}, is the same. The schema for \texttt{SimpleKeyValue} is as follows:
+
+\begin{lstlisting}
+  create_table "validated_key_values", force: true do |t|
+    t.string   "key"
+    t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+\end{lstlisting}
+
+For \texttt{SimpleKeyValue}, we simply require that the \texttt{key} and \texttt{value} fields are not null:
+
+\begin{lstlisting}
+class SimpleKeyValue < ActiveRecord::Base
+  validates :key, presence: true
+  validates :value, presence: true
+end
+\end{lstlisting}
+
+For \texttt{ValidatedKeyValue}, we add a \texttt{uniqueness} constraint to \texttt{key}.
+
+\begin{lstlisting}
+class ValidatedKeyValue < ActiveRecord::Base
+  validates :key, presence: true, uniqueness: true
+  validates :value, presence: true
+end
+\end{lstlisting}
+
+The remainder of the application consists of a simple View and Controller logic to allow us to \texttt{POST}, \texttt{GET}, and \texttt{DELETE} each kind of model instance programatically via HTTP.
+
+\minihead{Uniqueness Stress Test} For the uniqueness stress test (Figure~\ref{fig:pk-stress}), we repeatedly attempt to create duplicate records. We issue a set of 64 concurrent requests to create instances with the \texttt{key} field set to an increasing sequence number ($k$, below) and repeat 100 times. At the end of the run, we count the number of duplicate records in the table:
+
+\begin{algorithm}[h!]
+\begin{algorithmic}
+\For{model $m \in \{\texttt{SimpleKeyValue}, \texttt{ValidatedKeyValue}\}$}
+  \For{$k \gets 1$ to $100$}
+    \ParFor{$1$ to $64$}
+      \State via HTTP: attempt to create new $m$ with \texttt{key=$k$}
+     \EndParFor
+   \EndFor
+   \State dups $\gets $execute(\texttt{SELECT key, COUNT(key)-1 FROM $T_M$}
+   \State \hspace{6.5em}\texttt{GROUP BY key HAVING COUNT(key) > 1;})
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\minihead{Uniqueness Workload Test} For the uniqueness workload test (Figure~\ref{fig:pk-workload}), a set of 64 workers sequentially issues a set of 100 operations each. Each operation attempts to create a new model instance with the \texttt{key} field set to a random item generated according to the distributions described in Section~\ref{sec:evaluation}:
+
+\begin{algorithm}[h!]
+\begin{algorithmic}
+\For{model $m \in \{\texttt{SimpleKeyValue}, \texttt{ValidatedKeyValue}\}$}
+  \ParFor{$1$ to $64$}
+    \For{$1$ to $100$}
+      \State $k \gets$ \textit{pick new key according to distribution}
+      \State via HTTP: attempt to create new $m$ with \texttt{key=$k$}
+     \EndFor
+   \EndParFor
+   \State dups $\gets $execute(\texttt{SELECT key, COUNT(key)-1 FROM $T_M$}
+   \State \hspace{6.5em}\texttt{GROUP BY key HAVING COUNT(key) > 1;})
+\EndFor
+\end{algorithmic}
+\end{algorithm}

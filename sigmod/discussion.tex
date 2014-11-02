@@ -32,36 +32,51 @@ An author of a portion of the code specification notes separately:
   before you go for [a Bean Validation] approach.''~\cite{unique-bean}
 \end{quote}
 %http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1414639627_4654729130380ec6809634192c3faacb
-By default, JPA Validations are triggered pre-commit upon model
-change and therefore run in a transaction.
+By default, JPA Validations are triggered pre-commit upon model change
+and therefore run in a transaction (at the default isolation level).
 
 \orm{Hibernate} (version 4.3.5), a Java ORM based on JPA, does
-not automatically enforce declared foreign key relationships. For uniqueness and
-foreign key constraints, it relies on JPA annotations for
-correctness. However, it also has an extensive user-level validation
-framework.\footnote{\url{http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/}}
+\textit{not} automatically enforce declared foreign key relationships:
+if a foreign key constraint is declared; a corresponding column is
+added, but that column is not backed by a database foreign
+key. Instead, for both uniqueness and foreign key constraints,
+Hibernate relies on JPA schema annotations for correctness. Hibernate
+also has an extensive user-level validation framework based on the JPA
+Validation Bean
+specification.\footnote{\url{http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/}}
 
 \orm{CakePHP} (version 2.5.5), a PHP-based web
 framework,\footnote{\url{http://cakephp.org/}} supports uniqueness,
-foreign key, and UDF validations via user-level checks. It does not
-back any of its validation checking with a database transaction and
-relies on the user to correctly specify the schema.
+foreign key, and UDF validations. CakePHP does \textit{not} back any of its
+validation checking with a database transaction and relies on the user
+to correctly specify any corresponding foreign keys or uniqueness
+constraints within the database the schema. Thus, while users can
+declare each of these validations, there is no guarantee that they are
+actually enforced by the database.
+
+\orm{Laravel} (version 4.2), another PHP-based web
+framework,\footnote{\url{http://laravel.com/}} supports the same set
+of functionality as CakePHP. Laravel supports uniqueness, foreign key,
+and UDF validations in the application, but any database-backed
+constraints must be specified manually in the schema. The authors note
+that ``database-level validations can efficiently handle some things
+(such as uniqueness of a column in heavily-used tables) that can be
+difficult to implement otherwise'' but ``[t]esting and maintenance is
+more difficult...[and] your validations would be database- and
+schema-specific, which makes migrations or switching to another
+database backend more difficult in the future.'' In contrast,
+model-level validations are ``the recommended way to ensure that only
+valid data is saved into your database. They are database agnostic,
+cannot be bypassed by end users, and are convenient to test and
+maintain.'' There is no discussion of
+concurrency.\footnote{http://laravelbook.com/laravel-input-validation/}
 
 \orm{Django} (version 1.7), a popular Python-based
 framework,\footnote{\url{https://www.djangoproject.com/}} backs declared
 uniqueness and foreign key constraints with database-level
-invariants. It also supports custom validations, which are not wrapped
+constraints. It also supports custom validations, but these
+validations are not wrapped
 in a transaction (e.g., \footnote{https://github.com/jaylett/django-database-constraints}).
-
-\orm{Laravel} (version 4.2), another PHP-based web framework,\footnote{\url{http://laravel.com/}} supports the same
-set of functionality as CakePHP. Any database-backed constraints must
-be specified manually in the schema. The authors note that
-``database-level validations can efficiently handle some things (such
-as uniqueness of a column in heavily-used tables) that can be
-difficult to implement otherwise...The other big downside to this
-approach is that your validations would be database- and
-schema-specific, which makes migrations or switching to another
-database backend more difficult in the future.''
 
 \orm{Waterline} (version 0.10), a persistence layer for
 node.js\footnote{\url{https://github.com/balderdashy/waterline}}

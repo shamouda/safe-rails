@@ -219,17 +219,21 @@ applications to determine how each of the concurrency control
 mechanisms from each application were used (see Appendix for
 methodological details).
 
-Overwhelmingly, applications used validators and associations instead
-of transactions or locks (Figure~\ref{fig:usages} and
-Table~\ref{table:app-summary}). On average, applications used 0.13 transactions, 1.82
+Overwhelmingly, applications did not use transactions or locks
+(Figure~\ref{fig:usages} and Table~\ref{table:app-summary}). On
+average, applications used 0.13 transactions, 0.01 locks, 1.82
 validations, and 3.30 associations per model (with an average of 29.1
-models per application). No application used more transactions
-than locks.
+models per application). While 46 (68.7\%) of applications at least
+transactions, 66 (98.5\%) used at least one validation or
+association. Only six applications (8.9\%) used locks, with
+pessimistic locking over twice as common as optimistic locking.
 
-In the next section, we explore exactly what these validations and
-associations are protecting against, but, for now, we note that we
-initially found this deviation from traditional concurrency control
-somewhat surprising. That is, rather than adopting the use of
+Thus, as a general trend, we find that validations and associations
+are, respectively, 14 and 25 times more common than transactions and
+orders of magnitude more common than locking. The feral
+mechanisms---that rely on application-enforced integrity
+maintenance---are---in keeping with the Rails philosophy---favored by
+these application developers. That is, rather than adopting the use of
 traditional transactional updates, Rails application writers chose to
 instead declaratively specify correctness criteria and have the ORM
 system check the criteria for them instead. It is unclear and even
@@ -238,7 +242,47 @@ of program correctness: undoubtedly, some of these programs contain
 errors. However, from the perspective of database usability and
 idiomatic web programming patterns, this reliance on application-level
 correctness criteria hints at an alternative developer mentality than
-users of traditional database concurrency control.
+users of traditional database concurrency control.   We
+devote much of the remainder of this work to examining exactly what
+these feral mechanisms are attempting preserve (and whether they are
+actually correct in doing so).
+
+Over the course of our investigation, we found a variety of
+interesting anecdotes. For example, the eCommerce application Spree
+uses six transactions, one for each of cancelling an order and and
+approving an order (atomically setting the user ID and timestamp),
+transfering shipments between fulfillment locations (e.g.,
+warehouses), transferring items between shipments, transfering stock
+between fulfillment locations, and updating an order's specific
+inventory status. A perhaps more natural point of contention
+(reminsicent of the canonical bank example from database textbooks) is
+mediating access to the available stock in an inventory. Performing
+delta adjustments to the available stock
+(\texttt{adjust\_count\_on\_hand(value)}) is protected via a
+pessimistic lock, but setting the available stock
+(\texttt{set\_count\_on\_hand(value)}) is not. The stock level itself
+is wrapped in a validation ensuring non-negative balances
+(\texttt{validates :count\_on\_hand, numericality: {
+    greater\_than\_or\_equal\_to: 0 }, if:
+  :verify\_count\_on\_hand?}). At one point, Spree's inventory was
+protected by an optimistic lock; it was removed due to failing
+customer checkout requests. On the relevant GitHub issue, a committer
+notes that ``I think we should get rid of the [optimistic lock] if
+there's no documentation about why it's there...I think we can look at
+this issue again in a month's time and see if there's been any
+problems since you turned it
+off.''\footnote{\url{https://github.com/spree/spree/issues/3238#issuecomment-20035900}}. Thus,
+the choice of (and even use of) concurrency control is 
+sometimes an ad-hoc process.
+
+The remainder of the corpus contains a number of such phenomena. The
+use of each style of concurrency control varies across repositories,
+but our results demonstrate a clear trend towards feral mechanisms
+within Rails. As a consequence of the breadth of our study (and paper
+formatting limitations), we are not able to discuss every application
+in detail (though the source code of each and, fortunately, the Git
+history and, often, issue trackers are publicly available for
+inspection).
 
 \begin{figure}
   \newcommand{\skipht}{\\[-2em]}
@@ -251,11 +295,7 @@ users of traditional database concurrency control.
 \label{fig:usages}
 \end{figure}
 
-Optimistic lock usage was sparing. Spree had it once, ``I think we
-should get rid of the field if there's no documentation about why it's
-there...I think we can look at this issue again in a month's time and
-see if there's been any problems since you turned it
-off.''\footnote{\url{https://github.com/spree/spree/issues/3238#issuecomment-20035900}}.
+
 
 \minihead{Additional metrics} To better illustrate how programmers
 were using each of these mechanisms, we report on two additional

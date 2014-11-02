@@ -1,3 +1,19 @@
 
 \section{Conclusion}
 \label{sec:conclusion}
+
+In this work, we examined the use of concurrency control mechanisms in
+a set of 67 open source Ruby on Rails applications and, to a less
+thorough extent, concurrency control support in a range of other web
+frameworks. We found that, in contrast with traditional transaction
+processing, these applications overwhelmingly prefer to leverage
+application-level \textit{feral} support for data integrity, typically
+in the form of declarative (sometimes user-defined) validation and
+association logic. Despite the popularity of these validations, we
+find limited use of in-database support to correctly implement them,
+leading to a range of quantifiable inconsistencies for Rails' built-in
+uniqueness and association validations. While indeed many validations
+are invariant confluent and therefore correct under concurrent
+execution given standard RDBMS weak isolation and concurrent update
+semantics, we see considerable opportunity to better support these
+users and their feral databases in the future.

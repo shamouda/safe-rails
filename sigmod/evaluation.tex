@@ -18,7 +18,8 @@ When a Model field is declared with a \texttt{:validates\_uniqueness}
 annotation, any instance of that model is checked against all other
 models in the database to ensure uniqueness. Rails accomplishes this
 by issuing a \texttt{SELECT WHERE} query in SQL and, if no such record
-is found, Rails updates the instance state in the database.
+is found, Rails updates the instance state in the database
+(Appendix~\ref{sec:appendix-uniqueness-behavior}).
 
 While this user-level uniqueness validation runs within a transaction,
 the exact isolation level of the transaction affects its
@@ -98,12 +99,30 @@ broken (at least under non-serializable isolation), $ii.)$ have a
 work-around by correctly declaring them within the database, yet
 $iii.)$ are widely used, we sought to understand their costs and
 benefits in an actual production environment. Accordingly, we wrote
-and deployed a custom Rails 4 application that exercised uniqueness
-validations and observed its behavior under various workloads.
+and deployed a custom Rails 4.1.5 application that exercised
+uniqueness validations and observed its behavior under various
+workloads.\footnote{In our experimental evaluation, we use the custom
+  applications---effectively, microbenchmarks for
+  ActiveRecord---described below (and in
+  Appendix~\ref{sec:appendix-experiments}) for two reasons. First,
+  these test cases allow us to isolate ActiveRecord behavior to the
+  relevant set of validations as they are deployed by default and
+  independent of any specialized controller logic. Second, this
+  reduces the complexity of programmatic deployment and testing; we
+  are able to bypass sessionization and authentication logic when
+  triggering ActiveRecord. Many of the applications in our corpus
+  indeed use the same code paths within ActiveRecord, but, to, say,
+  create a new User (without modifying the actual application code)
+  would otherwise require additional inputs, including a session and
+  authorization token as well as email and/or Captcha
+  authentication. These applications indeed allow concurrent accesses,
+  but the process of actually producing concurrency using their native
+  HTTP interfaces is more complex.}
 
 \minihead{Experimental setup} We developed a Rails 4 application that
 performed insertions to a non-indexed string column and compared the
-degree of violations both with and without a uniqueness validator. We
+degree of violations both with and without a uniqueness validator (for
+more details, see Appendix~\ref{sec:appendix-uniqueness-schema}). We
 deployed this application across two Amazon EC2 \texttt{m2.4xlarge}
 instances, offering 68.4 GB RAM, 8 CPU cores, and 1680GB local
 storage, running Ubuntu 14.04 LTS. On one instance, we deployed our
@@ -126,7 +145,8 @@ validated key (e.g., all with field \texttt{key} set to value 1)
 against the Rails application. Across an increasing number of Unicorn
 workers, we repeated this set of requests 100 times (blocking
 in-between rounds to ensure that each round is, in fact, a concurrent
-set of requests), changing the validated key each round.
+set of requests), changing the validated key each round
+(Appendix~\ref{sec:appendix-uniqueness-stress}).
 
 Figure~\ref{fig:pk-stress} shows the results. With no validation, all
 concurrent requests succeed, resulting in 6300 duplicate records (100
@@ -182,7 +202,7 @@ insert and update traffic from this benchmark.
 
 For each trial in this workload, we used 64 concurrent clients
 independently issuing a set of 100 requests each, with a fixed number
-of 64 Unicorn workers per process. 
+of 64 Unicorn workers per process (Appendix~\ref{sec:appendix-uniqueness-workload}). 
 
 Figure~\ref{fig:pk-workload} illustrates the number of duplicate
 records observed under each of these workloads. As we increase the
@@ -212,26 +232,79 @@ rapidly with increased numbers of keys.
 \label{fig:pk-workload}
 \end{figure}
 
-\subsection{Associations}
+
+\subsection{Associations Constraints and Isolation}
+
+When a Model field is declared with an association (e.g.,
+\texttt{:belongs\_to}) \textit{and} a \texttt{:validates\_presence}
+validation, Rails will attempt to ensure that the declared validation
+is valid before saving the model. Rails accomplishes this by issuing a
+\texttt{SELECT WHERE} query in SQL to find an associated record (e.g.,
+to ensure the ones end of a one-to-many relationship exists) and, if a
+matching association is found, Rails updates the instance state in the
+database (Appendix~\ref{sec:appendix-association-behavior}). On
+deletion, any models with associations marked with \texttt{:dependent:
+  destroy} (or \texttt{:dependent: delete}) will have any associated
+models destroyed (i.e., removed by instantiating in Rails and calling
+\texttt{destroy} on the model) or deleted (i.e., removed by simply
+calling the database's \texttt{DELETE} method). Implementing cascading
+deletes correctly even under serial accesses is complicated but is
+nevertheless possible.
+
+This feral association validation runs within a transaction, but,
+again the exact isolation level of the transaction affects its
+correctness. For correct execution, the \texttt{SELECT} query must
+also attain a predicate lock on the validated column for the duration
+of the transaction. Similar to the uniqueness validator, concurrent
+deletions and insertions are unsafe under Read Committed, Repeatable
+Read, and Snapshot Isolation. Thus, unless the database is configured
+for serializable isolation, inconsistency may result and the feral
+validation will fail to prevent data corruption.
+
+Unlike uniqueness validations, there is no discussion of associations
+and concurrency anomalies in the Rails documentation. Moreover, there
+is no way to natively declare a foreign key constraint in Rails; it
+must be done via a third-party library such as the \texttt{foreigner}
+Gem. Only two projects (\texttt{canvaslms} and \texttt{diaspora}) used
+\texttt{foreigner}, and only one project (\texttt{juvia}) used the
+alternative Gem \texttt{schema\_plus}. One project
+(\texttt{jobsworth}) uses a custom schema annotation and constraint
+generator. Rails 4.2 (in Beta as of November 2014) adds support for
+foreign key constraints via manual schema annotation.
+
+\minihead{Understanding association behavior} Given that entirely
+feral mechanisms can introduce broken associations, how many dangling
+records can be introduced? Once a record is deleted, any later
+validations will observe it via \texttt{SELECT} calls. However, in the
+worst case, the feral cascading deletion on the one side of a
+one-to-many relation can stall indefinitely, allowing an unlimited
+number of concurrent insertions to the many side of the
+relation. Thus, validations---at least theoretically---only reduce the
+worst-case number of dangling records that were inserted prior to
+deletion; any number of concurrent insertions may occur during
+validation, leading to unbounded inconsistency.
+
+\subsection{Quantifying Association Anomalies}
 
 We repeated another set of experiments to test association behavior
 under insertions and deletions. Using the same Unicorn and PostgreSQL
 deployment, we configured another application to test whether or not
-Rails validations would defend against dangling entries.
+Rails validations would defend against dangling entries. We consider
+an application with two models: Users and Departments. We configure a
+one-to-many relationship: each user \texttt{belongs\_to} a department,
+and each department \texttt{has\_many} user
+(Appendix~\ref{sec:appendix-association-schema}).
 
-As a basic stress test, we consider an application with two models:
-Users and Departments. We configure a one-to-many relationship: each
-user \texttt{belongs\_to} a department, and each department
-\texttt{has\_many} user. In the workload, we initialize the database
-by creating 100 departments with no users. Subsequently, for each
-department in the database, we issue a single request to delete the
-department along with 64 concurrent requests to insert users in that
-department. To correctly preserve the one-to-many relationship, the
-database should either reject the deletion operation or perform a
-cascading deletion of the department and any users (while rejecting any
-future user creation requests for that department). We can quantify
-the degree of inconsistency by counting the number of users left in
-the database who have no corresponding department.
+As a basic stress test, we initialize the database by creating 100
+departments with no users. Subsequently, for each department in the
+database, we issue a single request to delete the department along
+with 64 concurrent requests to insert users in that department. To
+correctly preserve the one-to-many relationship, the database should
+either reject the deletion operation or perform a cascading deletion
+of the department and any users (while rejecting any future user
+creation requests for that department). We can quantify the degree of
+inconsistency by counting the number of users left in the database who
+have no corresponding department (Appendix~\ref{sec:appendix-association-stress}).
 
 With associations declared in Rails, the Rails process performing the
 deletion will attempt a cascading delete of users upon department
@@ -262,13 +335,14 @@ deletions and insertions. We subsequently varied the degree of
 contention within the workload. We configured the same application and
 performed a set of insertions and deletions, but spread across a
 greater number of keys and at random. A set of 64 processes
-concurrently each issued 100 User creation and Department deletion requests (at
-a ratio of 10 to 1) to a set of randomly-selected keys (again at a ratio of 10
-Users to each Department). By varying the number of Users and
-Departments, we were able to control the amount of contention within
-the workload. Under this workload, inconsistency resulted only when a
-Department deletion proceeded concurrently with a User creation event
-and the feral cascading deletion ``missed'' the User creation.
+concurrently each issued 100 User creation and Department deletion
+requests (at a ratio of 10 to 1) to a set of randomly-selected keys
+(again at a ratio of 10 Users to each Department). By varying the
+number of Users and Departments, we were able to control the amount of
+contention within the workload. Under this workload, inconsistency
+resulted only when a Department deletion proceeded concurrently with a
+User creation event and the feral cascading deletion ``missed'' the
+User creation (Appendix~\ref{sec:appendix-association-workload}).
 
 Figure~\ref{fig:fk-workload} shows the results. As the number of
 Departments increases, we observe two trends. First, with only one

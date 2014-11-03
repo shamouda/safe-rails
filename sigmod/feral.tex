@@ -28,9 +28,9 @@ Rails contains four main mechanisms for concurrency control.
 sequence of operations within a special \texttt{transaction} block,
 Rails operations will execute transactionally, backed by an actual
 database transaction. The database transaction either runs at the
-database's configured default isolation level or, as of Rails 4, can
+database's configured default isolation level or, as of Rails 4.0.0, can
 be configured on a per-transaction
-basis.\footnote{https://github.com/rails/rails/commit/392eeecc11a291e406db927a18b75f41b2658253}
+basis~\cite{code-transaction-isolation}.
 
 \item Rails provides support for both optimistic and pessimistic
 \textbf{locking}. Applications invoke pessimistic locks on an Active

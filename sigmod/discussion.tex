@@ -245,59 +245,73 @@ effort from with 41 representatives from companies including Google,
 Oracle, and Red Hat), suggests that validations are, in fact, a common
 way to express domain logic in web programs.
 
+Conceptually, these validations fail today largely because they
+are expressed in a language that is not understood or interpreted by
+the database, which is unable to assist in ensuring data
+integrity. Databases do provide a tried-and-true (under serializable
+isolation) programming construct: the transaction concept. But these
+web programming frameworks have adopted their \textit{own}, similar
+but separate set of language idioms. To his credit, DHH explicitly
+disowns the title of ``computer scientist'' and instead refers to
+himself as an ``information systems
+programmer''~\cite{dhh-keynote}. DHH's information systems are ``built
+on top of computer science...[and] computer science is what it makes
+it possible for us to do what it is that we [information systems programmers] do. But
+it doesn't define what we do.'' Given a set of database system
+implementations that necessarily require buy-in to a transactional
+programming model in order to support concurrent programming (not to
+mention the complexities associated with weak isolation), DHH and the
+Rails community instead have forged their own path.
+
+Therefore, we see considerable opportunity in better supporting these
+alternative programming models. Doing so has clear correctness
+implications but also has performance implications: in a tiered
+application deployment, native integration of user-defined validations
+with the database can help eliminate database
+RTTs~\cite{pyxis}---which, in particular, can assist with reducing the
+duration for which locks are held. We see opportunity for invariant-
+or validation-based concurrency control, thus allowing higher
+concurrency and avoiding the cost of serializable isolation that these
+data stores and users have evidently eschewed. This suggests the
+possibility of a revival of concepts from active and rule-based
+databases~\cite{activedb-book} and, broadly, semantic concurrency
+control. The challenge of declaring semantic criteria for correctness
+is already being performed by database users---at least for some
+correctness criteria. While they are likely incomplete specifications,
+we view the fact that declarative validations are being used
+organically and have been produced by database users (in lieu of
+standard transaction model) as ample cause for re-evaluating the
+decades of work on semantic concurrenty control.
+
 The second part of our study here demonstrates the challenges inherent
-in actually providing correct invariant-based concurrency
-control. Despite the fact that frameworkssuch as Rails and JPA wrap
-validations within the scope of a transaction, the pervasive use of
-weak isolation undermines the safety of non-I-confluent
-validations. (When default database isolation is non-serializable,
-expect ``convention over configuration'' to lead to isolation
-anomalies.) A small but notable portion of these validations cannot be
+in actually ensuring this vision with current technology. Despite the
+fact that frameworks such as Rails and JPA wrap validations within the
+scope of a transaction, the pervasive use of weak isolation undermines
+the safety of non-I-confluent validations. (When default database
+isolation is non-serializable, one can only expect ``convention over
+configuration'' to lead to isolation anomalies.) As our analysis
+shows, a small but notable portion of these validations cannot be
 sufficiently enforced under non-serializable isolation. Moreover,
-there is compelling evidence that the framework authors \textit{are}
+there is compelling evidence that some framework authors \textit{are}
 aware of this issue (e.g., Footnote~\ref{fn:si-rails}, the JPA
 comments in Section~\ref{sec:other-orms}). While serializable
 isolation is conceptually sufficient to correctly enforce isolation,
 its lack of support in databases such as Oracle 12c and implementation
 bugs such as the error we encountered in PostgreSQL are often enough
-to compromise validator integrity. The complete divorce of validation
-annotations from schema declaration in both PHP frameworks we examined
-is even more perplexing. These trends suggest a desire for greater
-flexibility and a disregard of database safety mechanisms such as
-built-in uniqueness and referential integrity constraints.
-
-We see considerable opportunity in bridging this gap and better
-facilitating these application-level validations. Doing so has not
-only correctness implications but also performance implications: in a
-tiered application deployment, native integration of user-defined
-validations with the database can help eliminate database
-RTTs~\cite{pyxis}---which, in particular, can assist with reducing the
-duration for which locks are held. While the best of these validation
-implementations rely on transactions for isolation, we see opportunity
-for invariant- or validation-based concurrency control, thus allowing
-higher concurrency and avoiding the cost of serializable isolation
-that these data stores and users have evidently eschewed. This hints
-at the possibility of a revival of concepts from active and rule-based
-databases~\cite{activedb-book} and, broadly, semantic concurrency
-control. The challenge of declaring semantic criteria for correctness
-is already being performed by database users---at least for some
-correctness criteria. It remains to be seen whether, in fact, these
-validations can be treated as a complete specification for
-correctness. Nevertheless, we view the fact that declarative
-validations are being used organically and have been produced by
-database users (in lieu of standard transaction model) as ample cause
-for re-evaluating the decades of work on semantic concurrenty control.
+to compromise validator integrity. A community that shuns transaction
+use is even less likely to positively engage with the subtleties of
+weak isolation.
 
 \subsection{Usability and ``Correctness''}
 
 Returning, finally, to the Rails central goal of programmer
 productivity, our results ultimately hint at a triumph of convenience
 over formal---and, in some cases, practical---correctness
-guarantees. However, we have observed that the ``convenient''
-feral validations actually do serve a purpose in reducing worst-case
-data integrity errors. In a sense, this suggests that, in fact, these
-validations are somehow sufficient for most applications, or,
-alternatively, other errors (e.g., bugs in program logic) loom larger for developers.
+guarantees. However, we have observed that the ``convenient'' feral
+validations actually do serve a purpose in reducing worst-case data
+integrity errors. This suggests that, in fact, these validations are
+somehow sufficient for most applications, or, alternatively, other
+errors (e.g., bugs in program logic) loom larger for developers.
 
 The takeaway for the database community here is, in a sense, somewhat
 sobering. Ultimately, under the hypothesis that Rails has succeeded

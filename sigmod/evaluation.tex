@@ -35,18 +35,19 @@ potential inconsistency.\footnote{Using \texttt{SELECT FOR UPDATE}
 insertions to different records will similarly result in
 inconsistency.\footnote{The first reference to the potential integrity
   violations resulting from this implementation in the Rails code that
-  we are aware of dates to December 2007, in Rails v.2.0.0
-  (\url{https://github.com/rails/rails/commit/c01c28c3047bbf0be2861c7ae1146723cf4ff7a9})
-  In September 2008, another user added additional discussion
-  (\url{https://github.com/rails/rails/commit/adacd9451877d3c195da7f1935353b1cb3fed368}),
-  noting that ``this could even happen if you use transactions with
-  the 'serializable' isolation level.'' Without reading too closely,
+  we are aware of dates to December 2007, in Rails
+  v.2.0.0~\cite{code-unique-race-one}.  In September 2008, another
+  user added additional discussion within the code comments, noting
+  that ``this could even happen if you use transactions with the
+  'serializable' isolation
+  level''~\cite{code-unique-race-two}. Without reading too closely,
   the use of ``'serializable''' possibly suggests familiarity with the
   common, erroneous labeling of Snapshot Isolation as ``serializable''
   (as in Oracle 12c documentation and PostgreSQL documentation prior
-  to the introduction of SSI in version 9.1.1 in September 2011.)\label{fn:si-rails}. }
-Thus, unless the database is configured for serializable isolation,
-inconsistency may result and the feral validation will fail.
+  to the introduction of SSI in version 9.1.1 in September
+  2011.)\label{fn:si-rails}. } Thus, unless the database is configured
+for serializable isolation, inconsistency may result and the feral
+validation will fail.
 
 As we have discussed, MySQL and PostgreSQL each support serializable
 isolation but default to weaker isolation. Notably, in our
@@ -69,14 +70,30 @@ records may be inserted even despite uniqueness
 validations~\cite{rails-guide}. However, despite the existence of
 patches that remedy this behavior by the use of an in-database
 constraint and/or index, Rails provides this incorrect behavior out of
-the box.\footnote{\url{https://github.com/rails/rails/issues/645}} To
-quote one Rails issue: ``this is not a bug but documented and inherent
-behavior of
-validates\_uniqueness\_of''.\footnote{\url{https://github.com/rails/rails/issues/13234#issuecomment-30092363}} In an apparent departure from the Rails's stated philosophy, a
-core committer follows up, noting that ``the only way to handle this
+the box. (The patch was rejected; ``[t]he reasons for it not being
+incorporated as part of \texttt{validates\_uniqueness\_of} are lost in
+the mists of time but I suspect it's to do with backwards
+compatibility, cross database compatibility and applications varying
+on how they want/need to handle these kind of errors.''; all
+from~\cite{code-index-patch}).
+
+In another issue that reports errors arising from uniqueness
+validation, a commenter asserts ``this is not a bug but documented and
+inherent behavior of
+validates\_uniqueness\_of''~\cite{code-index-error}.  A Rails
+committer follows up, noting that ``the only way to handle this
 properly is at the database layer with a unique constraint on the
-column.'' We further discuss this mismatch between framework and database
-guarantees in Section~\ref{sec:discussion}
+column,'' and subsequently closes the issue. The original reporter
+protests that ``the problem extends beyond unique constraints and into
+validations that are unique to a Rails application that can't [sic?!] be
+enforced on the DB level''; the Rails committer responds that ``with
+the possible exception of \texttt{validates\_presence\_of
+  :association} and \texttt{validates\_associated}[,] all of the other
+validations are constrained by the attribute values currently in
+memory, so aren't susceptible to similar flaws.'' We investigate this
+claim in the remainder of this section and further discuss this
+mismatch between framework and database guarantees in
+Section~\ref{sec:discussion}.
 
 \minihead{Understanding validation behavior} Given that entirely feral
 mechanisms can introduce duplicates, how many duplicates can be

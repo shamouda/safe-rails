@@ -128,32 +128,6 @@
 {\author{}}
 \maketitle
 
-\section*{TODO}
-\begin{myitemize}
-\item Section~\ref{sec:rails-cc}: Add statistics on when optimistic
-  locking is used.
-\item Section~\ref{sec:rails-cc}: Add discussion about how often locks
-  are used.
-\item Section~\ref{sec:apps}: Add pseudocode for how validation is performed.
-\item Section~\ref{sec:rails-cc}: Expand discussion of which apps use
-  which mechanisms. Specifically, who uses transactions and why?
-\item Section~\ref{sec:evaluation}: Add pseudocode for sample applications.
-\item Section~\ref{sec:evaluation}: Add pseudocode for evaluation
-  workload.
-\item Section~\ref{sec:evaluation}: Add discussion of how association
-  checking can go wrong.
-\item Section~\ref{sec:evaluation}: Add discussion of worst case
-  degree of inconsistency for association races.
-\item Section~\ref{sec:other-orms}: Expand discussion of what these
-  frameworks actually do; too terse right now as to be ambiguous.
-\item Section~\ref{sec:other-orms}: Figure out if waterline has custom
-  validations.
-\item Section~\ref{sec:other-orms}: Figure out if Django backs custom
-  validations with a transaction.
-\item Section~\ref{sec:conclusion}: Add conclusion
-\item General: convert some of these footnotes to references
-\end{myitemize}
-
 \input{abstract}
 
 \input{intro}
@@ -172,12 +146,15 @@
 
 \input{conclusion}
 
-%\scriptsize
-%\linespread{.98}
-%\selectfont
-
+\scriptsize
+\linespread{.98}
+\selectfont
 
 \bibliography{feral-cc} \bibliographystyle{abbrv}
+
+\linespread{1}
+\normalsize
+\selectfont
 
 \input{appendix}
 

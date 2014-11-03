@@ -57,11 +57,9 @@ and saves the object.
   database-backed transaction upon model save.\footnote{The practice
     of wrapping validations in a transaction dates to the earliest
     Rails commit (albeit, in 2004, transactions were supported via a
-    per-Ruby VM global lock:
-    \url{https://github.com/rails/rails/blob/db045dbbf60b53dbe013ef25554fd013baf88134/activerecord/lib/active_record/transactions.rb#L6}). However,
+    per-Ruby VM global lock~\cite{code-txn-lock}). However,
     as late as 2010, updates were only partially protected by
-    transactions
-    (\url{https://github.com/rails/rails/commit/f4fbc2c1f943ff11776b2c7c34df6bcbe655a4e5}).}.\\[-2mm]
+    transactions~\cite{code-txn-update}.}.\\[-2mm]
 
 In contrast with the prior two mechanisms, Rails validations are a
 prominent feature of the Active Record model (i.e., neither
@@ -270,10 +268,9 @@ customer checkout requests. On the relevant GitHub issue, a committer
 notes that ``I think we should get rid of the [optimistic lock] if
 there's no documentation about why it's there...I think we can look at
 this issue again in a month's time and see if there's been any
-problems since you turned it
-off.''\footnote{\url{https://github.com/spree/spree/issues/3238#issuecomment-20035900}}. Thus,
-the choice of (and even use of) concurrency control is 
-sometimes an ad-hoc process.
+problems since you turned it off''~\cite{code-optimistic-issue}. Thus,
+the choice of (and even use of) concurrency control is sometimes an
+ad-hoc process.
 
 The remainder of the corpus contains a number of such phenomena. The
 use of each style of concurrency control varies across repositories,
@@ -369,9 +366,10 @@ validations and associations for three reasons. First, as we have
 seen, these constructs are widely used in the codebases we have
 studied, and, ostensibly, more widely used in the Rails community than
 the alternatives. Second, these constructs represent a deviation from
-standard concurrency control techniques and are therefore perhaps more likely to
-contain errors. Third, while code analysis of all \textit{program logic} in
-these applications in order to determine whether they are indeed
-correct would be instructive, this is likely beyond the capacity of 
-automated techniques. We opt to check \textit{declared}
-constraints rather than latent constraints.
+standard concurrency control techniques and are therefore perhaps more
+likely to contain errors. Third, while analyzing latent constraints (i.e.,
+those that might be determined via more sophisticated techniques such
+as pre- and post-condition invariant mining and/or by interviewing each
+developer on each project) would be instructive, this is difficult to
+scale. We view these forms of analysis as worthwhile avenues for
+future research.

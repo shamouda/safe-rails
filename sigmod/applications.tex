@@ -1,5 +1,5 @@
 
-\section{Safety and Correctness: Theory}
+\section{Analytical Integrity Analysis}
 \label{sec:apps}
 
 We now turn our attention to understanding which of Rails' feral
@@ -21,7 +21,7 @@ respectively, the weaker Read Committed and Repeatable Read isolation
 levels. Under this isolation level, as we will see shortly, many
 validations effectively run concurrently. While Rails 4 does provide
 support for changing the isolation level on a per-transaction basis,
-Rails does not actually change the isolation level for
+Rails does not actually change the database isolation level for
 validations. Similarly, none of the application code or configurations
 actually changethe default isolation level. Moreover, we did not
 encounter any application deployment documentation that suggested
@@ -55,7 +55,7 @@ database. If $i_1$ and $i_2$ have the same ID, we will end up with
 only one of the models in the database. In the latter case, we end up
 with a Lost Update, but, in general, we find that the invariants that
 are subject to violations under update are similarly subject to
-invariants under insertion.
+anomalies under insertion.
 
 Per~\cite{coord-avoid}, the state of the art in invariant confluence
 analysis currently relies on a combination of manual proofs and simple
@@ -92,24 +92,25 @@ validations by usage and their occurences in our application
 corpus. The most popular, \texttt{presence} is multi-modal: its basic
 behavior is to simply check for empty values in a model before
 saving. However, it can also be used to enforce that the opposite end
-of an association is, in fact, present in the database. The former use
-case is I-confluent, while the latter depends on whether or not the
-codebase uses deletions or not. The second most popular invariant,
-\texttt{uniqueness} is \textit{not} invariant confluent. That is, if
-two users concurrently insert or modify records, they can introduce
-duplicates. Eight of the next nine invariants are largely concerned
-with data formatting---for example, \texttt{numericality} ensures that
-the field contains a number rather than an alphanumeric string. These
-invariants are indeed invariant confluent under concurrent
-update. Finally, \texttt{associated} depends on whether or not the
-current updates are both insertions (safe) or mixed insertions and
-deletions (unsafe). Ignoring \texttt{presence} and
-\texttt{associated}, we can label 74.7\% of validation occurrences as
-invariant confluent. Including these two invariants, if we mark them
-as not invariant confluent (i.e., consider mixed deletions and
-insertions), we have 35.2\% occurrence of invariant confluence, and,
-optimistically (only considering insertions), a 87.3\% occurence of
-invariant confluence invariants.
+of an association is, in fact, present in the database (i.e.,
+referential integrity). The former use case is invariant confluent,
+while the latter depends on whether or not the codebase uses deletions
+or not. The second most popular invariant, \texttt{uniqueness} is
+\textit{not} invariant confluent. That is, if two users concurrently
+insert or modify records, they can introduce duplicates. Eight of the
+next nine invariants are largely concerned with data formatting---for
+example, \texttt{numericality} ensures that the field contains a
+number rather than an alphanumeric string. These invariants are indeed
+invariant confluent under concurrent update. Finally,
+\texttt{associated} depends on whether or not the current updates are
+both insertions (safe) or mixed insertions and deletions
+(unsafe). Ignoring \texttt{presence} and \texttt{associated}, we can
+label 74.7\% of validation occurrences as invariant
+confluent. Including these two invariants, if we mark them as not
+invariant confluent (i.e., consider mixed deletions and insertions),
+we have 35.2\% occurrence of invariant confluence, and, optimistically
+(only considering insertions), a 87.3\% occurence of invariant
+confluence invariants.
 
 Overall, a large number of built-in validations are safe under
 concurrent operation. However, associations and multi-record

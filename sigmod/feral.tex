@@ -41,7 +41,7 @@ in an Active Record model. When a Rails process performs an update to
 an optimistically locked Model, Active Record atomically checks that an object's
 \texttt{lock\_version} has not changed since the process last read the
 object and, if it has not changed, increments \texttt{lock\_version}
-and saves the object.
+and updates the object in the database.
 
 \item Rails provides support for application-level
   \textbf{validations}. Each Model has a set of zero or more
@@ -54,49 +54,57 @@ and saves the object.
   but also allows arbitrary user-defined validations (we discuss
   actual validations further in subsequent sections). Each validation
   declared for a given model is run sequentially within a
-  database-backed transaction upon model save.\footnote{The practice
+  database-backed transaction before actually updating the model state
+  in the database.\footnote{The practice
     of wrapping validations in a transaction dates to the earliest
     Rails commit (albeit, in 2004, transactions were supported via a
     per-Ruby VM global lock~\cite{code-txn-lock}). However,
     as late as 2010, updates were only partially protected by
     transactions~\cite{code-txn-update}.}.\\[-2mm]
 
-In contrast with the prior two mechanisms, Rails validations are a
-prominent feature of the Active Record model (i.e., neither
-transactions nor locks are actually discussed in the official ``Rails
-Guides''). Per the Rails documentation~\cite{rails-guide}, validations ``are database
-agnostic, cannot be bypassed by end users, and are convenient to test
-and maintain.'' In contrast, ``[d]atabase constraints and/or stored procedures make the
-validation mechanisms database-dependent and can make testing and
-maintenance more difficult.'' As we will see in the next subsection,
-validations are widely used by many actual applications.
+  Rails validations are a prominent feature of the Active Record
+  model. In contrast, neither transactions nor locks are actually
+  discussed in the official ``Rails Guides,'' and, generally, are not
+  promoted as a means of ensuring data integrity. Instead, the Rails
+  documentation~\cite{rails-guide} prefers validations as they are
+  ``are database agnostic, cannot be bypassed by end users, and are
+  convenient to test and maintain.'' Moreover, the Rails documentation
+  opines that ``[d]atabase constraints and/or stored procedures make
+  the validation mechanisms database-dependent and can make testing
+  and maintenance more difficult.'' As we will see in the next
+  subsection, validations are widely used by many actual applications.
 
 \item Rails provides support for application-level
-\textbf{associations}. Like validations, associations are a core
-concept of the Active Record model. As the name suggests, ``an
-association is a connection between two Active Record models,''
-effectively acting like a foreign key in a traditional
-database. Associations can be declared on one or both sides of a
-one-to-one or one-to-many relationship, including transitive
-dependencies (via a \texttt{:through} annotation). Declaring an
-association (e.g., \texttt{:belongs\_to dept}) produces a special field
-for the associated record ID within the model (e.g.,
-\texttt{dept\_id}). Coupling an association with an appropriate
-validation (e.g., \texttt{:presence}) ensures that the association is
-indeed valid (and is, via the validation, backed by a database
-transaction). Rails does not natively provide support for
-database-backed foreign key constraints.
+  \textbf{associations}. Like validations, associations are a core
+  concept of the Active Record model. As the name suggests, ``an
+  association is a connection between two Active Record models,''
+  effectively acting like a foreign key in a traditional
+  database. Associations can be declared on one or both sides of a
+  one-to-one or one-to-many relationship, including transitive
+  dependencies (via a \texttt{:through} annotation). Declaring an
+  association (e.g., \texttt{:belongs\_to dept}) produces a special
+  field for the associated record ID within the model (e.g.,
+  \texttt{dept\_id}). Coupling an association with an appropriate
+  validation (e.g., \texttt{:presence}) ensures that the association
+  is indeed valid (and is, via the validation, backed by a database
+  transaction). Rails does not provide native support for
+  database-backed foreign key constraints.\footnote{However, Rails 4.2
+    (in Beta as of November 2014) will add support for foreign key
+    constraints via manual schema annotation.}
 \end{myenumerate}
 
 Overall, these four mechanisms provide a range of options for
 developers. The first is squarely in the realm of traditional
-concurrency control. In many cases, the latter two are reminiscent of
-common database features such as referential integrity
-constraints. However, others, such as UDF-based validations, are
-reminiscent of proposals for more exotic, semantic-based concurrency
-control primitives. We call these latter two \textit{feral} strategies
-for concurrency control. As we will show shortly, the latter two
-dominate in terms of developer popularity.
+concurrency control. The second is, in effect, a coarse-grained
+user-level implementation of single-record transactions via
+database-level ``compare-and-swap'' primitives. In many cases, the
+latter two are reminiscent of common database features such as
+referential integrity constraints. However, others, such as UDF-based
+validations, are reminiscent of proposals for more exotic,
+semantic-based concurrency control primitives. We term these latter
+two strategies---validations and associations---\textit{feral}
+concurrency control mechanisms. As we will show shortly, these feral
+mechanisms dominate in terms of developer popularity.
 
 \subsection{Adoption in Practice}
 
@@ -221,29 +229,27 @@ Overwhelmingly, applications did not use transactions or locks
 (Figure~\ref{fig:usages} and Table~\ref{table:app-summary}). On
 average, applications used 0.13 transactions, 0.01 locks, 1.82
 validations, and 3.30 associations per model (with an average of 29.1
-models per application). While 46 (68.7\%) of applications at least
-transactions, 66 (98.5\%) used at least one validation or
-association. Only six applications (8.9\%) used locks, with
-pessimistic locking over twice as common as optimistic locking.
+models per application). While 46 (68.7\%) of applications used
+transactions, 66 (98.5\%) used validations or associations. Only six
+applications (8.9\%) used locks. Uses of pessimistic locking were more
+than twice as common as optimistic locking.
 
-Thus, as a general trend, we find that validations and associations
-are, respectively, 14 and 25 times more common than transactions and
-orders of magnitude more common than locking. The feral
-mechanisms---that rely on application-enforced integrity
-maintenance---are---in keeping with the Rails philosophy---favored by
-these application developers. That is, rather than adopting the use of
-traditional transactional updates, Rails application writers chose to
-instead declaratively specify correctness criteria and have the ORM
-system check the criteria for them instead. It is unclear and even
-unlikely that these declarative criteria are a complete specification
-of program correctness: undoubtedly, some of these programs contain
-errors. However, from the perspective of database usability and
-idiomatic web programming patterns, this reliance on application-level
-correctness criteria hints at an alternative developer mentality than
-users of traditional database concurrency control.   We
-devote much of the remainder of this work to examining exactly what
-these feral mechanisms are attempting preserve (and whether they are
-actually correct in doing so).
+Overall, we find that validations and associations are, respectively,
+14 and 25 times more common than transactions and orders of magnitude
+more common than locking. The feral mechanisms are---in keeping with
+the Rails philosophy---favored by these application developers. That
+is, rather than adopting the use of traditional transactional updates,
+Rails application writers chose to instead declaratively specify
+correctness criteria and have the ORM system check the criteria for
+them instead. It is unclear and even unlikely that these declarative
+criteria are a complete specification of program correctness:
+undoubtedly, some of these programs contain errors. However, from the
+perspective of database usability and idiomatic web programming
+patterns, this reliance on application-level correctness criteria
+hints at an alternative developer mentality than users of traditional
+database concurrency control.  We devote much of the remainder of this
+work to examining exactly what these feral mechanisms are attempting
+preserve (and whether they are actually correct in doing so).
 
 Over the course of our investigation, we found a variety of
 interesting anecdotes. For example, the eCommerce application Spree
@@ -258,8 +264,10 @@ mediating access to the available stock in an inventory. Performing
 delta adjustments to the available stock
 (\texttt{adjust\_count\_on\_hand(value)}) is protected via a
 pessimistic lock, but setting the available stock
-(\texttt{set\_count\_on\_hand(value)}) is not. The stock level itself
-is wrapped in a validation ensuring non-negative balances
+(\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why one
+operation necessitates a lock but the other does not, given that both
+are ostensibly sensitive to concurrent accesses. The stock level
+itself is wrapped in a validation ensuring non-negative balances
 (\texttt{validates :count\_on\_hand, numericality: {
     greater\_than\_or\_equal\_to: 0 }, if:
   :verify\_count\_on\_hand?}). At one point, Spree's inventory was
@@ -275,11 +283,11 @@ ad-hoc process.
 The remainder of the corpus contains a number of such phenomena. The
 use of each style of concurrency control varies across repositories,
 but our results demonstrate a clear trend towards feral mechanisms
-within Rails. As a consequence of the breadth of our study (and paper
-formatting limitations), we are not able to discuss every application
-in detail (though the source code of each and, fortunately, the Git
-history and, often, issue trackers are publicly available for
-inspection).
+within Rails rather than traditional use of transactions. As a
+consequence of the breadth of our study (and paper formatting
+limitations), we are not able to discuss every application in detail
+(though the source code of each and, fortunately, the Git history and,
+often, issue trackers are publicly available for inspection).
 
 \begin{figure}
   \newcommand{\skipht}{\\[-2em]}
@@ -305,17 +313,18 @@ of intervals through the application's history (by commits). At each
 interval, we recorded the number of occurrences of each of these
 constructs relative to the total number of occurences in the project
 in the latest repository we examined. Figure~\ref{fig:historical}
-plots the median number of occurences across all projects. Notably, by
-the time 50\% of the commits have been entered into the repository,
-over 75\% of the models, transactions, validations, and associations
-have been written. This suggests that the Model layer may be less
-volatile than the View and Controller components of the
-applications. Moreover, the initial proportion of validations and
-associations is higher than the initial proportion of transactions:
-the data model appears to stabilize faster than the controller
-logic. It is unclear whether the bulk of transaction usage is added in
-order to compensate for, say, concurrency violations, or is instead
-due to growth in Controller code and business logic.
+plots the median number of occurences across all projects. Notably,
+these results demonstrate that, by the time 50\% of the commits have
+been entered into the repository, over 75\% of the models,
+transactions, validations, and associations have been written. This
+suggests that the Model layer may be less volatile than the View and
+Controller components of the applications. Moreover, the initial
+proportion of validations and associations is higher than the initial
+proportion of transactions: the data model appears to stabilize faster
+than the controller logic. It is unclear whether the bulk of
+transaction usage is added in order to compensate for, say,
+concurrency violations, or is instead due to growth in Controller code
+and business logic.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/historical-median.pdf}\vspace{-2em}
@@ -340,7 +349,10 @@ schema than contribute to the actual application code.
   \newcommand{\skipht}{\\[-2em]}
 \includegraphics[width=\columnwidth]{figs/commit-authorship-cdf.pdf}\vspace{-2em}
 \includegraphics[width=\columnwidth]{figs/invariant-authorship-cdf.pdf}\vspace{-1em}
-\caption{CDFs of authorship of invariants and commits.}
+\caption{CDFs of authorship of invariants and commits. Bolded line
+  shows the average CDF across projects, while faint lines show CDFs
+  for individual projects. The dotted line shows the 95th percentile
+  CDF value. }
 \label{fig:cdfs}
 \end{figure}
 
@@ -352,24 +364,23 @@ layer. There is little actual communication of correctness critera to
 the database layer. Part of this is due to limitations within
 Rails. As we have mentioned, there is no way to actually declare a
 foreign key constraint in Rails without importing additional
-third-party modules. However, insofar as Rails is an ``opinionated''
-framework encouraging an idiomatic programming style, if our
-application corpus is any indication, DHH and his co-authors
-advocating application-level data management appear to have succeeded en
-masse.
+third-party modules. Insofar as Rails is an ``opinionated'' framework
+encouraging an idiomatic programming style, if our application corpus
+is any indication, DHH and his co-authors advocating application-level
+data management appear to have succeeded en masse.
 
 Having observed the relative popularity of these mechanisms, we turn
 our attention to the question of their correctness. Specifically, do
 these application-level criteria actually enforce the constraints that
 they claim to enforce? We restrict ourself to studying declared
 validations and associations for three reasons. First, as we have
-seen, these constructs are widely used in the codebases we have
-studied, and, ostensibly, more widely used in the Rails community than
-the alternatives. Second, these constructs represent a deviation from
-standard concurrency control techniques and are therefore perhaps more
-likely to contain errors. Third, while analyzing latent constraints (i.e.,
+seen, these constructs are more widely used in the codebases we have
+studied. Second, these constructs represent a deviation from standard
+concurrency control techniques and are therefore perhaps more likely
+to contain errors. Third, while analyzing latent constraints (i.e.,
 those that might be determined via more sophisticated techniques such
-as pre- and post-condition invariant mining and/or by interviewing each
+as pre- and post-condition invariant
+mining~\cite{writes-forest,redblue-new} and/or by interviewing each
 developer on each project) would be instructive, this is difficult to
 scale. We view these forms of analysis as worthwhile avenues for
 future research.

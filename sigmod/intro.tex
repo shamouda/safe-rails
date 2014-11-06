@@ -30,9 +30,10 @@ environments such as Heroku. Thus, Rails programmers represent a large
 class of consumers of database technology. Second, and perhaps more
 importantly, Rails is ``opinionated
 software''~\cite{dhh-opinionated}. That is, Rails embodies the strong
-personal convictions of its creator, David Heinemeier Hansson (DHH),
-and developer community and is particularly opinionated towards the
-database systems that Rails tasks with data storage. To quote DHH:
+personal convictions of its developer community, and, in particular,
+David Heinemeier Hansson (DHH), its creator. Rails is particularly
+opinionated towards the database systems that it tasks with data
+storage. To quote DHH:
 \begin{quote}
 ``I don't \textit{want} my database to be clever! \dots I consider stored procedures and constraints vile and reckless destroyers of coherence. No, Mr. Database, you can not have my business logic. Your procedural ambitions will bear no fruit and you'll have to pry that logic from my dead, cold object-oriented hands \dots I want a single layer of cleverness: My domain model.''~\cite{dhh-clever}
 \end{quote}
@@ -63,48 +64,71 @@ overwhelmingly---instead of using traditional mechanisms like
 transactions---these applications use Rails' built-in support for
 declarative invariants, or \textit{validations}, to protect data
 integrity. We find over $9700$ uses of application-level constraints
-across the applications used to guard against referential integrity,
-uniqueness, and data formatting violations.
+across the applications used to guard against violations of
+referential integrity, uniqueness, and data formatting requirements.
 
-Given this corpus, we subsequently ask: are these validations actually
-correct? Do they work in practice? Under concurrent execution, Rails
-will execute validation checks in parallel, and any validation logic
-that is susceptible to races may lead to data corruption. Accordingly,
-we apply invariant confluence analysis~\cite{coord-avoid} and show
-that, in fact, over $74.7\%$ of Rails validations usage by volume is
-actually safe. However, the remainder, which include uniqueness
-violations under insertion and foreign key constraint violations under
-deletion, are not. Hence, we quantify the impact of concurrency on
-data corruption for Rails uniqueness and foreign key constraints under
-both worst-case analysis and via actual Rails deployment. We
-demonstrate that, for pathological workloads, validations reduce the
-severity of data corruption by orders of magnitude but, nevertheless,
-still permit integrity violations.
+Given this corpus, we subsequently ask: are these feral validations
+actually correct? Do they work in practice? Under concurrent
+execution, Rails will execute validation checks in parallel, and any
+validation logic that is susceptible to races may lead to data
+corruption under default (and sometimes strongest, including
+``serializable'') database isolation levels. Accordingly, we apply
+invariant confluence analysis~\cite{coord-avoid} and show that, in
+fact, over $74.7\%$ of Rails validation usage by volume is actually
+safe. However, the remainder, which include uniqueness violations
+under insertion and foreign key constraint violations under deletion,
+are not. Therefore, we quantify the impact of concurrency on data
+corruption for Rails uniqueness and foreign key constraints under both
+worst-case analysis and via actual Rails deployment. We demonstrate
+that, for pathological workloads, validations reduce the severity of
+data corruption by orders of magnitude but, nevertheless, still permit
+integrity violations.
 
-Given these results, we present recommendations for the database
-research community. We survey several additional web frameworks and
-demonstrate that many also provide a notion of feral validations,
-suggesting an industry-wide trend. While the success of Rails and its
-ilk are firm evidence of the continued ``impedance mismatch'' between
-object-oriented programming and the relational model, we see
-considerable opportunity in adapting existing database concurrency
-control to better serve these communities---via both increased native
-support for declarative invariants and server-side code execution.
+Given these results, we return to our goal of improving the underlying
+data management systems that power these applications and present
+recommendations for the database research community. We survey several
+additional web frameworks and demonstrate that many also provide a
+notion of feral validations, suggesting an industry-wide trend. While
+the success of Rails and its ilk are firm evidence of the continued
+``impedance mismatch'' between object-oriented programming and the
+relational model, we see considerable opportunity in adapting existing
+database concurrency control to better serve these communities---via
+both increased native support for declarative invariants and
+server-side code execution as well as broader education about (and
+less prevalent default use of) weak isolation guarantees.
 
 In summary, this paper makes the following contributions:
 \begin{myitemize}
 \item We analyze 67 open source Ruby on Rails applications to
   determine their use of both database-backed and feral concurrency
-  control mechanisms.
+  control mechanisms. This provides a quantitative picture of how
+  mainstream web developers interact with database systems, and, more
+  specifically, concurrency control.
 
-\item We analytically and experimentally quantify the degree of
-  inconsistency allowed by Rails's built-in uniqueness and association
-  validations.
+\item We study these applications' feral mechanisms potential for
+  application integrity violations. We analytically and experimentally
+  quantify the incidence and degree of inconsistency allowed by
+  Rails's uniqueness and association validations.
 
-\item We survey six additional popular frameworks for similarly unsafe
-  validations and discuss the implications of feral concurrency
-  control for future database system designs.
+\item We survey six additional frameworks for similarly unsafe
+  validations. Based on these results and those above, we present a
+  set of recommendations for database systems designers, including
+  expanded in-database support for application-level validations and
+  greater user education about weak isolation.
 \end{myitemize}
+
+In all, this paper is a pragmatic attempt to understand how a large
+and growing class of database management system users---namely, web
+developers---interacts with the databases that this community
+builds. In doing so, we hope to raise awareness about prevalent and,
+as we discuss, largely undersupported application programming
+patterns and their implications for the integrity of real-world, end-user
+database-backed applications. Thus, while our contribution here is
+\textit{not} a new system or solution for database concurrency
+control, it is our goal that our contributions \textit{inform}
+designers and architects of next-generation data management systems
+and provide quantitative evidence of the practical shortcomings and
+pitfalls in real-world database concurrency control today.
 
 The remainder of this paper proceeds as
 follows. Section~\ref{sec:motivation} briefly provides background on
@@ -114,7 +138,8 @@ mechanisms. Section~\ref{sec:apps} presents analysis of mechanism
 usage in open source applications as well as safety under weak
 isolation.  Section~\ref{sec:evaluation} experimentally quantifies the
 degree of inconsistency allowed by these mechanisms in a Rails
-deployment. Section~\ref{sec:other-orms} discusses additional web
-frameworks, and Section~\ref{sec:discussion} presents recommendations
-for better supporting these framework demands. Section~\ref{sec:relatedwork}
+deployment. Section~\ref{sec:other-orms} describes support for feral
+validations in additional frameworks, and
+Section~\ref{sec:discussion} presents recommendations for better
+supporting these framework demands. Section~\ref{sec:relatedwork}
 presents related work and Section~\ref{sec:conclusion} concludes.

@@ -240,12 +240,16 @@ database. However, LinkBench has less contention and anomalies decrease more
 rapidly with increased numbers of keys.
 
 \begin{figure}
- \begin{adjustwidth}{-2em}{}
-\includegraphics[width=1.08\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
-\includegraphics[width=1.08\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2em}
-\includegraphics[width=1.08\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2em}
-\includegraphics[width=1.08\columnwidth]{figs/pk-workload-linkbench-upd-violations.pdf}\vspace{-1em}
-\end{adjustwidth}
+
+\begin{minipage}[l]{0cm}
+\includegraphics[angle=90, width=.185in]{figs/pk-workload-ylabel.pdf}
+\end{minipage}
+\begin{minipage}{\columnwidth}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-linkbench-upd-violations.pdf}\vspace{-1em}
+\end{minipage}
 \caption{Uniqueness workload integrity violations.}
 \label{fig:pk-workload}
 \end{figure}

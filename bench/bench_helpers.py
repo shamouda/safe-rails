@@ -134,7 +134,7 @@ def pk_stress(rails_host, nclients=100, trials=10, port=3000, model="indexed_key
         w.delete_kvp("-1", model).read()
 
 
-    while !resultQueue.empty():
+    while not resultQueue.empty():
         resultQueue.get()        
 
     fails = []
@@ -221,7 +221,7 @@ def fk_stress(rails_host, n_clients=100, trials=10, port=3000, model="simple"):
         w.destroy_user_or_department(-1, model+"_department").read()
     print "... running!"
 
-    while !resultQueue.empty():
+    while not resultQueue.empty():
         resultQueue.get()    
 
     fails = []
@@ -325,7 +325,7 @@ def start_passenger(host, nprocs):
     ssh(host, "cd ~/safe-rails/demo; sudo pkill -9 passenger; passenger start -d --log-file /tmp/phusion-log.out --max-pool-size %d --min-instances %d &> /tmp/passenger.out" % (nprocs, nprocs), bg=True)
 
 def start_unicorn(host, nprocs):
-    ssh(host, "sudo /etc/init.d/nginx stop; cd ~/safe-rails/demo; rm /tmp/*.out; passenger stop &> /dev/null; sudo pkill -9 unicorn_rails; pkill -9 unicorn_rails; killall unicorn_rails; sleep 1; git checkout config/unicorn.rb; rm log/*.log; sudo rm -rf /tmp/*; echo \"worker_processes %d\" >> config/unicorn.rb; unicorn_rails -c config/unicorn.rb -D & sudo /etc/init.d/nginx start;" % (nprocs), bg=True)
+    ssh(host, "sudo /etc/init.d/nginx stop; cd ~/safe-rails/demo; rm /tmp/*.out; passenger stop &> /dev/null; sudo pkill -9 unicorn_rails; pkill -9 unicorn_rails; killall unicorn_rails; sleep 1; git checkout config/unicorn.rb; rm log/*.log; rake db:migrate; sudo rm -rf /tmp/*; echo \"worker_processes %d\" >> config/unicorn.rb; unicorn_rails -c config/unicorn.rb -D & sudo /etc/init.d/nginx start;" % (nprocs), bg=True)
 
 def pk_workload_task(tup):
     rails_host, port, model, keys = tup
@@ -360,7 +360,7 @@ def pk_workload(rails_host, workload="uniform", records=100, model="simple_key_v
         w = Worker(rails_host+":"+str(port))
         w.delete_kvp("-1", model).read()
 
-    while !resultQueue.empty():
+    while not resultQueue.empty():
         resultQueue.get()
 
         
@@ -448,7 +448,7 @@ def fk_workload(rails_host, workload="uniform", records=100, model="simple", ops
         w.insert_department(d, model+"_department")
     print "populated!"
 
-    while !resultQueue.empty():
+    while not resultQueue.empty():
         resultQueue.get()        
 
     results = []

@@ -4,8 +4,8 @@ from time import sleep
 import pickle
 from random import seed
 
-PG_HOST = "ec2-54-203-221-73.us-west-2.compute.amazonaws.com"
-RAILS_HOST = "ec2-54-245-166-54.us-west-2.compute.amazonaws.com"
+PG_HOST = "ec2-54-190-172-66.us-west-2.compute.amazonaws.com"
+RAILS_HOST = "ec2-54-184-226-137.us-west-2.compute.amazonaws.com"
 
 use_nginx = True
 
@@ -40,7 +40,7 @@ iterations = 2
 FK_USERS_TO_DEPT_PROPORTION = 10
 
 NUMRECORDS_PK = [1, 10, 100, 1000, 10000, 100000, 1000000]
-NUMRECORDS_FK = [10, 100, 1000, 10000, 100000, 1000000, 10000000]
+NUMRECORDS_FK = [10, 100, 1000, 10000, 100000]
 OPS_PER_CLIENT = 100
 WORKLOADS = ["ycsb", "linkbench-ins", "linkbench-upd", "uniform"]
 RECORD_TEST_N_RAILS_PROCS = 64
@@ -68,6 +68,7 @@ if BENCH_PK_WORKLOAD:
                                                             model=m,
                                                             ops_per_client=OPS_PER_CLIENT,
                                                             n_clients=RECORD_TEST_N_CLIENTS)
+                    sleep(1)
                     pk_bench_dups[m] = count_duplicates(PG_HOST, m)
                     print pk_bench_dups
                     ALL_RESULTS.append({ 
@@ -94,6 +95,7 @@ if BENCH_PK_STRESS:
                 print "STARTING", m, "..."
                 reset_hosts(nprocs)
                 pk_stress_model_results[m] = pk_stress(RAILS_HOST, model=m, nclients=STRESS_CLIENTS, trials=STRESS_TRIALS)
+                sleep(1)
                 pk_stress_dups[m] = count_duplicates(PG_HOST, m)
                 print pk_stress_dups[m]
                 ALL_RESULTS.append({ 
@@ -125,6 +127,7 @@ if BENCH_FK_WORKLOAD:
                                                             ops_per_client=OPS_PER_CLIENT,
                                                             n_clients=RECORD_TEST_N_CLIENTS,
                                                             users_to_dept=FK_USERS_TO_DEPT_PROPORTION)
+                    sleep(1)
                     fk_bench_dups[m] = count_dangling_users(PG_HOST, m)
                     print fk_bench_dups
                     ALL_RESULTS.append({ 
@@ -152,6 +155,7 @@ if BENCH_FK_STRESS:
                 print "STARTING", m, "..."
                 reset_hosts(nprocs)
                 fk_stress_model_results[m] = fk_stress(RAILS_HOST, model=m, n_clients=STRESS_CLIENTS, trials=STRESS_TRIALS)
+                sleep(1)
                 fk_stress_dups[m] = count_dangling_users(PG_HOST, m)
                 print fk_stress_dups[m]
                 ALL_RESULTS.append({ 

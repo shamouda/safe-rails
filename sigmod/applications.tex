@@ -1,16 +1,16 @@
 
-\section{Analytical Integrity Analysis}
+\section{Isolation and Integrity}
 \label{sec:apps}
 
 We now turn our attention to understanding which of Rails' feral
 validations and associations are actually correct under multi-tier,
 concurrent execution discussed in Section~\ref{sec:deployment}.
 
-Recall that each of a model's declared validations is run before a model instance is saved to
-the database. To correctly enforce a validation requires either that
-\textit{i.)} the validations are isolated from one another or
-that \textit{ii.)} the validations are somehow ``safe'' to run
-concurrently.
+Recall that each of a model's declared validations is run before a
+model instance is saved to the database. To correctly enforce a
+validation requires either that \textit{i.)} validations are isolated
+from one another or that \textit{ii.)} validations are somehow
+``safe'' to run concurrently.
 
 Are validations isolated? Given that each sequence of validations is
 wrapped within a transaction, under serializable isolation,
@@ -123,6 +123,8 @@ and are therefore likely to cause problems. In the next section, we
 examine these invariants in greater detail.
 
 \begin{table}
+\begin{center}
+\small
 \begin{tabular}{|l l l |}
 \hline
 Name & Occurrences & I-Confluent?\\\hline
@@ -139,6 +141,7 @@ Name & Occurrences & I-Confluent?\\\hline
 \texttt{validates\_email} & 34 & Yes \\
 Other & 303 & \\\hline
 \end{tabular}
+\end{center}\vspace{-1em}
 \caption{Use of and invariant confluence of built-in validations.}
 \label{table:builtins}
 \end{table}

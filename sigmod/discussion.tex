@@ -230,44 +230,97 @@ uses db foreign keys
 % udfs
 
 
-\section{Design Revisited}
+\section{Database System Implications}
 \label{sec:discussion}
 
 In this section, we discuss the implications of this study's results
 for future database systems designs and research.
 
-\subsection{Feral Invariants}
+\subsection{Designing for Feral Validations}
 
 In Rails and, across the other ORMs we studied, the use of
-application-enforced invariants was surprisingly common. Notably, the
+application-enforced validations was surprisingly common. The
 inclusion of validations in the Java EE JPA specification (including
 effort from with 41 representatives from companies including Google,
 Oracle, and Red Hat), suggests that validations are, in fact, a common
-way to express domain logic in web programs.
+way to express domain logic in web programs. We believe that
+appropriate support for these validations should therefore be an
+important concern of database management systems. Unfortunately,
+support for enforcing validations is limited, and validations are
+often insufficient to prevent integrity errors. As we have seen, Rails
+validations as deployed in today's database systems may corrupt
+data. Among the frameworks we have studied, we can identify three main
+approaches to validation enforcement:
+\begin{defendenumerate}
+\item Let the the application enforce the validations, and also let
+  the application prevent concurrency anomalies.
 
-Conceptually, these validations fail today largely because they
-are expressed in a language that is not understood or interpreted by
-the database, which is unable to assist in ensuring data
-integrity. Databases do provide a tried-and-true (under serializable
-isolation) programming construct: the transaction concept. But these
-web programming frameworks have adopted their \textit{own}, similar
-but separate set of language idioms. To his credit, DHH explicitly
-disowns the title of ``computer scientist'' and instead refers to
-himself as an ``information systems
-programmer''~\cite{dhh-keynote}. DHH's information systems are ``built
-on top of computer science...[and] computer science is what it makes
-it possible for us to do what it is that we [information systems programmers] do. But
-it doesn't define what we do.'' Given a set of database system
-implementations that necessarily require buy-in to a transactional
-programming model in order to support concurrent programming (not to
-mention the complexities associated with weak isolation), DHH and the
-Rails community instead have forged their own path.
+\item Let the application enforce the validations, and use database
+  transactions to mediate between concurrent validations and updates.
 
-Therefore, we see considerable opportunity in better supporting these
-alternative programming models. Doing so has clear correctness
-implications but also has performance implications: in a tiered
-application deployment, native integration of user-defined validations
-with the database can help eliminate database
+\item Let the database the perform validations (e.g. by declaring a unique
+  index on a column that is supposed to be unique)
+\end{defendenumerate}
+As we have seen, in practice, the second approach is most prevalent in
+Rails applications. However, under default, non-serializable
+isolation, this approach is unsufficient to correctly enforce
+concurrent validations. Non-serializable isolation is
+\textit{sometimes} okay, but it is not a general solution for
+arbitrary invariants. As a consequence, users today must effectively
+roll their own solutions---the first approach---or otherwise risk
+inconsistency.
+
+We see two primary avenues for improving validation support.
+
+\minihead{Fixing weak isolation} First, we can ensure that
+validator-based transactions run under appropriate isolation. In an
+ideal world, transaction isolation would default to serializable
+isolation (without bugs). (When default database isolation is
+non-serializable, one can only expect ``convention over
+configuration'' to lead to isolation anomalies.)  its lack of support
+in databases such as Oracle 12c and implementation bugs such as the
+error we encountered in PostgreSQL are often enough to compromise
+validator integrity. A community that shuns transaction use is even
+less likely to positively engage with the subtleties of weak
+isolation.  In the real world, we believe weak isolation suffers from
+an education problem among developers. There is compelling evidence
+that some framework authors \textit{are} aware of this issue (e.g.,
+Footnote~\ref{fn:si-rails}, the JPA comments in
+Section~\ref{sec:other-orms}). However, many of these anomalies could
+be remedied by setting the validation isolation level to serializable
+isolation or otherwise making greater use of existing language-level
+support like \texttt{SELECT FOR UPDATE}.
+
+\minihead{Natively supporting validations} Second, and perhaps more
+interestingly, we can consider greater in-database support for
+validations. That is, while database today provide support for limited
+forms of constraints (including uniqueness, referential integrity, and
+row-level check constraints), we can consider broader support for
+declarative UDF-based constraints.
+
+Conceptually, these validations fail today largely because they are
+expressed in a language that is not understood or interpreted by the
+database, which is unable to assist in ensuring data integrity. Today,
+commodity databases offer one general-purpose programming construct
+for ensuring data integrity: the transaction concept. But these web
+programming frameworks have adopted their \textit{own}, similar but
+separate set of language idioms. To his credit, DHH explicitly disowns
+the title of ``computer scientist'' and instead refers to himself as
+an ``information systems programmer''~\cite{dhh-keynote}. DHH's
+information systems are ``built on top of computer science...[and]
+computer science is what it makes it possible for us to do what it is
+that we [information systems programmers] do. But it doesn't define
+what we do.'' Given a set of database system implementations that
+necessarily require buy-in to a transactional programming model in
+order to support concurrent programming (not to mention the
+complexities associated with weak isolation), DHH and the Rails
+community instead have forged their own path.
+
+Can database systems natively support DHH and company's feral
+validations (thereby ``domesticating'' them)?  Doing so has clear
+correctness implications but also has performance implications: in a
+tiered application deployment, native integration of user-defined
+validations with the database can help eliminate database
 RTTs~\cite{pyxis}---which, in particular, can assist with reducing the
 duration for which locks are held. We see opportunity for invariant-
 or validation-based concurrency control, thus allowing higher
@@ -283,24 +336,6 @@ organically and have been produced by database users (in lieu of
 standard transaction model) as ample cause for re-evaluating the
 decades of work on semantic concurrenty control.
 
-The second part of our study here demonstrates the challenges inherent
-in actually ensuring this vision with current technology. Despite the
-fact that frameworks such as Rails and JPA wrap validations within the
-scope of a transaction, the pervasive use of weak isolation undermines
-the safety of non-I-confluent validations. (When default database
-isolation is non-serializable, one can only expect ``convention over
-configuration'' to lead to isolation anomalies.) As our analysis
-shows, a small but notable portion of these validations cannot be
-sufficiently enforced under non-serializable isolation. Moreover,
-there is compelling evidence that some framework authors \textit{are}
-aware of this issue (e.g., Footnote~\ref{fn:si-rails}, the JPA
-comments in Section~\ref{sec:other-orms}). While serializable
-isolation is conceptually sufficient to correctly enforce isolation,
-its lack of support in databases such as Oracle 12c and implementation
-bugs such as the error we encountered in PostgreSQL are often enough
-to compromise validator integrity. A community that shuns transaction
-use is even less likely to positively engage with the subtleties of
-weak isolation.
 
 \subsection{Usability and ``Correctness''}
 

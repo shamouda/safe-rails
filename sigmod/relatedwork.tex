@@ -2,9 +2,10 @@
 \section{Related Work}
 \label{sec:relatedwork}
 
-There is a large body of related work that we consider in
-three categories: object relational mapping systems, study of weak
-isolation and applications, and the quantification of isolation behavior.
+There is a large body of related work that we consider in four
+categories: object relational mapping systems, the study of weak
+isolation and applications requirements, the quantification of isolation
+behavior, and empirical open source software analysis.
 
 \minihead{ORMs} Database systems and application programming
 frameworks have a long
@@ -81,7 +82,21 @@ isolation anomalies~\cite{zellag-real}. Probabilistically Bounded
 Staleness provides time- and version-based staleness predictions for
 eventually consistent data stores~\cite{pbs}. While the two are
 related, our focus here is on anomalies as observed by application
-logic rather than read-write anomalies resulting from particular
-(weak) isolation guarantees.
+logic rather than read-write anomalies observed under (weak) isolation.
 
-
+\minihead{Empirical software analysis} Empirical software analysis of
+open source software is a topic of active interest in the software
+engineering research community~\cite{foss-icse}. In the parlance of
+that community, in this work, we perform a mixed-methods analysis,
+combining quantitative survey techniques with a confirmatory case
+study of Rails's susceptibility to validation
+errors~\cite{empiricalmethods}. In our survey, we attempt to minimize
+sampling bias towards validation-heavy projects by focusing our
+attention on popular projects, as measured by GitHub stars. Our use of
+quantitative data followed by supporting qualitative data from
+documentation and issue tracking---as well as the chronology of
+methodologies we employed to attain the results presented here---can
+be considered an instance of the sequential exploration
+strategy~\cite{creswell2013research}. We specifically use these techniques in
+service of better understanding use of database
+concurrency control.

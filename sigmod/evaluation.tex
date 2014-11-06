@@ -1,5 +1,5 @@
 
-\section{Evaluating ActiveRecord Safety}
+\section{Quantifying Feral Anomalies}
 \label{sec:evaluation}
 
 In the previous section, we identified two classes of commonly used
@@ -116,11 +116,15 @@ broken (at least under non-serializable isolation), $ii.)$ have a
 work-around by correctly declaring them within the database, yet
 $iii.)$ are widely used, we sought to understand their costs and
 benefits in an actual production environment. Accordingly, we wrote
-and deployed a custom Rails 4.1.5 application that exercised
+and deployed a custom Rails application that exercised
 uniqueness validations and observed its behavior under various
-workloads.\footnote{In our experimental evaluation, we use the custom
-  applications---effectively, microbenchmarks for
-  ActiveRecord---described below (and in
+workloads.
+
+\minihead{Experimental setup} We developed a Rails 4.1.5 application that
+performed insertions to a non-indexed string column and compared the
+degree of violations both with and without a uniqueness validator (for
+more details, see Appendix~\ref{sec:appendix-uniqueness-schema}).\footnote{In our experimental evaluation, we use the custom
+  applications described below (and in
   Appendix~\ref{sec:appendix-experiments}) for two reasons. First,
   these test cases allow us to isolate ActiveRecord behavior to the
   relevant set of validations as they are deployed by default and
@@ -129,17 +133,12 @@ workloads.\footnote{In our experimental evaluation, we use the custom
   are able to bypass sessionization and authentication logic when
   triggering ActiveRecord. Many of the applications in our corpus
   indeed use the same code paths within ActiveRecord, but, to, say,
-  create a new User (without modifying the actual application code)
+  create a new user in an application (without modifying the actual application code)
   would otherwise require additional inputs, including a session and
   authorization token as well as email and/or Captcha
   authentication. These applications indeed allow concurrent accesses,
   but the process of actually producing concurrency using their native
-  HTTP interfaces is more complex.}
-
-\minihead{Experimental setup} We developed a Rails 4 application that
-performed insertions to a non-indexed string column and compared the
-degree of violations both with and without a uniqueness validator (for
-more details, see Appendix~\ref{sec:appendix-uniqueness-schema}). We
+  HTTP interfaces is more complex.} We
 deployed this application across two Amazon EC2 \texttt{m2.4xlarge}
 instances, offering 68.4 GB RAM, 8 CPU cores, and 1680GB local
 storage, running Ubuntu 14.04 LTS. On one instance, we deployed our
@@ -186,8 +185,8 @@ anomalies. However, with a unique index declared on the \texttt{key}
 column, we observed no duplicates, as expected.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}
-\caption{Uniqueness stress results.}
+\includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}\vspace{-1.5em}
+\caption{Uniqueness stress test integrity violations.}
 \label{fig:pk-stress}
 \end{figure} 
 
@@ -197,7 +196,7 @@ workload for uniqueness validations. In practice, such a workload is
 likely rare.\footnote{In fact, it was in the above workload that we
   encountered the non-serializable PostgreSQL behavior under
   serializable isolation. Under serializable isolation, the number of
-  anomlies is reduced compared to the number under Read Committed
+  anomalies is reduced compared to the number under Read Committed
   isolation (as we report here), but we still detected duplicate
   record creation. We confirmed this non-serializable behavior via
   subsequent implementations of this parallel
@@ -237,15 +236,17 @@ The actual ``production'' workloads exhibit different trends. In
 general, YCSB is an extremely high contention workload, with a Zipfian
 constant of 0.99, resulting in one very hot key. This decreases the
 beneficial effect of increasing the number of keys in the
-database. However, LinkBench is less contentious and decreases more
+database. However, LinkBench has less contention and anomalies decrease more
 rapidly with increased numbers of keys.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
-\includegraphics[width=\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2em}
-\includegraphics[width=\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2em}
-\includegraphics[width=\columnwidth]{figs/pk-workload-linkbench-upd-violations.pdf}\vspace{-1em}
-\caption{Uniqueness workload results.}
+ \begin{adjustwidth}{-2em}{}
+\includegraphics[width=1.08\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
+\includegraphics[width=1.08\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2em}
+\includegraphics[width=1.08\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2em}
+\includegraphics[width=1.08\columnwidth]{figs/pk-workload-linkbench-upd-violations.pdf}\vspace{-1em}
+\end{adjustwidth}
+\caption{Uniqueness workload integrity violations.}
 \label{fig:pk-workload}
 \end{figure}
 
@@ -341,7 +342,7 @@ within the database, we observe no inconsistency.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}\vspace{-1em}
-\caption{Foreign key stress results.}
+\caption{Foreign key stress association anomalies.}
 \label{fig:fk-stress}
 \end{figure}
 
@@ -370,7 +371,7 @@ linearly with the number of records.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}\vspace{-1em}
-\caption{Foreign key workload results.}
+\caption{Foreign key workload association anomalies.}
 \label{fig:fk-workload}
 \end{figure}
 

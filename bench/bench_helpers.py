@@ -133,6 +133,10 @@ def pk_stress(rails_host, nclients=100, trials=10, port=3000, model="indexed_key
         w = Worker(rails_host+":"+str(port))
         w.delete_kvp("-1", model).read()
 
+
+    while !resultQueue.empty():
+        resultQueue.get()        
+
     fails = []
     allresults = []
 
@@ -216,6 +220,9 @@ def fk_stress(rails_host, n_clients=100, trials=10, port=3000, model="simple"):
         w = Worker(rails_host+":"+str(port))
         w.destroy_user_or_department(-1, model+"_department").read()
     print "... running!"
+
+    while !resultQueue.empty():
+        resultQueue.get()    
 
     fails = []
     allresults = []
@@ -353,7 +360,10 @@ def pk_workload(rails_host, workload="uniform", records=100, model="simple_key_v
         w = Worker(rails_host+":"+str(port))
         w.delete_kvp("-1", model).read()
 
+    while !resultQueue.empty():
+        resultQueue.get()
 
+        
     print "... running!"
 
     results = []
@@ -437,6 +447,9 @@ def fk_workload(rails_host, workload="uniform", records=100, model="simple", ops
         w = Worker(rails_host+":"+str(port))
         w.insert_department(d, model+"_department")
     print "populated!"
+
+    while !resultQueue.empty():
+        resultQueue.get()        
 
     results = []
     workers = [(rails_host, port, model, ops_per_client, users_to_dept, records) for i in range(0, n_clients)]

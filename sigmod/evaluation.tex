@@ -15,11 +15,11 @@ To begin, we consider Rails's uniqueness validations: 12.7\% of the
 built-in validations we encountered.
 
 When a Model field is declared with a \texttt{:validates\_uniqueness}
-annotation, any instance of that model is checked against all other
-models in the database to ensure uniqueness. Rails accomplishes this
-by issuing a \texttt{SELECT WHERE} query in SQL and, if no such record
-is found, Rails updates the instance state in the database
-(Appendix~\ref{sec:appendix-uniqueness-behavior}).
+annotation, any instance of that model is compared against all other
+corresponding records in the database to ensure uniqueness. Rails
+accomplishes this by issuing a \texttt{SELECT WHERE} query in SQL and,
+if no such record is found, Rails updates the instance state in the
+database (Appendix~\ref{sec:appendix-uniqueness-behavior}).
 
 While this user-level uniqueness validation runs within a transaction,
 the exact isolation level of the transaction affects its

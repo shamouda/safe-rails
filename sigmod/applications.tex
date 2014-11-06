@@ -3,8 +3,8 @@
 \label{sec:apps}
 
 We now turn our attention to understanding which of Rails' feral
-validations and associations are actually correct under the execution
-model discussed in Section~\ref{sec:deployment}. 
+validations and associations are actually correct under multi-tier,
+concurrent execution discussed in Section~\ref{sec:deployment}.
 
 Recall that each of a model's declared validations is run before a model instance is saved to
 the database. To correctly enforce a validation requires either that
@@ -59,12 +59,16 @@ anomalies under insertion.
 
 Per~\cite{coord-avoid}, the state of the art in invariant confluence
 analysis currently relies on a combination of manual proofs and simple
-static analysis. Given a set of invariant and operation pairs
+static analysis: given a set of invariant and operation pairs
 classified as providing the invariant confluence property, we can
 iterate through all operations and declarated invariants and check
 whether or not they appear in the set of invariant confluent pairs. If
 so, we can label the pair as invariant confluent. If not, we can
-conservatively label the pair as unsafe under concurrent execution.
+either conservatively label the pair as unsafe under concurrent
+execution or prove the pair as invariant confluent or not. (To prove a
+pair is invariant confluent, we must show that the set of database
+states reachable by executing operations preserves the invariant under
+merge, as described in the paragraph above.)
 
 Returning to our task of classifying Rails validations and
 associations, we applied this invariant confluence analysis to the

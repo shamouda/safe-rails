@@ -33,15 +33,16 @@ be configured on a per-transaction
 basis~\cite{code-transaction-isolation}.
 
 \item Rails provides support for both optimistic and pessimistic
-\textbf{locking}. Applications invoke pessimistic locks on an Active
-Record object by calling its \texttt{lock} method, which invokes a
-\texttt{SELECT FOR UPDATE} statement in the database. Optimistic
-locking is invoked by declaring a special \texttt{lock\_version} field
-in an Active Record model. When a Rails process performs an update to
-an optimistically locked Model, Active Record atomically checks that an object's
-\texttt{lock\_version} has not changed since the process last read the
-object and, if it has not changed, increments \texttt{lock\_version}
-and updates the object in the database.
+  per-record \textbf{locking}. Applications invoke pessimistic locks
+  on an Active Record object by calling its \texttt{lock} method,
+  which invokes a \texttt{SELECT FOR UPDATE} statement in the
+  database. Optimistic locking is invoked by declaring a special
+  \texttt{lock\_version} field in an Active Record model. When a Rails
+  process performs an update to an optimistically locked Model, Active
+  Record atomically checks that an object's \texttt{lock\_version} has
+  not changed since the process last read the object and, if it has
+  not changed, increments \texttt{lock\_version} and updates the
+  object in the database.
 
 \item Rails provides support for application-level
   \textbf{validations}. Each Model has a set of zero or more

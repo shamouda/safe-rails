@@ -49,12 +49,12 @@ set of primitives for handling application integrity in the
 application tier---building, from the underlying database system's
 perspective, a \textit{feral} concurrency control system. We examine
 the design and, more importantly, \textit{use} of these feral
-mechanisms and evaluate their effective ``cleverness'' in
-practice. Our goal is to understand how this growing class of
-applications currently interacts (or, as the case may be, does not
-interact) with database systems and how we, as a database systems
-community, we can positively engage with these criticisms to better
-serve the needs of these developers.
+mechanisms and evaluate their effective ``cleverness'' in practice by
+experimentally demonstrating data integrity violations. Our goal is to
+understand how this growing class of applications currently interacts
+(or, as the case may be, does not interact) with database systems and
+how we, as a database systems community, we can positively engage with
+these criticisms to better serve the needs of these developers.
 
 We begin by surveying the state of Rails' application-tier concurrency
 control primitives and examining their use in 67 open source
@@ -75,7 +75,7 @@ corruption under default (and sometimes strongest, including
 ``serializable'') database isolation levels. Accordingly, we apply
 invariant confluence analysis~\cite{coord-avoid} and show that, in
 fact, over $74.7\%$ of Rails validation usage by volume is actually
-safe. However, the remainder, which include uniqueness violations
+correct. However, the remainder, which include uniqueness violations
 under insertion and foreign key constraint violations under deletion,
 are not. Therefore, we quantify the impact of concurrency on data
 corruption for Rails uniqueness and foreign key constraints under both

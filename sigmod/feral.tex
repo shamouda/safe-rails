@@ -260,16 +260,18 @@ authored.\footnote{We chose to analyze commits authored rather than
   insertions. Nevertheless, we observed a close correlation between
   lines of code and commits authored.} As Figure~\ref{fig:cdfs}
 demonstrates, 95\% of all commits are authored by 42.4\% of
-authors. However, 95\% of invariants are authored by only 20.3\% of
-authors. This is reminiscent of traditional database schema
-authorship, where a smaller number of authors (e.g., DBAs) modify the
-schema than contribute to the actual application code.
+authors. However, 95\% of invariants (validations plus associations)
+are authored by only 20.3\% of authors. This is reminiscent of
+traditional database schema authorship, where a smaller number of
+authors (e.g., DBAs) modify the schema than contribute to the actual
+application code.
 
 \begin{figure}
   \newcommand{\skipht}{\\[-2em]}
 \includegraphics[width=\columnwidth]{figs/commit-authorship-cdf.pdf}\vspace{-2em}
 \includegraphics[width=\columnwidth]{figs/invariant-authorship-cdf.pdf}\vspace{-1em}
-\caption{CDFs of authorship of invariants and commits. Bolded line
+\caption{CDFs of authorship of invariants (validations plus
+  associations) and commits. Bolded line
   shows the average CDF across projects, while faint lines show CDFs
   for individual projects. The dotted line shows the 95th percentile
   CDF value. }

@@ -177,17 +177,17 @@ investigation, we found varying use of mechanisms across
 applications.
 
 For example, the eCommerce application Spree uses only
-six transactions, one for each of $1.)$ cancelling an order, $2.)$
+six transactions, one for each of $1.)$ canceling an order, $2.)$
 approving an order (atomically setting the user ID and timestamp),
-$3.)$ transfering shipments between fulfillment locations (e.g.,
+$3.)$ transferring shipments between fulfillment locations (e.g.,
 warehouses), $4.)$ transferring items between shipments, $5.)$
 transfering stock between fulfillment locations, and $6.)$ updating an
 order's specific inventory status.
 
-In an eCommerce application like Spree, one might expect (reminsicent
-of the canonical bank example from database textbooks) the inventory
-count for each item to be a hotspot for concurrency issues. We found
-that performing differential addition and subtraction to the available
+In an eCommerce application like Spree, one might expect (as in the
+canonical banking example from database textbooks) the inventory count
+for each item to be a hotspot for concurrency issues. We found that
+performing differential addition and subtraction to the available
 stock of an item (\texttt{adjust\_count\_on\_hand(value)}) is indeed
 protected via a pessimistic lock, but simply setting the available
 stock (\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why
@@ -242,7 +242,7 @@ and associations over each project's lifetime. Using each
 application's Git logs, we repeated the above analysis at a fixed set
 of intervals through the application's history (by commits). At each
 interval, we recorded the number of occurrences of each of these
-constructs relative to the total number of occurences in the project
+constructs relative to the total number of occurrences in the project
 in the latest repository we examined. Figure~\ref{fig:historical}
 plots the median number of occurences across all projects. Notably,
 these results demonstrate that, by the time 50\% of the commits have
@@ -291,9 +291,9 @@ application code.
 
 \subsection{Discussion}
 
-Returning to the Rails design philosphy, the applications we have
+Returning to the Rails design philosophy, the applications we have
 encountered do indeed express their logic at the application
-layer. There is little actual communication of correctness critera to
+layer. There is little actual communication of correctness criteria to
 the database layer. Part of this is due to limitations within
 Rails. As we have mentioned, there is no way to actually declare a
 foreign key constraint in Rails without importing additional

@@ -101,7 +101,7 @@ Given double-blind constraints, we cannot release this code at this time. Once d
 \subsection{Invariant Confluence}
 \label{sec:appendix-ic}
 
-Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). As above, we plan to release additional, more detailed data following double-blind review.
+Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved. As above, we plan to release additional, more detailed data following double-blind review.
 
 \section{Detailed Validation Behavior}
 
@@ -143,7 +143,7 @@ This is a classic example of the phantom problem. As we mention in Section~\ref{
 
 \lstset{language=Ruby,basicstyle=\ttfamily\small,columns=fullflexible,frame=single}
 
-In this section, we describe our applications deployed in Section~\ref{sec:evaluation} in greater detail.
+We describe our applications from Section~\ref{sec:evaluation} in greater detail.
 
 \subsection{Uniqueness Validation Schema}
 \label{sec:appendix-uniqueness-schema}

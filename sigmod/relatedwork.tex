@@ -53,7 +53,7 @@ use the concept of invariant confluence from~\cite{coord-avoid} to
 determine whether Rails's built-in validators and applications written
 in Rails are indeed safe under any coordination-free execution. Our
 methodology is closest in spirit to~\cite{coord-avoid}, but, here, we
-examine real applications instead of industrial benchmarks.
+examine real applications instead of standardized benchmarks.
 
 \minihead{Quantifying anomalies} A range of research similarly
 quantifies the effect of non-serializable isolation in a variety of
@@ -82,7 +82,7 @@ isolation anomalies~\cite{zellag-real}. Probabilistically Bounded
 Staleness provides time- and version-based staleness predictions for
 eventually consistent data stores~\cite{pbs}. While the two are
 related, our focus here is on anomalies as observed by application
-logic rather than read-write anomalies observed under (weak) isolation.
+logic rather than read-write anomalies observed under weak isolation.
 
 \minihead{Empirical software analysis} Empirical software analysis of
 open source software is a topic of active interest in the software

@@ -2,18 +2,18 @@
 \section{Feral Mechanisms in Rails}
 \label{sec:rails-cc}
 
-As we discussed in Section~\ref{sec:motivation}, Rails services user
+As we discussed in Section~\ref{sec:deployment}, Rails services user
 requests entirely independently, with the database acting as a point
 of rendezvous for concurrent operations. Given Rails's design goals of
 maintaining application logic at the user level, this appears---on its
 face---a somewhat cavalier proposition with respect to application
-integrity. In response, Rails has developed a range of
-concurrency control strategies that largely operate external to the
-database and at the application level, which we term \textit{feral
-  concurrency control}.
+integrity. In response, Rails has developed a range of concurrency
+control strategies, two of which operate external to the database and
+at the application level, which we term \textit{feral concurrency
+  control} mechanisms.
 
 In this section, we outline four major mechanisms for guarding against
-correctness anomalies under concurrent execution in Rails. We
+integrity violations under concurrent execution in Rails. We
 subsequently begin our study of 67 open source applications to
 determine which of these mechanisms are used in practice. In the following
 section, we will determine which are are sufficient to maintain
@@ -41,7 +41,7 @@ basis~\cite{code-transaction-isolation}.
   process performs an update to an optimistically locked Model, Active
   Record atomically checks that an object's \texttt{lock\_version} has
   not changed since the process last read the object and, if it has
-  not changed, increments \texttt{lock\_version} and updates the
+  not changed, transactionally increments \texttt{lock\_version} and updates the
   object in the database.
 
 \item Rails provides support for application-level
@@ -57,11 +57,11 @@ basis~\cite{code-transaction-isolation}.
   declared for a given model is run sequentially within a
   database-backed transaction before actually updating the model state
   in the database.\footnote{The practice
-    of wrapping validations in a transaction dates to the earliest
-    Rails commit (albeit, in 2004, transactions were supported via a
+    of wrapping validations in a transaction dates to the earliest public
+    Rails commit (albeit, in 2004, transactions were only supported via a
     per-Ruby VM global lock~\cite{code-txn-lock}). However,
     as late as 2010, updates were only partially protected by
-    transactions~\cite{code-txn-update}.}.\\[-2mm]
+    transactions~\cite{code-txn-update}.}\\[-2mm]
 
   Rails validations are a prominent feature of the Active Record
   model. In contrast, neither transactions nor locks are actually
@@ -79,8 +79,7 @@ basis~\cite{code-transaction-isolation}.
   \textbf{associations}. Like validations, associations are a core
   concept of the Active Record model. As the name suggests, ``an
   association is a connection between two Active Record models,''
-  effectively acting like a foreign key in a traditional
-  database. Associations can be declared on one or both sides of a
+  effectively acting like a foreign key in an RDBMS. Associations can be declared on one or both sides of a
   one-to-one or one-to-many relationship, including transitive
   dependencies (via a \texttt{:through} annotation). Declaring an
   association (e.g., \texttt{:belongs\_to dept}) produces a special
@@ -88,7 +87,7 @@ basis~\cite{code-transaction-isolation}.
   \texttt{dept\_id}). Coupling an association with an appropriate
   validation (e.g., \texttt{:presence}) ensures that the association
   is indeed valid (and is, via the validation, backed by a database
-  transaction). Rails does not provide native support for
+  transaction). Rails does not currently provide native support for
   database-backed foreign key constraints.\footnote{However, Rails 4.2
     (in Beta as of November 2014) will add support for foreign key
     constraints via manual schema annotation.}
@@ -98,18 +97,20 @@ Overall, these four mechanisms provide a range of options for
 developers. The first is squarely in the realm of traditional
 concurrency control. The second is, in effect, a coarse-grained
 user-level implementation of single-record transactions via
-database-level ``compare-and-swap'' primitives. In many cases, the
-latter two are reminiscent of common database features such as
-referential integrity constraints. However, others, such as UDF-based
-validations, are reminiscent of proposals for more exotic,
-semantic-based concurrency control primitives. We term these latter
-two strategies---validations and associations---\textit{feral}
-concurrency control mechanisms. As we will show shortly, these feral
-mechanisms dominate in terms of developer popularity.
+database-level ``compare-and-swap'' primitives (implemented via
+\texttt{SELECT FOR UPDATE}). However, the latter two---validations and
+associations---operate, in effect, at the application level. Although
+some validations, such as uniqueness validations, have natural analogs
+in an RDBMS, the semantics of these validations in Rails are entirely
+contained within the Rails code. In effect, from the database's
+perspective, these validations exist external to the system and are
+\textit{feral} concurrency control mechanisms. As we will show
+shortly, these feral mechanisms dominate in terms of developer
+popularity.
 
 \subsection{Adoption in Practice}
 
-To understand exactly how users were interacting with these
+To understand exactly how users interact with these
 concurrency control mechanisms and determine which deserved more
 study, we examined their usage in a portfolio of publicly available
 open source applications.
@@ -124,8 +125,8 @@ file sharing, Git hosting, link aggregation, crowdfunding, social
 networking, and blogging. We sought projects with substantial
 code-bases (average: 26,380 lines of Ruby) multiple contributors
 (average: 69.2), and relative popularity (measured according to GitHub
-stars) on the site. Table~\ref{table:app-summary} provides an
-overview.
+stars) on the site. Table~\ref{table:app-summary} (in the Appendix)
+provides a detailed overview.
 
 
 While several of these applications are projects undertaken by
@@ -135,11 +136,13 @@ Discourse, Spree, GitLab) and/or have a large open source community
 larger-scale commercial, closed-source Rails projects such as Twitter,
 GitHub, or Airbnb might exhibit different trends than those we observe
 here. However, in the open source domain, we believe these
-applications represent a diverse selection of Rails use cases.
+applications represent a diverse selection of Rails use cases, and a
+good-faith effort to obtain a representative sample of open source
+Rails applications as hosted on GitHub.
 
 \minihead{Mechanism usage} We performed a simple analysis of the
 applications to determine how each of the concurrency control
-mechanisms were used (see Appendix for
+mechanisms were used (see Appendix~\ref{sec:appendix-methodology} for more
 methodological details).
 
 Overwhelmingly, applications did not use transactions or locks
@@ -149,14 +152,14 @@ validations, and 3.30 associations per model (with an average of 29.1
 models per application). While 46 (68.7\%) of applications used
 transactions, 66 (98.5\%) used validations or associations. Only six
 applications (8.9\%) used locks. Use of pessimistic locks was more than
-twice as common as optimistic locks.
+twice as common as the use of optimistic locks.
 
 Overall, we find that validations and associations are, respectively,
 14 and 25 times more common than transactions and orders of magnitude
-more common than locking. The feral mechanisms are---in keeping with
+more common than locking. These feral mechanisms are---in keeping with
 the Rails philosophy---favored by these application developers. That
-is, rather than adopting the use of traditional transactional updates,
-Rails application writers chose to instead declaratively specify
+is, rather than adopting the use of traditional transactional
+programming primitives, Rails application writers chose to instead declaratively specify
 correctness criteria and have the ORM system check the criteria for
 them instead. It is unclear and even unlikely that these declarative
 criteria are a complete specification of program correctness:
@@ -168,43 +171,50 @@ database concurrency control.  We devote much of the remainder of this
 work to examining exactly what these feral mechanisms are attempting
 preserve (and whether they are actually correct in doing so).
 
-Over the course of our investigation, we found a variety of
-interesting anecdotes. For example, the eCommerce application Spree
-uses six transactions, one for each of cancelling an order and and
-approving an order (atomically setting the user ID and timestamp),
-transfering shipments between fulfillment locations (e.g.,
-warehouses), transferring items between shipments, transfering stock
-between fulfillment locations, and updating an order's specific
-inventory status. A perhaps more natural point of contention
-(reminsicent of the canonical bank example from database textbooks) is
-mediating access to the available stock in an inventory. Performing
-delta adjustments to the available stock
-(\texttt{adjust\_count\_on\_hand(value)}) is protected via a
-pessimistic lock, but setting the available stock
-(\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why one
-operation necessitates a lock but the other does not, given that both
-are ostensibly sensitive to concurrent accesses. The stock level
-itself is wrapped in a validation ensuring non-negative balances
-(\texttt{validates :count\_on\_hand, numericality: {
-    greater\_than\_or\_equal\_to: 0 }, if:
-  :verify\_count\_on\_hand?}). At one point, Spree's inventory was
-protected by an optimistic lock; it was removed due to failing
-customer checkout requests. On the relevant GitHub issue, a committer
-notes that ``I think we should get rid of the [optimistic lock] if
-there's no documentation about why it's there...I think we can look at
-this issue again in a month's time and see if there's been any
-problems since you turned it off''~\cite{code-optimistic-issue}. Thus,
-the choice of (and even use of) concurrency control is sometimes an
-ad-hoc process.
+\minihead{Understanding specific applications} Over the course of our
+investigation, we found varying use of mechanisms across
+applications.
 
-The remainder of the corpus contains a number of such phenomena. The
-use of each style of concurrency control varies across repositories,
-but our results demonstrate a clear trend towards feral mechanisms
-within Rails rather than traditional use of transactions. As a
-consequence of the breadth of our study (and paper formatting
-limitations), we are not able to discuss every application in detail
-(though the source code of each and, fortunately, the Git history and,
-often, issue trackers are publicly available for inspection).
+For example, the eCommerce application Spree uses only
+six transactions, one for each of $1.)$ cancelling an order, $2.)$
+approving an order (atomically setting the user ID and timestamp),
+$3.)$ transfering shipments between fulfillment locations (e.g.,
+warehouses), $4.)$ transferring items between shipments, $5.)$
+transfering stock between fulfillment locations, and $6.)$ updating an
+order's specific inventory status.
+
+In an eCommerce application like Spree, one might expect (reminsicent
+of the canonical bank example from database textbooks) the inventory
+count for each item to be a hotspot for concurrency issues. We found
+that performing differential addition and subtraction to the available
+stock of an item (\texttt{adjust\_count\_on\_hand(value)}) is indeed
+protected via a pessimistic lock, but simply setting the available
+stock (\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why
+one operation necessitates a lock but the other does not, given that
+both are ostensibly sensitive to concurrent accesses. Meanwhile, the
+stock level itself is wrapped in a validation ensuring non-negative
+balances, if not Lost Updates.
+
+At one point, Spree's inventory was protected by an optimistic lock;
+it was removed due to optimistic lock failure during customer
+checkouts. On relevant bug tracker issue, a committer notes that ``I
+think we should get rid of the [optimistic lock] if there's no
+documentation about why it's there...I think we can look at this issue
+again in a month's time and see if there's been any problems since you
+turned it off''~\cite{code-optimistic-issue}. The issue has, to our
+knowledge, not been revisited, despite the potential dangers of
+removing this point of synchronization.
+
+Thus, the choice of (and even use of) concurrency control appears an
+ad-hoc process. The remainder of the corpus contains a number of such
+phenomena. The use of each style of concurrency control varies across
+repositories, but our results demonstrate a clear trend towards feral
+mechanisms within Rails rather than traditional use of
+transactions. As a consequence of the breadth of our study (and paper
+formatting limitations), we are not able to discuss every application
+in detail (though the source code of each and, fortunately, the Git
+history and issue trackers typically publicly available for
+inspection).
 
 \begin{figure}
   \newcommand{\skipht}{\\[-2em]}
@@ -240,8 +250,8 @@ transactions, validations, and associations have been written. This
 suggests that the Model layer may be less volatile than the View and
 Controller components of the applications. Moreover, the initial
 proportion of validations and associations is higher than the initial
-proportion of transactions: the data model appears to stabilize faster
-than the controller logic. It is unclear whether the bulk of
+proportion of transactions; thus, the data model appears to stabilize
+faster than the controller logic. It is unclear whether the bulk of
 transaction usage is added in order to compensate for, say,
 concurrency violations, or is instead due to growth in Controller code
 and business logic.

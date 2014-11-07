@@ -2,7 +2,7 @@
 \section{Introduction}
 \label{sec:intro}
 
-The rise of ``Web 2.0'' applications delivering dynamic, highly
+The rise of ``Web 2.0'' Internet applications delivering dynamic, highly
 interactive user experiences has been accompanied by a new generation
 of programming frameworks~\cite{web20}. These frameworks simplify
 common tasks such as content templating and presentation, request
@@ -50,11 +50,12 @@ application tier---building, from the underlying database system's
 perspective, a \textit{feral} concurrency control system. We examine
 the design and, more importantly, \textit{use} of these feral
 mechanisms and evaluate their effective ``cleverness'' in practice by
-experimentally demonstrating data integrity violations. Our goal is to
-understand how this growing class of applications currently interacts
-(or, as the case may be, does not interact) with database systems and
-how we, as a database systems community, we can positively engage with
-these criticisms to better serve the needs of these developers.
+analyzing them and and experimentally quantifying data integrity
+violations in practice. Our goal is to understand how this growing
+class of applications currently interacts (or, as the case may be,
+does not interact) with database systems and how we, as a database
+systems community, we can positively engage with these criticisms to
+better serve the needs of these developers.
 
 We begin by surveying the state of Rails' application-tier concurrency
 control primitives and examining their use in 67 open source
@@ -63,26 +64,27 @@ Customer Relationship Management and social networking. We find that,
 overwhelmingly---instead of using traditional mechanisms like
 transactions---these applications use Rails' built-in support for
 declarative invariants, or \textit{validations}, to protect data
-integrity. We find over $9700$ uses of application-level constraints
-across the applications used to guard against violations of
-referential integrity, uniqueness, and data formatting requirements.
+integrity. We find over $9700$ uses of application-level validations
+across the applications designed to ensure conditions including
+referential integrity, uniqueness, and adherence to common data
+formats.
 
 Given this corpus, we subsequently ask: are these feral validations
 actually correct? Do they work in practice? Under concurrent
 execution, Rails will execute validation checks in parallel, and any
 validation logic that is susceptible to races may lead to data
-corruption under default (and sometimes strongest, including
+corruption under default (and sometimes strongest, including some
 ``serializable'') database isolation levels. Accordingly, we apply
 invariant confluence analysis~\cite{coord-avoid} and show that, in
 fact, over $74.7\%$ of Rails validation usage by volume is actually
-correct. However, the remainder, which include uniqueness violations
-under insertion and foreign key constraint violations under deletion,
-are not. Therefore, we quantify the impact of concurrency on data
-corruption for Rails uniqueness and foreign key constraints under both
-worst-case analysis and via actual Rails deployment. We demonstrate
-that, for pathological workloads, validations reduce the severity of
-data corruption by orders of magnitude but, nevertheless, still permit
-integrity violations.
+safe under concurrent execution. However, the remainder, which include
+uniqueness violations under insertion and foreign key constraint
+violations under deletion, are not. Therefore, we quantify the impact
+of concurrency on data corruption for Rails uniqueness and foreign key
+constraints under both worst-case analysis and via actual Rails
+deployment. We demonstrate that, for pathological workloads,
+validations reduce the severity of data corruption by orders of
+magnitude but, nevertheless, still permit serious integrity violations.
 
 Given these results, we return to our goal of improving the underlying
 data management systems that power these applications and present
@@ -95,7 +97,7 @@ relational model, we see considerable opportunity in adapting existing
 database concurrency control to better serve these communities---via
 both increased native support for declarative invariants and
 server-side code execution as well as broader education about (and
-less prevalent default use of) weak isolation guarantees.
+less prevalent use of) weak isolation guarantees (at least by default).
 
 In summary, this paper makes the following contributions:
 \begin{myitemize}
@@ -121,14 +123,14 @@ In all, this paper is a pragmatic attempt to understand how a large
 and growing class of database management system users---namely, web
 developers---interacts with the databases that this community
 builds. In doing so, we hope to raise awareness about prevalent and,
-as we discuss, largely undersupported application programming
-patterns and their implications for the integrity of real-world, end-user
-database-backed applications. Thus, while our contribution here is
-\textit{not} a new system or solution for database concurrency
-control, it is our goal that our contributions \textit{inform}
-designers and architects of next-generation data management systems
-and provide quantitative evidence of the practical shortcomings and
-pitfalls in real-world database concurrency control today.
+as we discuss, largely undersupported application programming patterns
+and their implications for the integrity of real-world, end-user
+database-backed applications. While our contribution here is
+\textit{not} a new system for database concurrency control, our goal
+is to \textit{inform} designers and architects of next-generation data
+management systems and provide quantitative evidence of the practical
+shortcomings and pitfalls in real-world database concurrency control
+today.
 
 The remainder of this paper proceeds as
 follows. Section~\ref{sec:motivation} briefly provides background on

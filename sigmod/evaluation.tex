@@ -184,7 +184,7 @@ anomalies. However, when we added in in-database unique index declared
 on the \texttt{key} column and repeated the experiment, we observed no
 duplicates, as expected.
 
-\begin{figure}
+\begin{figure}\vspace{-1em}
 \includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}\vspace{-1.5em}
 \caption{Uniqueness stress test integrity violations.}
 \label{fig:pk-stress}
@@ -249,8 +249,7 @@ rapidly with increased numbers of keys.
 \label{fig:pk-workload}
 \end{figure}
 
-
-\subsection{Associations Constraints and Isolation}
+\subsection{Association Validations and Isolation}
 
 Having investigated uniqueness constraints, we turn our attention to
 association validations. We first, again, discuss how Rails enforces

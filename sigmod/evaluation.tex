@@ -113,7 +113,11 @@ Given that feral uniqueness validations are $i.)$ acknowledged to be
 broken (at least under non-serializable isolation), $ii.)$ have a
 work-around by correctly declaring them within the database, yet
 $iii.)$ are widely used, we sought to understand exactly how often
-uniqueness anomalies occur in an actual deployment.
+uniqueness anomalies occur in an actual deployment. In this section,
+we show that uniqueness validations in Rails are indeed unsafe under
+non-serializable isolation. While they prevent some data integrity
+errors, we observe---depending on the workload---many duplicate
+records to be created.
 
 \minihead{Experimental setup} We developed a Rails 4.1.5 application
 that performed insertions to a non-indexed string column and compared
@@ -230,10 +234,6 @@ beneficial effect of increasing the number of keys in the
 database. However, LinkBench has less contention and anomalies decrease more
 rapidly with increased numbers of keys.
 
-\minihead{Summary} Uniqueness validations in Rails are indeed unsafe
-under non-serializable isolation, and, while they prevent some data
-integrity errors, they allow many duplicate records to be created.
-
 \begin{figure}
 
 \begin{minipage}[l]{0cm}
@@ -308,7 +308,8 @@ validation, leading to unbounded numbers of dangling records.
 \subsection{Quantifying Association Anomalies}
 
 Given this potential for errors, we again set out to quantify
-integrity errors. 
+integrity errors. We demonstrate that weak isolation can indeed lead
+to data integrity errors in Rails' implementation of associations.
 
 We performed another set of experiments to test association validation
 behavior under concurrent insertions and deletions. Using the same
@@ -374,19 +375,15 @@ Figure~\ref{fig:fk-workload} shows the results. As the number of
 Departments increases, we observe two trends. First, with only one
 Department, there is again less chance of inconsistency: all
 operations contend on the same data item, so the total number of
-inconsistent data is limited by racing deletions. However, with
-increasing Departments, the number of inconsistent records decreases
-linearly with the number of records.
+inconsistent, orphaned users is limited by the number of potentially
+racing. However, as the number of Departments increases, the chance of
+concurrent deletions and insertions drops.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}\vspace{-1em}
 \caption{Foreign key workload association anomalies.}
 \label{fig:fk-workload}
 \end{figure}
-
-\minihead{Summary} Again, we demonstrate that weak isolation can lead
-to data integrity errors, this time in Rails' implementation of
-associations.
 
 \subsection{Takeaways and Discussion}
 
@@ -407,12 +404,13 @@ execution, validations are correct. Second, validations \textit{do}
 reduce the incidence of inconsistency. Empirically, even under
 worst-case workloads, these validations result in order-of-magnitude
 reductions in inconsistency. Under less pathological workloads, they
-may, in practice, eliminate it. It is possible that, in fact, the
+may eliminate it. It is possible that, in fact, the
 degree of concurrency and data contention within Rails-backed
 applications simply does not lead to these concurrency races---that,
 in some sense, validations are ``good enough'' for many applications.
 
-Nevertheless, Rails's feral mechanisms are a poor substitute for their
-respective database counterparts in both cases. We re-examine the Rails community's
-reluctance to embrace these mechanisms in Section~\ref{sec:discussion}.
+Nevertheless, in both cases, Rails's feral mechanisms are a poor
+substitute for their respective database counterparts---at least in
+terms of integrity. We re-examine the Rails community's reluctance to
+embrace these mechanisms in Section~\ref{sec:discussion}.
 

@@ -261,7 +261,7 @@ Thus, on deletion of a model of type \texttt{ValidatedDepartment}, ActiveRecord 
 \subsection{Association Stress Test}
 \label{sec:appendix-association-stress}
 
-For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly attempt to create dangling users. We issue a set of 64 concurrent requests to create Users belonging to a particular department, while simultaneously deleting that department and repeat 100 times. At the end of the run, we count the number of users with a department that does not exist:
+For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly attempt to create orphan users. We issue a set of 64 concurrent requests to create Users belonging to a particular department, while simultaneously deleting that department and repeat 100 times. At the end of the run, we count the number of users with a department that does not exist:
 
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -278,7 +278,7 @@ For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly atte
       \EndIf        
      \EndParFor
    \EndFor
-   \State dangling $\gets $execute(``\texttt{SELECT $m$\_department\_id,}
+   \State orphaned $\gets $execute(``\texttt{SELECT $m$\_department\_id,}
    \State \hspace{8.5em}\texttt{COUNT(*) FROM $m$\_users AS U}
    \State \hspace{8.5em}\texttt{LEFT OUTER JOIN}
    \State \hspace{8.5em}\texttt{$m$\_departments AS D}
@@ -293,7 +293,7 @@ For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly atte
 \subsection{Association Workload Test}
 \label{sec:appendix-association-workload}
 
-For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$. We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of dangling users, as above.
+For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$. We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of orphaned users, as above.
 
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -309,7 +309,7 @@ For the association workload test (Figure~\ref{fig:fk-workload}), we begin by cr
         \State via HTTP: create new $m$User \texttt{department\_id=$d$}
       \EndIf        
    \EndParFor
-   \State dangling $\gets $ as above, in stress test
+   \State orphaned $\gets $ as above, in stress test
 \EndFor
 \end{algorithmic}
 \end{algorithm}

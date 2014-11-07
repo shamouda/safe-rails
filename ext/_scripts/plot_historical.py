@@ -9,6 +9,8 @@ lw=1
 ms=6
 fontsize = 7
 
+fmts = ['-', '--', '-.', ':']
+
 # super inefficient
 def interpolate(target_xs, actual_xs, actual_ys):
     return_ys = []
@@ -121,10 +123,10 @@ for p in projects:
 
 metric = median
 
-plot(xmarks, [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], label="Associations per Model")
-plot(xmarks, [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], label="Transactions per Model")
-plot(xmarks, [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], label="Validations per Model")
-plot(xmarks, [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], label="Models")
+plot(xmarks, [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], '--', label="Associations per Model")
+plot(xmarks, [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], '-s', label="Transactions per Model", markersize=2, markeredgecolor="None")
+plot(xmarks, [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], '.-', label="Validations per Model", markersize=2)
+plot(xmarks, [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], '-', label="Models")
 
 ylabel("% of Final Occurrences")
 xlabel("Normalized Application History (Commits)")

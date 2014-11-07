@@ -8,7 +8,7 @@ ys = []
 
 lw=1
 ms=6
-fontsize = 8
+fontsize = 6.5
 
 matplotlib.rcParams['lines.linewidth'] = lw
 matplotlib.rcParams['axes.linewidth'] = lw
@@ -16,7 +16,7 @@ matplotlib.rcParams['lines.markeredgewidth'] = lw
 matplotlib.rcParams['lines.markersize'] = 6
 matplotlib.rcParams['font.size'] = fontsize
 matplotlib.rcParams['font.weight'] = 'normal'
-matplotlib.rcParams['figure.figsize'] = 3.3, 1.5
+matplotlib.rcParams['figure.figsize'] = 3.3, 1.6
 matplotlib.rcParams['legend.fontsize'] = fontsize
 
 ALPHA=.5
@@ -190,8 +190,8 @@ for yi in ys_of_interest:
     plot([0, interpolated_x], [yi, yi], ':', color="black")    
 
     
-xlabel("Percentage of Authors")
-ylabel("Proportion Invariants")
+xlabel("Proportion Authors")
+ylabel("Valid/Assoc Authored (CDF)")
 
 #xlim(xmax=.4)
 ylim(ymax=1)
@@ -286,8 +286,8 @@ for yi in ys_of_interest:
     
 plot([0]+xs, avg_ys, color="red", linewidth=lw*1.5)
 
-xlabel("Percentage of Authors")
-ylabel("Proportion Commits")
+#xlabel("Percentage of Authors")
+ylabel("Commits Authored (CDF)")
 
 #xlim(xmax=.4)
 ylim(ymax=1)

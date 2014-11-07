@@ -111,7 +111,7 @@ end
 
 
 
-# PB SAFE; checking record
+# PB SAFE ; checking record
 railscollab validates_each railscollab/app/models/milestone.rb:275
   validates_presence_of :name
   validates_each :is_private, :if => Proc.new { |obj| !obj.last_edited_by_owner? } do |record, attr, value|
@@ -793,7 +793,7 @@ canvas-lms validates_each canvas-lms/app/models/group_category.rb:74
       role_category_for_context('imported', context)
     end
 
-# PB NOT_SAFE; may delete the appointment_group.contexts concurrently
+# PB NOT_SAFE ; may delete the appointment_group.contexts concurrently
 canvas-lms validates_each canvas-lms/app/models/appointment_group_sub_context.rb:28
 
   validates_each :sub_context do |record, attr, value|
@@ -839,7 +839,7 @@ canvas-lms validates_each canvas-lms/app/models/user.rb:279
   after_save :self_enroll_if_necessary
 
 
-# PB NOT_SAFE; duplicates, etc.
+# PB NOT_SAFE ; duplicates, etc.
 canvas-lms validates_each canvas-lms/app/models/calendar_event.rb:70
 
   validates_each :child_event_data do |record, attr, events|
@@ -867,7 +867,7 @@ canvas-lms validates_each canvas-lms/app/models/calendar_event.rb:70
         event.updating_user = @updating_user
         event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at])
 
-# PB SAFE; simple formatting
+# PB SAFE ; simple formatting
 canvas-lms validates_each canvas-lms/app/models/group.rb:87
 
   validates_each :name do |record, attr, value|
@@ -895,7 +895,7 @@ canvas-lms validates_each canvas-lms/app/models/group.rb:87
     Wiki.wiki_for_context(self)
   end
 
-# PB SAFE; formatting
+# PB SAFE ; formatting
 canvas-lms validates_each canvas-lms/app/models/group.rb:95
 
   validates_each :max_membership do |record, attr, value|
@@ -952,7 +952,7 @@ canvas-lms validates_each canvas-lms/app/models/appointment_group.rb:65
   # appointment times. these will be added to the existing appointment times
 
 
-# PB SAFE; Resources set by conf
+# PB SAFE ; Resources set by conf
 refinerycms FileSizeValidator refinerycms/resources/lib/refinery/resources/validators/file_size_validator.rb:3
     module Validators
       class FileSizeValidator < ActiveModel::Validator
@@ -1092,7 +1092,7 @@ communityengine validates_each communityengine/app/models/friendship.rb:14
     Friendship.find(:first, :conditions => ['user_id = ? and friend_id = ?', self.friend_id, self.user_id])
   end
 
-# PB SAFE; validates against external URLs, but fine from DB 
+# PB SAFE ; validates against external URLs, but fine from DB 
 publify validates_each publify/lib/spam_protection.rb:103
 
         validates_each(attr_names, configuration) do |record, attr_name, value|
@@ -1377,7 +1377,7 @@ spree DbMaximumLengthValidator spree/core/app/models/spree/validations/db_maximu
 end
 
 
-# PB SAFE; internationalization formatting
+# PB SAFE ; internationalization formatting
 onebody validates_each onebody/app/models/relationship.rb:13
   validates_uniqueness_of :other_name, scope: [:site_id, :name, :person_id, :related_id]
   validates_each :name do |record, attribute, value|
@@ -1489,7 +1489,7 @@ onebody validates_each onebody/app/models/message.rb:34
   end
 
 
-# PB NOT_SAFE; can change settings during save
+# PB NOT_SAFE ; can change settings during save
 discourse Validators::UploadValidator discourse/lib/validators/upload_validator.rb:4
 
 class Validators::UploadValidator < ActiveModel::Validator

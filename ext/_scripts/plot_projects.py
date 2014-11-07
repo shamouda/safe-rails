@@ -9,6 +9,14 @@ lw=1
 ms=6
 fontsize = 6.5
 
+optimistic_locks = defaultdict(int)
+
+optimistic_locks['canvas-lms'] = 1
+optimistic_locks['chiliproject'] = 1
+optimistic_locks['openproject']=3
+optimistic_locks['radiant'] = 1
+optimistic_locks['redmine'] = 1
+
 DO_PRINT_TABLE = True
 
 matplotlib.rcParams['lines.linewidth'] = lw
@@ -270,6 +278,9 @@ for p in toplot:
     savefig(label.lower()+"-single-bar.pdf", transparent=True)
     cla()
 
+print "NUM PROJECTS WITH LOCKS:", len([o for o in projects if int(o[11]) != 0])
+print "NUM PROJECTS WITH TXNS:", len([o for o in projects if int(o[12]) != 0])
+    
 if DO_PRINT_TABLE:
     from os import system
     import datetime
@@ -289,11 +300,11 @@ if DO_PRINT_TABLE:
         num_commits = p[9]
         num_models = p[10]
         num_locks = p[11]
+        o_locks = optimistic_locks[name]
         num_transactions = p[12]
 
         system("cd ../"+name+"; git log -n 1 --pretty='%h %at' > /tmp/hash.txt")
         githash, timestr = open("/tmp/hash.txt").read().split(' ')
-        datestr = datetime.datetime.fromtimestamp(int(timestr)).strftime("%m/%d/%y")
         output.append([fullname,
                        "{\\scriptsize{%s}}" % (desc),
                        num_authors,
@@ -302,18 +313,21 @@ if DO_PRINT_TABLE:
                        num_models,
                        num_transactions,
                        num_locks,
+                       o_locks,
                        num_validations,
                        num_associations,
                        stars,
                        "{\\tiny\\texttt{%s}}" % (githash),
-                       "{\\tiny %s}" % (datestr)])
+                       int(timestr)])
 
     avgs = []
     for i in range(0, len(output[0])):
         if i == 0:
             avgs.append("\\textbf{Average:}")
-        elif i < 3 or i > len(output[0])-3:
+        elif i < 2 or (i > len(output[0])-3 and i != len(output[0])-1):
             avgs.append("")
+        elif i == len(output[0]) - 1:
+            avgs.append("{\\tiny\\textbf{%s}}" % (datetime.datetime.fromtimestamp(average([o[i] for o in output])).strftime("%m/%d/%y")))
         else:
             avgs.append("\\textbf{%s}" % ("{0:,.2f}".format(average([float(o[i]) for o in output]))))
     output.append(avgs)
@@ -321,6 +335,8 @@ if DO_PRINT_TABLE:
     for o in output[:-1]:
         for i in range(2, len(o)-2):
             o[i] = "{:,}".format(int(o[i]))
+        o[-1] = "{\\tiny{%s}}" % datetime.datetime.fromtimestamp(o[-1]).strftime("%m/%d/%y")
+
 
 
     output.insert(0, ["Name",
@@ -330,9 +346,10 @@ if DO_PRINT_TABLE:
                        "Num. Commits",
                        "Num. Models",
                        "Num. Transactions",
-                       "Num. Locks",
-                       "Num. Validations",
-                       "Num. Associations",
+                       "PL",
+                       "OL",
+                       "V",
+                       "A",
                        "GitHub Stars",
                        "Githash",
                        "Last commit date"])
@@ -343,4 +360,3 @@ if DO_PRINT_TABLE:
 
                        
                        
-        

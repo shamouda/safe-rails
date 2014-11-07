@@ -1,0 +1,38 @@
+./canvas-lms/db/migrate/20140314220629_add_lock_version_on_context_module_progressions.rb:    add_column :context_module_progressions, :lock_version, :integer
+./canvas-lms/db/migrate/20140314220629_add_lock_version_on_context_module_progressions.rb:    change_column_default :context_module_progressions, :lock_version, 0
+./canvas-lms/db/migrate/20140314220629_add_lock_version_on_context_module_progressions.rb:    remove_column :context_module_progressions, :lock_version
+./canvas-lms/db/migrate/20140418211204_disallow_null_on_context_module_progression_lock_version_column.rb:    change_column_null :context_module_progressions, :lock_version, false
+./canvas-lms/db/migrate/20140418211204_disallow_null_on_context_module_progression_lock_version_column.rb:    change_column_null :context_module_progressions, :lock_version, true
+./chiliproject/db/migrate/20100804112053_merge_wiki_versions_with_journals.rb:      t.rename :version, :lock_version
+./chiliproject/db/migrate/20100804112053_merge_wiki_versions_with_journals.rb:      t.rename :lock_version, :version
+./chiliproject/vendor/plugins/acts_as_journalized/lib/redmine/acts/journalized/creation.rb:                                                          :lock_version,
+./openproject/app/models/journal/base_journal.rb:    [primary_key.to_sym, inheritance_column.to_sym, :journal_id, :lock_version, :created_at, :root_id, :lft, :rgt]
+./openproject/app/models/permitted_params.rb:                                         :lock_version)
+./openproject/app/models/permitted_params.rb:                                                     :lock_version,
+./openproject/db/migrate/20130620082322_create_work_packages.rb:      t.column :lock_version, :integer, :default => 0, :null => false
+./openproject/db/migrate/20130807084417_create_work_package_journals.rb:      t.integer  :lock_version,                    :default => 0,  :null => false
+./openproject/db/migrate/20130807085245_create_wiki_content_journals.rb:      t.integer  :lock_version,                       :null => false
+./openproject/lib/plugins/acts_as_journalized/lib/acts_as_journalized.rb:            :updated_on << :updated_at << :lock_version << :lft << :rgt
+./radiant/app/models/layout.rb:  attr_accessible :lock_version, :name, :content_type, :content
+./radiant/app/models/page.rb:  attr_accessible :lock_version, :parent_id, :class_name, :title, :slug, :breadcrumb, :layout_id, :status_id, :published_at, :parts_attributes
+./radiant/db/migrate/015_add_optimistic_locking.rb:      add_column table, :lock_version, :integer, :default => 0
+./radiant/db/migrate/015_add_optimistic_locking.rb:      remove_column table, :lock_version
+./spree/api/app/helpers/spree/api/api_helpers.rb:        :id, :lock_version, :state, :variant_id, :shipment_id,
+./spree/api/app/helpers/spree/api/api_helpers.rb:        :id, :count_on_hand, :backorderable, :lock_version, :stock_location_id,
+./spree/core/db/migrate/20120831092320_spree_one_two.rb:      t.integer    :lock_version,        :default => 0
+./spree/core/db/migrate/20121009142519_add_lock_version_to_variant.rb:    add_column :spree_variants, :lock_version, :integer, :default => 0
+./spree/core/db/migrate/20130211190146_create_spree_stock_items.rb:      t.integer :lock_version
+./spree/core/db/migrate/20130329134939_remove_stock_item_and_variant_lock.rb:    remove_column :spree_stock_items, :lock_version
+./spree/core/db/migrate/20130329134939_remove_stock_item_and_variant_lock.rb:    remove_column :spree_variants, :lock_version
+./spree/core/db/migrate/20130329134939_remove_stock_item_and_variant_lock.rb:    add_column :spree_stock_items, :lock_version, :integer
+./spree/core/db/migrate/20130329134939_remove_stock_item_and_variant_lock.rb:    add_column :spree_variants, :lock_version, :integer
+./spree/core/db/migrate/20130711200933_remove_lock_version_from_inventory_units.rb:    remove_column :spree_inventory_units, :lock_version
+./spree/core/lib/spree/permitted_attributes.rb:      :name, :presentation, :cost_price, :lock_version,
+./redmine/app/models/wiki_content.rb:  self.locking_column = 'version'
+./squaresquash/config/initializers/active_record.rb:      changes[self.class.locking_column] = increment_lock if locking_enabled?
+
+'canvas-lms': 1,
+'chiliproject': 1,
+'openproject':3,
+'radiant', 1
+'redmine', 1

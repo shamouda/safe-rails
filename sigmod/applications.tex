@@ -27,11 +27,11 @@ We did not encounter evidence that applications changed the isolation
 level. Rails does not configure the database isolation level for
 validations, and none of the application code or configurations we
 encountered change the default isolation level, either (or mention
-doing so in documentation). Thus, although we cannot prove it, this
-data suggests that validations are likely running at default isolation
-in practice.
+doing so in documentation). Thus, although we cannot prove that this
+is indeed the case, this data suggests that validations are likely
+to run at default database isolation in production environments.
 
-\minihead{Validations without Isolation} Given that validations are
+\minihead{Validations without isolation} Given that validations are
 not likely to be perfectly isolated, does this lack of serializable
 isolation actually affect these invariants?  Just because validations
 effectively run concurrently does not mean that they are necessarily
@@ -189,6 +189,6 @@ foil this validation by attempting to simultaneously author many posts.
 
 In summary, again, a large proportion of validations appear
 safe. Nevertheless, the few non-I-confluent validations should be
-cause for concern.
+cause for concern under concurrent execution.
 
 

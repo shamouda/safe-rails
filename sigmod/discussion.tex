@@ -228,12 +228,12 @@ for future database systems designs and research.
 In Rails and, across the other ORMs we studied, the use of
 application-enforced validations was surprisingly common. The
 inclusion of validations in a framework as mature as the Java EE JPA
-specification (which includes effort from with 41 representatives from
-companies including Google, Oracle, and Red Hat), suggests that
+specification (which was produced by a group of 41 representatives
+from companies including Google, Oracle, and Red Hat), suggests that
 validations are, in fact, a common way to express domain logic in web
-frameworks (and are not simply an artifact of Rails). We believe that
-appropriate enforcement of these validations should therefore be an
-important concern for database management systems.
+frameworks (and are not simply an artifact of Rails). We therefore
+believe that appropriate enforcement of these validations should
+be an important concern for database management systems.
 
 \minihead{Enforcing validations} Among the frameworks we have studied,
 we can identify three main approaches to validation enforcement:
@@ -265,21 +265,22 @@ isolation (without bugs). When default database isolation is
 non-serializable, one can only expect ``convention over
 configuration'' to lead to isolation anomalies.
 
-There are several pragmatic challenges here. However, lack of support
-for serializable isolation in databases such as Oracle 12c and
-implementation bugs such as the error we encountered in PostgreSQL
-raise portability challenges. There is compelling evidence that some
-framework authors \textit{are} aware of this issue (e.g.,
-Footnote~\ref{fn:si-rails}, the JPA comments in
-Section~\ref{sec:other-orms}). However, despite this awareness,
-integrity violations are still possible, and, in some frameworks,
-authors have chosen not to back validations with a transaction at
-all. This suggests a lack of user education or, alternatively,
-frustration with the existing prevalence of weak isolation techniques.
+There are several pragmatic challenges here. Lack of support for
+serializable isolation in databases such as Oracle 12c and
+implementation bugs such as the error we discovered in PostgreSQL
+raise complex portability challenges. Moreover, there is compelling
+evidence that some framework authors \textit{are} aware of this issue
+(e.g., Footnote~\ref{fn:si-rails}, the JPA comments in
+Section~\ref{sec:other-orms}). However, despite this awareness, these
+frameworks \textit{still} allow integrity violations and have not take
+steps to address them. In some frameworks, authors have chosen not to
+back validations with a transaction at all. This suggests a lack of
+user education or, perhaps alternatively, frustration with the existing
+prevalence of weak isolation guarantees.
 
-Nevertheless, better understanding when weak isolation models
-\textit{as deployed in production databases} are sufficient for and
-when stronger levels are required would be an excellent start.
+From a research perspective, better understanding when weak isolation models
+\textit{as deployed in production databases} are sufficient and
+when stronger levels are required would be helpful here.
 
 \minihead{Natively supporting validations} Second, we can consider
 greater in-database support for validations. That is, while databases
@@ -316,13 +317,13 @@ control, thus allowing higher concurrency and avoiding the cost of
 serializable isolation that these data stores and users have evidently
 eschewed. This suggests the possibility of a revival of concepts from
 active and rule-based databases~\cite{activedb-book} and, broadly,
-semantic concurrency control. The challenge of declaring semantic
-criteria for correctness is already being performed by database
-users---at least for some correctness criteria. While they are likely
-incomplete specifications, we view the fact that declarative
-validations are being used organically and have been produced by
-database users (in lieu of standard transaction model) as ample cause
-for re-evaluating the decades of work on semantic concurrency control~\cite{tamer-book}.
+semantic concurrency control~\cite{tamer-book}. The challenge of
+declaring semantic criteria for correctness is already being performed
+by database users---at least for some correctness criteria. While they
+are likely incomplete specifications, we view the fact that
+declarative validations are being used organically and have been
+produced by database users (in lieu of standard transaction model) as
+ample cause for re-evaluating the decades of work on these topics.
 
 \minihead{A note on usability} Returning, finally, to Rails's central
 goal of programmer productivity, our results ultimately hint at a
@@ -332,16 +333,17 @@ succeeded due to its usability and end-user productivity---despite its
 apparent lack of rigor in enforcing correctness---we believe there is
 an important takeaway for database developers. As we noted in
 Section~\ref{sec:intro}, this echoes many strains of the NoSQL
-movement; per NoSQL architect Justin Sheehy: ``What does a
-first-time user of your system experience in their first five
+movement; per NoSQL architect Justin Sheehy: ``What does a first-time
+user of your system experience in their first five
 minutes?''~\cite{marcus-talk}. Rails simplifies the development
 process and makes the process of getting started remarkably
 straightforward, with a suite of simple automation tools and a
 plethora of starter documentation and tutorials. In contrast, typical
-database configuration is often less accessible. Notably,
-understanding the slew of anomalies that characterize each default
-isolation level---which were at the heart of Rails' feral validation
-errors---remains a subject of graduate-level study within
+database configuration and, specifically, concurrency control
+mechanism are often less accessible. Notably, understanding the slew
+of anomalies that characterize each default isolation level---which
+were at the heart of Rails' feral validation errors---remains a
+subject of graduate-level study within
 databases~\cite{adya-isolation,hat-vldb}. We believe that
 understanding weak isolation and the interaction with validation logic
 is an important step in this direction.

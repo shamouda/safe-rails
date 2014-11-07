@@ -16,10 +16,11 @@ theoretically---unsafe.
 
 When a Model field is declared with a \texttt{:validates\_uniqueness}
 annotation, any instance of that model is compared against all other
-corresponding records in the database to ensure uniqueness. Rails
-accomplishes this by issuing a ``\texttt{SELECT}'' query in SQL and,
-if no such record is found, Rails updates the instance state in the
-database (Appendix~\ref{sec:appendix-uniqueness-behavior}).
+corresponding records in the database to ensure that the field is
+indeed unique. ActiveRecord accomplishes this by issuing a
+``\texttt{SELECT}'' query in SQL and, if no such record is found,
+Rails updates the instance state in the database
+(Appendix~\ref{sec:appendix-uniqueness-behavior}).
 
 While this user-level uniqueness validation runs within a transaction,
 the exact isolation level of the transaction affects its
@@ -256,19 +257,20 @@ association validations. We first, again, discuss how Rails enforces
 these validations and describe how---at least
 theoretically---validations might result in integrity errors.
 
-When a Model field is declared with an association (e.g.,
-\texttt{:belongs\_to}) \textit{and} a \texttt{:validates\_presence}
-validation, Rails will attempt to ensure that the declared validation
-is valid before saving the model. Rails accomplishes this by issuing a
-``\texttt{SELECT WHERE}'' query in SQL to find an associated record (e.g.,
-to ensure the ``one'' end of a one-to-many relationship exists) and, if a
-matching association is found, Rails updates the instance state in the
-database (Appendix~\ref{sec:appendix-association-behavior}). On
-deletion, any models with associations marked with \texttt{:dependent =>
-  destroy} (or \texttt{:dependent  => delete}) will have any associated
-models destroyed (i.e., removed by instantiating in Rails and calling
+When a Model field is declared with an association (e.g., it
+\texttt{:belongs\_to} another model) \textit{and} a
+\texttt{:validates\_presence} validation, Rails will attempt to ensure
+that the declared validation is valid before saving the model. Rails
+accomplishes this by issuing a ``\texttt{SELECT WHERE}'' query in SQL
+to find an associated record (e.g., to ensure the ``one'' end of a
+one-to-many relationship exists) and, if a matching association is
+found, Rails updates the instance state in the database
+(Appendix~\ref{sec:appendix-association-behavior}). On deletion, any
+models with associations marked with \texttt{:dependent => destroy}
+(or \texttt{:dependent => delete}) will have any associated models
+destroyed (i.e., removed by instantiating in Rails and calling
 \texttt{destroy} on the model) or deleted (i.e., removed by simply
-calling the database's \texttt{DELETE} method). 
+calling the database's \texttt{DELETE} method).
 
 This feral association validation runs within a transaction, but,
 again the exact isolation level of the transaction affects its
@@ -285,7 +287,7 @@ and concurrency anomalies in the Rails documentation. Moreover, there
 is no way to natively declare a foreign key constraint in Rails; it
 must be done via a third-party library such as
 \texttt{foreigner}~\cite{foreigner} or
-\texttt{schema\_plus}\cite{schemaplus}. Only two applications
+\texttt{schema\_plus}~\cite{schemaplus}. Only two applications
 (\texttt{canvaslms} and \texttt{diaspora}) used \texttt{foreigner},
 and only one application (\texttt{juvia}) used \texttt{schema\_plus}. One
 application (\texttt{jobsworth}) used a custom schema annotation and
@@ -308,14 +310,14 @@ validation, leading to unbounded numbers of dangling records.
 Given this potential for errors, we again set out to quantify
 integrity errors. 
 
-We performed another set of experiments to test association behavior
-under concurrent insertions and deletions. Using the same Unicorn and
-PostgreSQL deployment, we configured another application to test
-whether or not Rails validations would defend against dangling
-entries. We consider an application with two models: Users and
-Departments. We configure a one-to-many relationship: each user
-\texttt{belongs\_to} a department, and each department
-\texttt{has\_many} user
+We performed another set of experiments to test association validation
+behavior under concurrent insertions and deletions. Using the same
+Unicorn and PostgreSQL deployment as above, we configured another
+application to test whether or not Rails validations would correctly
+enforce association-based integrity constraints. We consider an
+application with two models: Users and Departments. We configure a
+one-to-many relationship: each user \texttt{belongs\_to} a department,
+and each department \texttt{has\_many} user
 (Appendix~\ref{sec:appendix-association-schema}).
 
 As a basic stress test, we initialize the database by creating 100

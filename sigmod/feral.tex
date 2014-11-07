@@ -173,8 +173,7 @@ work to examining exactly what these feral mechanisms are attempting
 preserve (and whether they are actually correct in doing so).
 
 \minihead{Understanding specific applications} Over the course of our
-investigation, we found varying use of mechanisms across
-applications.
+investigation, we found mechanism use varied across applications.
 
 For example, the eCommerce application Spree uses only
 six transactions, one for each of $1.)$ canceling an order, $2.)$
@@ -182,11 +181,13 @@ approving an order (atomically setting the user ID and timestamp),
 $3.)$ transferring shipments between fulfillment locations (e.g.,
 warehouses), $4.)$ transferring items between shipments, $5.)$
 transfering stock between fulfillment locations, and $6.)$ updating an
-order's specific inventory status.
+order's specific inventory status. While this is a reasonable set of
+locations for transactions, in an eCommerce application, one might
+expect a number of scenarios that require concurrency control,
+including order placement and stock adjustment.
 
-In an eCommerce application like Spree, one might expect (as in the
-canonical banking example from database textbooks) the inventory count
-for each item to be a hotspot for concurrency issues. We found that
+In the case of stock adjustment, the inventory count for each item to
+is indeed a potential hotspot for concurrency issues. We found that
 performing differential addition and subtraction to the available
 stock of an item (\texttt{adjust\_count\_on\_hand(value)}) is indeed
 protected via a pessimistic lock, but simply setting the available
@@ -194,7 +195,7 @@ stock (\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why
 one operation necessitates a lock but the other does not, given that
 both are ostensibly sensitive to concurrent accesses. Meanwhile, the
 stock level itself is wrapped in a validation ensuring non-negative
-balances, if not Lost Updates.
+balances, if not Lost Updates~\cite{adya-isolation}.
 
 At one point, Spree's inventory was protected by an optimistic lock;
 it was removed due to optimistic lock failure during customer
@@ -214,7 +215,7 @@ mechanisms within Rails rather than traditional use of
 transactions. As a consequence of the breadth of our study (and paper
 formatting limitations), we are not able to discuss every application
 in detail (though the source code of each and, fortunately, the Git
-history and issue trackers typically publicly available for
+history and issue trackers typically available for
 inspection).
 
 \begin{figure}
@@ -289,7 +290,7 @@ application code.
 \label{fig:cdfs}
 \end{figure}
 
-\subsection{Discussion}
+\subsection{Summary and Discussion}
 
 Returning to the Rails design philosophy, the applications we have
 encountered do indeed express their logic at the application

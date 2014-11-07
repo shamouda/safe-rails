@@ -42,20 +42,19 @@ antagonistic relationship to database management systems, echoing a familiar ref
 
 In this paper, we examine the implications of this decision---for
 Rails as a framework, for applications built using Rails, and for
-database systems builders---through the lens of data integrity and
-concurrency control. In particular, by shunning decades of work on
-native database concurrency control solutions, Rails has developed a
-set of primitives for handling application integrity in the
-application tier---building, from the underlying database system's
-perspective, a \textit{feral} concurrency control system. We examine
-the design and, more importantly, \textit{use} of these feral
-mechanisms and evaluate their effective ``cleverness'' in practice by
-analyzing them and and experimentally quantifying data integrity
-violations in practice. Our goal is to understand how this growing
-class of applications currently interacts (or, as the case may be,
-does not interact) with database systems and how we, as a database
-systems community, we can positively engage with these criticisms to
-better serve the needs of these developers.
+database systems---through the lens of data integrity. In particular,
+by shunning decades of work on native database concurrency control
+solutions, Rails has developed a set of primitives for handling
+application integrity in the application tier---building, from the
+underlying database system's perspective, a \textit{feral} concurrency
+control system. We examine the design and, more importantly,
+\textit{use} of these feral mechanisms and evaluate their effective
+``cleverness'' in practice by analyzing them and experimentally
+quantifying data integrity violations in practice. Our goal is to
+understand how this growing class of applications currently interacts
+(or, as the case may be, does not interact) with database systems and
+how we, as a database systems community, we can positively engage with
+these criticisms to better serve the needs of these developers.
 
 We begin by surveying the state of Rails' application-tier concurrency
 control primitives and examining their use in 67 open source
@@ -96,8 +95,9 @@ the success of Rails and its ilk are firm evidence of the continued
 relational model, we see considerable opportunity in adapting existing
 database concurrency control to better serve these communities---via
 both increased native support for declarative invariants and
-server-side code execution as well as broader education about (and
-less prevalent use of) weak isolation guarantees (at least by default).
+server-side code execution as well as broader education about,
+understanding of, and less prevalent default use of weak isolation
+guarantees.
 
 In summary, this paper makes the following contributions:
 \begin{myitemize}

@@ -3,8 +3,9 @@
 \label{sec:other-orms}
 
 While our focus in this paper is on Rails, we briefly investigated
-support for (problematic, in Rails) uniqueness, foreign key, and
-custom validations in several other frameworks.
+support for uniqueness, foreign key, and custom validations in several
+other frameworks. We find widespread support for these constructs in
+addition to varying degrees of susceptibility to integrity errors.
 
 \newcommand{\orm}[1]{{\vspace{.45em}\noindent\textit{#1}}}
 
@@ -31,8 +32,10 @@ An author of a portion of the code specification notes separately:
   before you go for [an application-level] approach.''~\cite{unique-bean}
 \end{quote}
 %http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1414639627_4654729130380ec6809634192c3faacb
-By default, JPA Validations are run upon model save
-and run in a transaction (at the default isolation level).
+By default, JPA Validations are run upon model save and run in a
+transaction at the default isolation level, and therefore, as the
+developers above hint, are susceptible to the same kinds of integrity
+violations we study here.
 
 \orm{Hibernate} (version 4.3.7)~\cite{code-hibernate}, a Java ORM
 based on JPA, does \textit{not} automatically enforce declared foreign
@@ -53,7 +56,9 @@ checking with a database transaction and relies on the user to
 correctly specify any corresponding foreign keys or uniqueness
 constraints within the database the schema. Thus, while users can
 declare each of these validations, there is no guarantee that they are
-actually enforced by the database.
+actually enforced by the database. Thus, unless users are careful to
+specify constraints in both their schema and in their validations,
+validations may lead to integrity violations.
 
 \orm{Laravel} (version 4.2)~\cite{code-laravel}, another PHP-based web
 framework, supports the same set of functionality as CakePHP. Laravel
@@ -73,11 +78,11 @@ is no mention of concurrency in this current treatment, despite the
 glaring potential for integrity errors.
 
 \orm{Django} (version 1.7)~\cite{code-django}, a popular Python-based
-framework, backs declared
-uniqueness and foreign key constraints with database-level
-constraints. It also supports custom validations, but these
-validations are not wrapped
-in a transaction~\cite{code-django-constraints}.
+framework, backs declared uniqueness and foreign key constraints with
+database-level constraints. It also supports custom validations, but
+these validations are not wrapped in a
+transaction~\cite{code-django-constraints}. Thus, Django also appears
+problematic, but only for custom validations.
 
 \orm{Waterline} (version 0.10), a persistence layer for
 node.js~\cite{code-waterline} (backing Sails.js, a popular MVC
@@ -210,7 +215,6 @@ uses db foreign keys
 
 \end{comment}
 
-
 % what can we learn?
 % udfs
 
@@ -221,146 +225,126 @@ uses db foreign keys
 In this section, we discuss the implications of this study's results
 for future database systems designs and research.
 
-\subsection{Designing for Feral Validations}
-
 In Rails and, across the other ORMs we studied, the use of
 application-enforced validations was surprisingly common. The
-inclusion of validations in the Java EE JPA specification (including
-effort from with 41 representatives from companies including Google,
-Oracle, and Red Hat), suggests that validations are, in fact, a common
-way to express domain logic in web frameworks. We believe that
-appropriate support for these validations should therefore be an
-important concern for database management systems. Unfortunately,
-support for enforcing validations is limited, and validations are
-often insufficient to prevent integrity errors. As we have seen, Rails
-validations as deployed in today's database systems may corrupt
-data. Among the frameworks we have studied, we can identify three main
-approaches to validation enforcement:
+inclusion of validations in a framework as mature as the Java EE JPA
+specification (which includes effort from with 41 representatives from
+companies including Google, Oracle, and Red Hat), suggests that
+validations are, in fact, a common way to express domain logic in web
+frameworks (and are not simply an artifact of Rails). We believe that
+appropriate enforcement of these validations should therefore be an
+important concern for database management systems.
+
+\minihead{Enforcing validations} Among the frameworks we have studied,
+we can identify three main approaches to validation enforcement:
 \begin{defendenumerate}
-\item Let the the application enforce the validations, and also let
+\item Let the application enforce the validations, and also let
   the application prevent concurrency anomalies.
 
 \item Let the application enforce the validations, and use database
   transactions to mediate between concurrent validations and updates.
 
-\item Let the database the perform validations (e.g. by declaring a unique
+\item Let the database perform validations (e.g., by declaring a unique
   index on a column that is supposed to be unique)
 \end{defendenumerate}
-As we have seen, in practice, the second approach is most prevalent in
-Rails applications. However, under default, non-serializable
-isolation, this approach is unsufficient to correctly enforce
-concurrent validations. Non-serializable isolation is
-\textit{sometimes} okay, but it is not a general solution for
-arbitrary invariants. As a consequence, users today must effectively
-roll their own solutions without the assistance of the database---the
-first approach---or otherwise risk inconsistency.
+In our Rails corpus, the second approach is most prevalent. However,
+under (often default) non-serializable isolation, this approach is
+insufficient to correctly enforce concurrent
+validations. Non-serializable isolation is \textit{sometimes} okay,
+but it is not a general solution for arbitrary invariants. As a
+consequence, users today must effectively roll their own solutions
+without the assistance of the database---the first approach---or
+otherwise risk inconsistency.
 
 We see two primary avenues for improving validation support.
 
-\minihead{Fixing weak isolation} First, we can ensure that
+\minihead{Address weak isolation} First, we can ensure that
 transaction-backed validations run under appropriate isolation. In an
 ideal world, transaction isolation would default to serializable
-isolation (without bugs). (When default database isolation is
+isolation (without bugs). When default database isolation is
 non-serializable, one can only expect ``convention over
-configuration'' to lead to isolation anomalies.)  However, lack of
-support in databases such as Oracle 12c and implementation bugs such
-as the error we encountered in PostgreSQL are often enough to
-compromise validator integrity. Moreover, a community like Rails that
-shuns database concurrency control is unlikely to positively engage
-with the subtleties of weak isolation.  There is compelling evidence
-that some framework authors \textit{are} aware of this issue (e.g.,
+configuration'' to lead to isolation anomalies.
+
+There are several pragmatic challenges here. However, lack of support
+for serializable isolation in databases such as Oracle 12c and
+implementation bugs such as the error we encountered in PostgreSQL
+raise portability challenges. There is compelling evidence that some
+framework authors \textit{are} aware of this issue (e.g.,
 Footnote~\ref{fn:si-rails}, the JPA comments in
-Section~\ref{sec:other-orms}). However, these anomalies still
-exist, and, in some frameworks, authors have chosen not to back
-validations with a transaction at all. This suggests a lack of user
-education or, alternatively, frustration with the existing prevalence
-of weak isolation techniques.
+Section~\ref{sec:other-orms}). However, despite this awareness,
+integrity violations are still possible, and, in some frameworks,
+authors have chosen not to back validations with a transaction at
+all. This suggests a lack of user education or, alternatively,
+frustration with the existing prevalence of weak isolation techniques.
 
-\minihead{Natively supporting validations} Second, and perhaps more
-interestingly, we can consider greater in-database support for
-validations. That is, while database today provide support for limited
-forms of constraints (including uniqueness, referential integrity, and
-row-level check constraints), we can consider broader support for
-declarative UDF-based constraints.
+Nevertheless, better understanding when weak isolation models
+\textit{as deployed in production databases} are sufficient for and
+when stronger levels are required would be an excellent start.
 
-Conceptually, these validations fail today largely because they are
+\minihead{Natively supporting validations} Second, we can consider
+greater in-database support for validations. That is, while databases
+today provide support for limited forms of constraints (including
+uniqueness, referential integrity, and row-level check constraints),
+typical database constraint support is insufficient to express the
+broad range of validations we see in Rails.
+
+Conceptually, Rails validations fail today largely because they are
 expressed in a language that is not understood or interpreted by the
-database, which is unable to assist in ensuring data integrity. Today,
-commodity databases offer one general-purpose programming construct
-for ensuring data integrity: the transaction concept. But these web
-programming frameworks have adopted their \textit{own}, similar but
-separate set of language idioms. To his credit, DHH explicitly disowns
-the title of ``computer scientist'' and instead refers to himself as
-an ``information systems programmer''~\cite{dhh-keynote}. DHH's
-information systems are ``built on top of computer science...[and]
-computer science is what it makes it possible for us to do what it is
-that we [information systems programmers] do. But it doesn't define
-what we do.'' Given a set of database system implementations that
-necessarily require buy-in to a transactional programming model in
-order to support concurrent programming (not to mention the
-complexities associated with weak isolation), DHH and the Rails
-community instead have forged their own path.
+database, which is unable to assist in ensuring data integrity. Modern
+commodity databases offer one \textit{general-purpose} programming
+construct for ensuring data integrity: the transaction concept, as
+enforced under serializable isolation. But these web programming
+frameworks have adopted their \textit{own}, similar but separate set
+of language idioms.
 
-Can database systems natively support DHH and company's feral
-validations (thereby ``domesticating'' them)?  Doing so has clear
-correctness implications but also has performance implications: in a
-tiered application deployment, native integration of user-defined
-validations with the database can help eliminate database
-RTTs~\cite{pyxis}---which, in particular, can assist with reducing the
-duration for which locks are held. We see opportunity for invariant-
-or validation-based concurrency control, thus allowing higher
-concurrency and avoiding the cost of serializable isolation that these
-data stores and users have evidently eschewed. This suggests the
-possibility of a revival of concepts from active and rule-based
-databases~\cite{activedb-book} and, broadly, semantic concurrency
-control. The challenge of declaring semantic criteria for correctness
-is already being performed by database users---at least for some
-correctness criteria. While they are likely incomplete specifications,
-we view the fact that declarative validations are being used
-organically and have been produced by database users (in lieu of
-standard transaction model) as ample cause for re-evaluating the
-decades of work on semantic concurrenty control.
+To his credit, DHH explicitly disowns the title of ``computer
+scientist'' and instead refers to himself as an ``information systems
+programmer''~\cite{dhh-keynote}. DHH's information systems are ``built
+on top of computer science...[and] computer science is what it makes
+it possible for us to do what it is that we [information systems
+programmers] do. But it doesn't define what we do.'' Can database
+systems natively support this alternative definition of correctness
+criteria (thereby ``domesticating'' feral validations)? We believe
+so. There are clear correctness implications and also performance
+implications: in a tiered application deployment, native integration
+of user-defined validations with the database can help eliminate
+database RTTs~\cite{pyxis}---which, in particular, can assist with
+reducing the duration for which locks are held.
 
+We see opportunity for invariant- or validation-based concurrency
+control, thus allowing higher concurrency and avoiding the cost of
+serializable isolation that these data stores and users have evidently
+eschewed. This suggests the possibility of a revival of concepts from
+active and rule-based databases~\cite{activedb-book} and, broadly,
+semantic concurrency control. The challenge of declaring semantic
+criteria for correctness is already being performed by database
+users---at least for some correctness criteria. While they are likely
+incomplete specifications, we view the fact that declarative
+validations are being used organically and have been produced by
+database users (in lieu of standard transaction model) as ample cause
+for re-evaluating the decades of work on semantic concurrenty control.
 
-\subsection{Usability and ``Correctness''}
-
-Returning, finally, to Rails's central goal of programmer
-productivity, our results ultimately hint at a triumph of convenience
-over formal---and, in some cases, practical---correctness
-guarantees. However, we have observed that the ``convenient'' feral
-validations actually do serve a purpose in reducing worst-case data
-integrity errors. This suggests that, in fact, these validations are
-somehow sufficient for most applications, or, alternatively, other
-errors (e.g., bugs in program logic) loom larger for developers.
-
-The takeaway for the database community here is, in a sense, somewhat
-sobering. Ultimately, under the hypothesis that Rails has succeeded
-due to its usability and productivity, conventional databases have
-largely failed to provide the same end-user efficiency. As we noted in
+\minihead{A note on usability} Returning, finally, to Rails's central
+goal of programmer productivity, our results ultimately hint at a
+triumph of convenience and portability over formal---and, in some
+cases, practical---correctness guarantees. If Rails has indeed
+succeeded due to its usability and end-user productivity---despite its
+apparent lack of rigor in enforcing correctness---we believe there is
+an important takeaway for database developers. As we noted in
 Section~\ref{sec:intro}, this echoes many strains of the NoSQL
-movement; per Basho Riak's Justin Sheehy: ``What does a first-time user of
-your system experience in their first five
+movement; per NoSQL architect Justin Sheehy: ``What does a
+first-time user of your system experience in their first five
 minutes?''~\cite{marcus-talk}. Rails simplifies the development
 process and makes the process of getting started remarkably
 straightforward, with a suite of simple automation tools and a
 plethora of starter documentation and tutorials. In contrast, typical
-database configuration is often less accessible. Moreover,
-understanding, for example, the slew of anomalies that characterize
-each isolation level (which also vary between stores), remains a
-subject of graduate-level study within
-databases~\cite{adya-isolation,hat-vldb}. Moreover, a first-time user
-is unlikely to run a highly concurrent workload and experience such
-integrity violations; rather, it is only at scale that they might
-encounter them.
-
-The resulting opportunity is to develop database systems that provide
-usability at both the early stages and, subsequently, at later
-stages. We are by no means the first to make this
-observation. However, in the context of modern web frameworks, it is
-our perogative to better support these users who, otherwise, appear
-content to ignore much of the technological advances within the
-database community of the last four decades and continue to use
-productive if unsafe programming patterns.
+database configuration is often less accessible. Notably,
+understanding the slew of anomalies that characterize each default
+isolation level---which were at the heart of Rails' feral validation
+errors---remains a subject of graduate-level study within
+databases~\cite{adya-isolation,hat-vldb}. We believe that
+understanding weak isolation and the interaction with validation logic
+is an important step in this direction.
 
 
 % Use of weak isolation

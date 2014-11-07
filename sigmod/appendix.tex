@@ -89,13 +89,19 @@ Obtvse & {\scriptsize{Blogging}} & 27 & 427 & 393 & 1 & 0 & 0 & 0 & 3 & 0 & 1,51
 \end{table*}
 
 \section{Analysis Methodology}
+\subsection{Mechanism Analysis}
 \label{sec:appendix-methodology}
 
 To determine the occurrences and number of models, transactions, locks, validations, and associations in Rails, we used a very simple set of custom code analysis scripts. We do not consider the analysis techniques here a contribution; rather, our interest is in the output of the analysis.  (Though we hesitate to term this process ``program analysis,'' the scripts embody a very simple syntactic static analysis.) The syntactic approach proved portable between the many versions of Rails against which each application is linked; otherwise, porting between non-backwards-compatible Rails versions was difficult and, in fact, unsupported by several of the Rails code analysis tools we considered using as alternatives. The choice to use syntax as a means of distinguishing code constructs led to some ambiguity. To compensate, we introduced custom logic to handle esoteric syntaxes that arose in particular projects (e.g., some projects extend \texttt{ActiveRecord::Base} with a separate, project-specific base class, while some validation usages vary between constructs like \texttt{:validates\_presence} and \texttt{:validates\_presence\_of}).
 
-To determine commit and project authorship, we used the output of \texttt{git log} and did not attempt any form of sophisticated entity resolution.
+To determine code authorship, we used the output of git \texttt{log} and \texttt{blame} and did not attempt any sophisticated entity resolution.
 
-Given double-blind constraints, we cannot release this code at this time. However, once double-blind restrictions have lifted, we plan to release the analysis scripts as to facilitate reproducibility of our results.
+Given double-blind constraints, we cannot release this code at this time. Once double-blind restrictions have lifted, we plan to release the analysis scripts to facilitate reproducibility of our results.
+
+\subsection{Invariant Confluence}
+\label{sec:appendix-ic}
+
+Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). As above, we plan to release additional, more detailed data following double-blind review.
 
 \section{Detailed Validation Behavior}
 
@@ -105,12 +111,13 @@ Given double-blind constraints, we cannot release this code at this time. Howeve
 When a controller attempts to \texttt{save} an ActiveRecord model instance $i$ of type $M$, if $M$ has a declared \texttt{:validates\_uniqueness} annotation on attribute $a$, the following steps will be performed during validation:
 
 \begin{enumerate} 
+\small
 
 \item Assuming that instances of $M$ are stored in database table $T_M$ (with attribute $a$ stored in column $C_a$), Active Record will perform the equivalent of $$\texttt{SELECT 1 FROM $T_M$ where $C_a$ = $i.a$ LIMIT ONE;}$$ (\texttt{SELECT COUNT(*)} would be sufficient here as well, but this is not how the query is actually implemented).
 
 \item If this result set is empty, the validation succeeds.
 
-\item If this result set is not empty, the validation fails. If the validation was called during \texttt{save}, the call returns \texttt{false}. If the validation was called during \texttt{save!}, the call returns an \texttt{ActiveRecord::RecordInvalid} exception.
+\item If this result set is not empty, the validation fails. If the validation was called during \texttt{save}, it returns \texttt{false}. If the validation was called during \texttt{save!}, it raises an \texttt{ActiveRecord::RecordInvalid} exception.
 
 \end{enumerate}
 
@@ -122,12 +129,12 @@ This is a classic example of the phantom problem. As we mention in Section~\ref{
  When a controller attempts to \texttt{save} an ActiveRecord model instance $i$ of type $M$, if $M$ has a declared \texttt{:belongs\_to} annotation on attribute $a$ pointing to attribute $b$ of model $N$ \textit{and} $M$ has a declared \texttt{:validates\_presence} annotation on attribute $a$, the following steps will be performed during validation:
 
 \begin{enumerate} 
-
+\small
 \item Assuming that instances of $N$ are stored in database table $T_N$ (with attribute $b$ stored in column $C_b$), Active Record will perform the equivalent of $$\texttt{SELECT 1 FROM $T_N$ where $C_b$ = $i.a$ LIMIT ONE;}$$
 
 \item If this result set is not empty, the validation succeeds.
 
-\item If this result set is empty, the validation fails. If the validation was called during \texttt{save}, the call returns \texttt{false}. If the validation was called during \texttt{save!}, the call returns an \texttt{ActiveRecord::RecordInvalid} exception.
+\item If this result set is empty, the validation fails. If the validation was called during \texttt{save}, it returns \texttt{false}. If the validation was called during \texttt{save!}, it raises an \texttt{ActiveRecord::RecordInvalid} exception.
 
 \end{enumerate}
 

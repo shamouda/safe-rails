@@ -28,7 +28,7 @@ As we are concerned with how Rails utilizes database back-ends, we largely focus
 \subsection{Databases and Deployment}
 \label{sec:deployment}
 
-This otherwise benign separation of data and logic becomes interesting when we consider how Rails actually processes requests. In brief, concurrency within request processing arises via multi-threaded or multi-process business logic processing, and the database is the only point of rendezvous for concurrent queries. We discuss actual mechanisms for rendezvous in the next section.
+This otherwise benign separation of data and logic becomes interesting when we consider how Rails actually processes requests. In this section, we describe how, in standard Rails deployments, requests may be processed entirely concurrently by separate threads or processes.
 
 In Rails, the database is---at least for basic usages---simply a place to store model state and is otherwise divorced from the application logic. All application code is run within the Ruby virtual machine (VM), and Active Record makes appropriate calls to the database in order to materialize collections of models in the VM memory as needed (as well as to persist model state). However, from the database's perspective (and per DHH's passionate declaration in Section~\ref{sec:intro}), logic remains in the application layer. Active Record natively provides support for PostgreSQL, MySQL, and SQLite, with extensions for databases including Oracle and is otherwise agnostic to database choice.
 
@@ -36,7 +36,7 @@ Rails deployments typically resemble traditional multi-tier web architectures~\c
 
 Thus, in a Rails application, the \textit{only} coordination between individual application requests occurs within the database system. Controller execution---whether in separate threads or across Ruby VMs (which may be active on different physical servers)---is entirely independent, save for the rendezvous of queries and modifications within the database tier, as triggered by Active Record operations.
 
-The independent execution of concurrent business logic should give serious pause to disciples of concurrent transaction processing. Is this execution strategy actually safe? Thus far, we have yet to discuss any mechanisms for maintaining correct application data, such as the use of transactions. In fact, as we will discuss in the next section, Rails has, over its lifetime, introduced several mechanisms for maintaining consistency of application data. In keeping with Rails' focus on keeping application logic within Rails (and not in the database), this has led to several different proposals. In the remainder of this paper, we examine their use and whether, in fact, they correctly maintain applicaiotn data.x
+The independent execution of concurrent business logic should give serious pause to disciples of concurrent transaction processing. Is this execution strategy actually safe? Thus far, we have yet to discuss any mechanisms for maintaining correct application data, such as the use of transactions. In fact, as we will discuss in the next section, Rails has, over its lifetime, introduced several mechanisms for maintaining consistency of application data. In keeping with Rails' focus on keeping application logic within Rails (and not in the database), this has led to several different proposals. In the remainder of this paper, we examine their use and whether, in fact, they correctly maintain application data.
 
 
 

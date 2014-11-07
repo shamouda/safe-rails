@@ -2,22 +2,22 @@
 \section{Quantifying Feral Anomalies}
 \label{sec:evaluation}
 
-While many of the validations were invariant confluent, we identified
-two classes of commonly used invariants that were not invariant
-confluent and therefore sensitive to concurrent execution: uniqueness
-constraints and associations under concurrent deletion and
-insertion. In this section, we evaluate how well Active Record
-actually guards against these class of violations.
+While many of the validations we encountered were I-confluent,
+not all were. In this section, we specifically investigate the effect
+of concurrent execution on two of the most popular non-I-confluent
+validations: uniqueness and foreign key validations.
 
 \subsection{Uniqueness Constraints and Isolation}
 
 To begin, we consider Rails's uniqueness validations: 12.7\% of the
-built-in validation uses we encountered.
+built-in validation uses we encountered. In this section, we discuss
+how Rails implements uniqueness and show that this is---at least
+theoretically---unsafe.
 
 When a Model field is declared with a \texttt{:validates\_uniqueness}
 annotation, any instance of that model is compared against all other
 corresponding records in the database to ensure uniqueness. Rails
-accomplishes this by issuing a \texttt{SELECT WHERE} query in SQL and,
+accomplishes this by issuing a ``\texttt{SELECT}'' query in SQL and,
 if no such record is found, Rails updates the instance state in the
 database (Appendix~\ref{sec:appendix-uniqueness-behavior}).
 
@@ -58,10 +58,10 @@ transactions derived from the Rails primary key validator. We omit
 further details due to double-blind reviewing requirements but as of
 November 2014 (PostgreSQL 9.3.5) have confirmed this behavior with the
 core PostgreSQL developers. Thus, any discussion of weak isolation
-levels aside, PostgreSQL's implementation of serializablility is not
+levels aside, PostgreSQL's implementation of serializability was not
 actually sufficient to provide correct behavior for the above
-uniqueness validations. We note that ``serializable'' databases such
-as Oracle 13g that actually provide Snapshot Isolation will similarly
+uniqueness validations. We note that so-called ``serializable'' databases such
+as Oracle 12c that actually provide Snapshot Isolation will similarly
 fall prey to duplicate validations.
 
 Interestingly, the Rails documentation actually warns that duplicate
@@ -102,7 +102,7 @@ is dependent on the Rails environment. In a Rails deployment
 permitting $P$ concurrent validations (e.g., a single-threaded,
 multi-process environment with $P$ processes), each value in the
 domain of the model field/database column can be inserted no more than
-$P$ times. Thus, validations---at least theoretically---reduce the
+$P$ times. Thus, validations---at least theoretically---bound the
 worst-case number of duplicate records for each unique value in the
 database table.
 
@@ -111,11 +111,8 @@ database table.
 Given that feral uniqueness validations are $i.)$ acknowledged to be
 broken (at least under non-serializable isolation), $ii.)$ have a
 work-around by correctly declaring them within the database, yet
-$iii.)$ are widely used, we sought to understand their costs and
-benefits in an actual production environment. Accordingly, we wrote
-and deployed a custom Rails application that exercised
-uniqueness validations and observed its behavior under various
-workloads.
+$iii.)$ are widely used, we sought to understand exactly how often
+uniqueness anomalies occur in an actual deployment.
 
 \minihead{Experimental setup} We developed a Rails 4.1.5 application
 that performed insertions to a non-indexed string column and compared
@@ -178,8 +175,9 @@ using validations, the microbenchmark duplicate count remains below
 700---nearly an order-of-magnitude fewer duplicates than without using
 validations. Therefore, even though these validations are, in fact,
 incorrectly implemented, they still result in fewer
-anomalies. However, with a unique index declared on the \texttt{key}
-column, we observed no duplicates, as expected.
+anomalies. However, when we added in in-database unique index declared
+on the \texttt{key} column and repeated the experiment, we observed no
+duplicates, as expected.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}\vspace{-1.5em}
@@ -215,14 +213,13 @@ of 64 Unicorn workers per process (Appendix~\ref{sec:appendix-uniqueness-workloa
 
 Figure~\ref{fig:pk-workload} illustrates the number of duplicate
 records observed under each of these workloads. As we increase the
-number of possible keys, there are two opposing effects. With
-more keys, the probability of any two operations colliding
+number of possible keys, there are two opposing effects. With more
+keys, the probability of any two operations colliding
 decreases. However, recall that, once a key is written, all subsequent
-validators can read it. Therefore, increasing the number of keys
-increases the total number of possible races that might
-occur. Therefore, while the uniform workload observes an average of
-2.33 duplicate records with only one possible key, it observes an average of 26
-duplicate keys with 1000 possible keys. Nevertheless, with 1 million possible
+validators can read it. While
+the uniform workload observes an average of 2.33 duplicate records
+with only one possible key, it observes an average of 26 duplicate
+keys with 1000 possible keys. Nevertheless, with 1 million possible
 keys, we do not observe any duplicate records.
 
 The actual ``production'' workloads exhibit different trends. In
@@ -231,6 +228,10 @@ constant of 0.99, resulting in one very hot key. This decreases the
 beneficial effect of increasing the number of keys in the
 database. However, LinkBench has less contention and anomalies decrease more
 rapidly with increased numbers of keys.
+
+\minihead{Summary} Uniqueness validations in Rails are indeed unsafe
+under non-serializable isolation, and, while they prevent some data
+integrity errors, they allow many duplicate records to be created.
 
 \begin{figure}
 
@@ -250,41 +251,45 @@ rapidly with increased numbers of keys.
 
 \subsection{Associations Constraints and Isolation}
 
+Having investigated uniqueness constraints, we turn our attention to
+association validations. We first, again, discuss how Rails enforces
+these validations and describe how---at least
+theoretically---validations might result in integrity errors.
+
 When a Model field is declared with an association (e.g.,
 \texttt{:belongs\_to}) \textit{and} a \texttt{:validates\_presence}
 validation, Rails will attempt to ensure that the declared validation
 is valid before saving the model. Rails accomplishes this by issuing a
-\texttt{SELECT WHERE} query in SQL to find an associated record (e.g.,
-to ensure the ones end of a one-to-many relationship exists) and, if a
+``\texttt{SELECT WHERE}'' query in SQL to find an associated record (e.g.,
+to ensure the ``one'' end of a one-to-many relationship exists) and, if a
 matching association is found, Rails updates the instance state in the
 database (Appendix~\ref{sec:appendix-association-behavior}). On
 deletion, any models with associations marked with \texttt{:dependent =>
   destroy} (or \texttt{:dependent  => delete}) will have any associated
 models destroyed (i.e., removed by instantiating in Rails and calling
 \texttt{destroy} on the model) or deleted (i.e., removed by simply
-calling the database's \texttt{DELETE} method). Implementing cascading
-deletes correctly even under serial accesses is complicated but is
-nevertheless possible.
+calling the database's \texttt{DELETE} method). 
 
 This feral association validation runs within a transaction, but,
 again the exact isolation level of the transaction affects its
 correctness. For correct execution, the \texttt{SELECT} query must
-also attain a predicate lock on the validated column for the duration
-of the transaction. Similar to the uniqueness validator, concurrent
-deletions and insertions are unsafe under Read Committed, Repeatable
-Read, and Snapshot Isolation. Thus, unless the database is configured
-for serializable isolation, inconsistency may result and the feral
-validation will fail to prevent data corruption.
+also attain a predicate lock on the specific value of the validated
+column for the duration of the transaction. Similar to the uniqueness
+validator, concurrent deletions and insertions are unsafe under Read
+Committed, Repeatable Read, and Snapshot Isolation. Thus, unless the
+database is configured for serializable isolation, inconsistency may
+result and the feral validation will fail to prevent data corruption.
 
 Unlike uniqueness validations, there is no discussion of associations
 and concurrency anomalies in the Rails documentation. Moreover, there
 is no way to natively declare a foreign key constraint in Rails; it
-must be done via a third-party library such as the \texttt{foreigner}
-Gem. Only two projects (\texttt{canvaslms} and \texttt{diaspora}) used
-\texttt{foreigner}, and only one project (\texttt{juvia}) used the
-alternative Gem \texttt{schema\_plus}. One project
-(\texttt{jobsworth}) uses a custom schema annotation and constraint
-generator.
+must be done via a third-party library such as
+\texttt{foreigner}~\cite{foreigner} or
+\texttt{schema\_plus}\cite{schemaplus}. Only two applications
+(\texttt{canvaslms} and \texttt{diaspora}) used \texttt{foreigner},
+and only one application (\texttt{juvia}) used \texttt{schema\_plus}. One
+application (\texttt{jobsworth}) used a custom schema annotation and
+constraint generator.
 
 \minihead{Understanding association behavior} Given that entirely
 feral mechanisms can introduce broken associations, how many dangling
@@ -300,13 +305,17 @@ validation, leading to unbounded numbers of dangling records.
 
 \subsection{Quantifying Association Anomalies}
 
-We repeated another set of experiments to test association behavior
-under insertions and deletions. Using the same Unicorn and PostgreSQL
-deployment, we configured another application to test whether or not
-Rails validations would defend against dangling entries. We consider
-an application with two models: Users and Departments. We configure a
-one-to-many relationship: each user \texttt{belongs\_to} a department,
-and each department \texttt{has\_many} user
+Given this potential for errors, we again set out to quantify
+integrity errors. 
+
+We performed another set of experiments to test association behavior
+under concurrent insertions and deletions. Using the same Unicorn and
+PostgreSQL deployment, we configured another application to test
+whether or not Rails validations would defend against dangling
+entries. We consider an application with two models: Users and
+Departments. We configure a one-to-many relationship: each user
+\texttt{belongs\_to} a department, and each department
+\texttt{has\_many} user
 (Appendix~\ref{sec:appendix-association-schema}).
 
 As a basic stress test, we initialize the database by creating 100
@@ -328,15 +337,15 @@ events that are processed while the search for Users to delete is
 underway will result in Users without departments.
 
 Figure~\ref{fig:fk-stress} shows the number of ``orphaned'' Users
-(i.e., Users without a matching Department) as a
-function of Rails worker processes. With no constraints declared to
-Rails or to the database, all User creations succeed, resulting in
-6400 dangling Users. With constraints declared in Rails (via a mix of
-validation and association), the degree of inconsistency depends on
-the degree of parallelism. Under the worst case, with 64 concurrent
-processes, the validations are almost worthless in preventing
-integrity errors. In contrast, when we declare a foreign key constraint
-within the database, we observe no inconsistency.
+(i.e., Users without a matching Department) as a function of Rails
+worker processes. With no constraints declared to Rails or to the
+database, all User creations succeed, resulting in 6400 dangling
+Users. With constraints declared in Rails (via a mix of validation and
+association), the degree of inconsistency depends on the degree of
+parallelism. Under the worst case, with 64 concurrent processes, the
+validations are almost worthless in preventing integrity errors. In
+contrast, when we declare a foreign key constraint within the database
+and run the workload again, we observe no inconsistency.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}\vspace{-1em}
@@ -373,6 +382,10 @@ linearly with the number of records.
 \label{fig:fk-workload}
 \end{figure}
 
+\minihead{Summary} Again, we demonstrate that weak isolation can lead
+to data integrity errors, this time in Rails' implementation of
+associations.
+
 \subsection{Takeaways and Discussion}
 
 The preceding experiments demonstrate that, indeed, Active Record is
@@ -388,15 +401,14 @@ non-concurrency-related anomalies such as data entry or input
 errors. For example, if a user attempts to reserve a username that was
 previously chosen, a validation would succeed. The failures we observe
 here are solely due to concurrent execution. Without concurrent
-execution, validations are correct. Second, validations
-\textit{do} reduce the incidence---if not the degree---of
-inconsistency. Empirically, even under worst-case workloads, these
-validations result in order-of-magnitude reductions in
-inconsistency. Under less pathological workloads, they may, in
-practice, eliminate it. It is possible that, in fact, the degree of
-concurrency and data contention within Rails-backed applications
-simply does not lead to these concurrency races---that, in some sense,
-validations are ``good enough'' for many applications.
+execution, validations are correct. Second, validations \textit{do}
+reduce the incidence of inconsistency. Empirically, even under
+worst-case workloads, these validations result in order-of-magnitude
+reductions in inconsistency. Under less pathological workloads, they
+may, in practice, eliminate it. It is possible that, in fact, the
+degree of concurrency and data contention within Rails-backed
+applications simply does not lead to these concurrency races---that,
+in some sense, validations are ``good enough'' for many applications.
 
 Nevertheless, Rails's feral mechanisms are a poor substitute for their
 respective database counterparts in both cases. We re-examine the Rails community's

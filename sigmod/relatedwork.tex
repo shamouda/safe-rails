@@ -63,8 +63,8 @@ Perhaps closest to our work is a study by Fekete et al., which
 quantitatively analyzed data inconsistencies arising from
 non-serializable schedules~\cite{fekete-quantifying}. This study used
 a hand-crafted benchmark for analysis but is nevertheless one of the only
-studies of actual application inconsistencies. Here, we focus on Rails
-applications.
+studies of actual application inconsistencies. Here, we focus on open
+source applications from the Rails community.
 
 A larger body of work examines isolation anomalies at the read-write
 interface (that is, measures deviations from properties such as
@@ -80,9 +80,9 @@ algorithms for verifying their
 serializability~\cite{zellag-consistent} and other cycle-based
 isolation anomalies~\cite{zellag-real}. Probabilistically Bounded
 Staleness provides time- and version-based staleness predictions for
-eventually consistent data stores~\cite{pbs}. While the two are
-related, our focus here is on anomalies as observed by application
-logic rather than read-write anomalies observed under weak isolation.
+eventually consistent data stores~\cite{pbs}. Our focus here is on
+anomalies as observed by application logic rather than read-write
+anomalies observed under weak isolation.
 
 \minihead{Empirical software analysis} Empirical software analysis of
 open source software is a topic of active interest in the software

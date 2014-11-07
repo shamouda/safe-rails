@@ -16,7 +16,7 @@ In this section, we outline four major mechanisms for guarding against
 integrity violations under concurrent execution in Rails. We
 subsequently begin our study of 67 open source applications to
 determine which of these mechanisms are used in practice. In the following
-section, we will determine which are are sufficient to maintain
+section, we will determine which are sufficient to maintain
 correct data---and when they are not.
 
 \subsection{Rails Concurrency Control Mechanisms}
@@ -113,7 +113,8 @@ popularity.
 To understand exactly how users interact with these
 concurrency control mechanisms and determine which deserved more
 study, we examined their usage in a portfolio of publicly available
-open source applications.
+open source applications. We find that validations and associations
+are overwhelmingly the most popular forms of concurrency control.
 
 \minihead{Application corpus} We selected 67 open source applications
 built using Ruby on Rails and Active Record, representing a variety of

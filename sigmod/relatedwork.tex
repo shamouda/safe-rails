@@ -35,13 +35,14 @@ written in Rails.
 are fundamental to the use of weak isolation in data management
 systems. Non-serializable isolation dates to the
 mid-1970s~\cite{gray-isolation} and has a colorful
-history~\cite{adya-isolation}; today, by volume, most data stores are
-non-serializable by default~\cite{hat-vldb}. The isolation anomalies
-surfaced by the stores we study here are directly responsible for
-corrupting the application data we study.
+history~\cite{adya-isolation}; today, by volume, many database
+management systems are non-serializable by
+default~\cite{hat-vldb}. The isolation anomalies surfaced by
+the stores we study here are directly responsible for violating the
+integrity of the validations we consider.
 
 However, serializable isolation is not strictly necessary for
-maintaining Rails application integrity. Semantic-based concurrency
+maintaining application integrity. Semantic-based concurrency
 control criteria has almost as long a lineage as
 serializability~\cite{eswaran-consistency,ic-survey-two} and suggests
 that, with additional, non-syntactic knowledge about applications

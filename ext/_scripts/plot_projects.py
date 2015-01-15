@@ -221,6 +221,7 @@ toplot = [(11, "purple", "Locks", DO_NORMALIZE),
  (12, "red", "Transactions", DO_NORMALIZE),
  (6, "green", "Associations", DO_NORMALIZE),
  (3, "blue", "Validations", DO_NORMALIZE),
+ (2, "blue", "Invariants", DO_NORMALIZE),
  (n_model_offset, "orange", "Models", False)]
 
 
@@ -236,10 +237,15 @@ print "TOTAL_AUTHORS: ", sum([int(p[1]) for p in projects]),  average([int(p[1])
     
 for p in toplot:
     offset, color, label, normalized = p
-    if normalized:
-        ys =  [int(projects[i][offset])/float(projects[i][n_model_offset]) for i in range(0, len(projects))]
+
+    # sad panda
+    if label == "Invariants":
+        ys = [(int(projects[i][3])+int(projects[i][6]))/float(projects[i][n_model_offset]) for i in range(0, len(projects))]
     else:
-        ys =  [int(projects[i][offset]) for i in range(0, len(projects))]
+        if normalized:
+            ys =  [int(projects[i][offset])/float(projects[i][n_model_offset]) for i in range(0, len(projects))]
+        else:
+            ys =  [int(projects[i][offset]) for i in range(0, len(projects))]
 
     avg = average(ys)
     print label, max(ys)
@@ -263,8 +269,15 @@ for p in toplot:
             
             text(61.5, 9.45, str(ys[-2]), size=4)
             plot([65, 66], [9.65, 9.65], '-', color="black", linewidth=.25)
-        
-    ylabel("%s%s" % (label, "/Model" if normalized else ""))
+
+    if label == "Invariants":
+        ylabel("Invariants/Table")
+        #print "AVERAGES:", avg(ys)
+        for i in range(0, len(ys)):
+            if ys[i] > 10:
+                print i, ys[i]
+    else:
+        ylabel("%s%s" % (label, "/Table" if normalized else ""))
     gca().spines['top'].set_visible(False)
     gca().spines['right'].set_visible(False)
     gca().get_xaxis().tick_bottom()

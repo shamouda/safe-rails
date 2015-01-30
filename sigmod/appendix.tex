@@ -96,12 +96,11 @@ To determine the occurrences and number of models, transactions, locks, validati
 
 To determine code authorship, we used the output of git \texttt{log} and \texttt{blame} and did not attempt any sophisticated entity resolution.
 
-Given double-blind constraints, we cannot release this code at this time. Once double-blind restrictions have lifted, we plan to release the analysis scripts to facilitate reproducibility of our results.
 
 \subsection{Invariant Confluence}
 \label{sec:appendix-ic}
 
-Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved. As above, we plan to release additional, more detailed data following double-blind review.
+Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved.
 
 \section{Detailed Validation Behavior}
 
@@ -293,7 +292,7 @@ For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly atte
 \subsection{Association Workload Test}
 \label{sec:appendix-association-workload}
 
-For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$. We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of orphaned users, as above.
+For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$). We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of orphaned users, as above.
 
 \begin{algorithm}[H]
 \begin{algorithmic}

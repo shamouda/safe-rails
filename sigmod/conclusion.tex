@@ -17,3 +17,39 @@ are invariant confluent and therefore correct under concurrent
 execution given standard RDBMS weak isolation and concurrent update
 semantics, we see considerable opportunity to better support these
 users and their feral validations in the future.
+
+
+\subsection*{Coda: A Call for Empiricism}
+
+This work is a first step towards better understanding how users in
+the wild actually interact with the database systems that this
+community builds. Given the ascendancy of open source, there is
+unprecedented opportunity to empirically and quantitatively study how
+our systems are and are not serving the needs of application
+programmers. Lightweight program analysis has never been easier, and
+the corpus of readily-accessible code---especially in an academic
+context---has never been larger.
+
+Undoubtedly, these open source applications are dwarfed by many other
+commercial and enterprise-grade codebases in terms of size, quality,
+and complexity. However, compared to alternatives like TPC-C, which
+today is almost 23 years old and is still the preferred benchmark for
+transaction processing evaluation, open source corpuses are far better
+proxies for modern applications (say, written more than a year after
+the creation of the World Wide Web). Recent efforts like the
+OLTPBenchmark suite~\cite{oltpbench} are a promising step forwards but
+are nevertheless (and necessarily) not a substitute for real
+application code. The opportunity to perform both quantitative surveys
+across a large set of applications as well as longitudinal studies
+over the history of each application repository (and the behavior of a
+given programmer over time and repositories) are particularly
+compelling. While these studies are inherently imprecise (due to
+limitations of the corpus), the resulting quantitative trends are
+invaluable.
+
+In summary, in this era of ``Big Data'' analytics, we see great
+promise in turning these analyses inward, towards an empirical
+understanding of the usage of database systems today, in service of
+better problem selection and a more quantitatively informed community
+dialogue.
+

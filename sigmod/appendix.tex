@@ -100,7 +100,7 @@ To determine code authorship, we used the output of git \texttt{log} and \texttt
 \subsection{Invariant Confluence}
 \label{sec:appendix-ic}
 
-Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite{coord-avoid} (Proof 1). ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved.
+Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite[Proof 1]{coord-avoid}. ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved.
 
 \section{Detailed Validation Behavior}
 

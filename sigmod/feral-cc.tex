@@ -1,5 +1,8 @@
 
 \documentclass{sig-alternate}
+\newcommand{\subparagraph}{}
+
+
 \usepackage{balance,array,microtype,pifont}
 \usepackage[bf]{subfigure}
 
@@ -77,6 +80,23 @@
     \vspace{-.4em}
 }
 
+\newenvironment{motitemize}
+{
+  \vspace{-.25em}
+    \begin{list}{$\bullet$ }{}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.25em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+    \vspace{-.25em}
+}
+
+
 \newenvironment{introenumerate}
 {
 
@@ -142,7 +162,7 @@
 % --- End of Author Metadata ---
 
 \title{Feral Concurrency Control: A Study of\\Application Integrity in
-  a Modern Web Framework\\TODO:HEKATON AND WRITES-FOREST}
+  a Modern Web Framework}
 
 {\author{Peter Bailis, Alan Fekete{\fontsize{12}{14}$^\dagger$},
     Michael J. Franklin, Ali Ghodsi, Joseph M. Hellerstein, Ion Stoica

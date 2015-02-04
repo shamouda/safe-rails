@@ -283,17 +283,17 @@ awareness, these frameworks \textit{still} allow integrity violations
 and have not take steps to address them. In some frameworks, authors
 have chosen not to back invariants with a transaction at all. This
 suggests a lack of user education or, perhaps alternatively,
-frustration with the existing prevalence of weak isolation guarantees.
+frustration with the weak isolation guarantees.
 
 As a community, the prevalence of weak isolation merits
 reflection. Perhaps the issue is performance. In this case, we might
 develop benchmarks to encourage vendors and open-source applications
-into delivering fast serializability that they are not ashamed to turn
-on by default. Alternatively, perhaps traditional implementations of
-serializability really are too slow, and recent work on
-high-performance in-memory transactions~\cite{hekaton,hstore} is
-critical to success. Or, alternatively, if serializability really is
-too slow for practical workloads, then we need to develop new
+into delivering fast serializability that they are not ashamed to
+support or even turn on by default. Alternatively, perhaps traditional
+implementations of serializability really are too slow, and recent
+work on high-performance in-memory transactions~\cite{hekaton,hstore}
+is critical to success. Alternatively, if serializability really
+is too slow for practical workloads, then we need to develop new
 programming models and new theory that application developers can
 understand~\cite{coord-avoid,calm,redblue-new,writes-forest}. In any
 event, the mismatch between our classic transaction model and
@@ -302,26 +302,27 @@ here---indicate a serious concern.
 
 \subsection{Database-Backed Invariants}
 
-An alternative to using
-transactions to enforce invariants is to provide native support for
-them (thereby ``domesticating'' feral concurrency control). In some
-cases---including our uniqueness validation and foreign key
-associations---databases often provide native support, in the form of
-DDL annotations that are straightforward and are even a standard part
-of undergraduate database curriculum. However, popular frameworks like
-Rails use databases as a least common denominator for compatibility,
-primarily supporting open source and NoSQL databases (including sqlite
-and MySQL) that often provide limited support for sophisticated
-constraints. This means that the any optimizations must be in
-DBMS-specific drivers and will limit portability. Moreover, even the
-strongest commodity databases are insufficiently powerful to enforce
-the broad range of validations we see in Rails (e.g., multi-row check
-constraints and UDF-based validations).
+An alternative to using transactions to enforce invariants is to
+provide native support for them as first-class primitives within the
+database system (thereby ``domesticating'' feral concurrency
+control). In some cases---including the uniqueness validations and
+foreign key associations we have studied here---many databases today
+already provide native support in the form of DDL annotations that are
+straightforward and are even a standard part of undergraduate database
+curriculum. However, popular frameworks like Rails use databases as a
+least common denominator for compatibility, primarily supporting open
+source and NoSQL databases (including SQLite and MySQL) that often
+provide limited support for more sophisticated constraints. This means
+that the any optimizations must be in DBMS-specific drivers and will
+limit portability. Moreover, even the strongest commodity databases
+are insufficiently powerful to enforce the broad range of validations
+we see in Rails (e.g., multi-row check constraints and UDF-based
+validations).
 
 While database-backed invariants are fraught with similar, largely
 pragmatic concerns regarding vendor support and compatibility, this
-latter strategy of domestication offers increased optimization
-opportunities compared to the use of transactions. In related work,
+latter strategy of domestication offers increased opportunity for
+optimization compared to the use of transactions. In related work,
 we~\cite{coord-avoid} (and others~\cite{redblue-new}) have already
 begun investigating the use of invariants as a promising basis for
 avoiding coordination overheads associated with serializable
@@ -331,12 +332,12 @@ integration of user-defined validations with the database can help
 eliminate database RTTs~\cite{pyxis}---which, in particular, can
 assist with reducing the duration for which coordination is performed
 (when it is in fact necessary). Recent work on extracting declarative
-subroutines from imperative code~\cite{statusquo,writes-forest} may allow us to
-automatically suggest invariants and even move closer to the ability
-to detect points of coordination within imperative code---particularly
-for emerging functional languages like Scala and F\#, which encourage
-the use of collection types and comprehensions, and discourage the use
-of mutable state.
+subroutines from imperative code~\cite{statusquo,writes-forest} may
+allow us to automatically suggest invariants and even move closer to
+the ability to detect points of coordination within imperative
+code---particularly for emerging functional languages like Scala and
+F\#, which encourage the use of collection types and comprehensions,
+and discourage the use of mutable state.
 
 Conceptually, Rails validations fail today largely because they are
 expressed in a language that is not understood or interpreted by the
@@ -351,7 +352,7 @@ of language idioms. This suggests the possibility of a revival of concepts from
  declaring semantic criteria for correctness is already being performed
  by database users---at least for some correctness criteria. While they
  are likely incomplete specifications, we view the fact that
- declarative validations are being used organically and have been
+ declarative invariants are being used organically and have been
  produced by database users (in lieu of the standard transaction model) as
  ample cause for re-evaluating the decades of work on these topics.
 
@@ -403,7 +404,7 @@ of language idioms. This suggests the possibility of a revival of concepts from
 % understanding weak isolation and the interaction with validation logic
 % is an important step in this direction.
 
-\
+
 
 % Use of weak isolation
 
@@ -417,9 +418,9 @@ of language idioms. This suggests the possibility of a revival of concepts from
 
 \subsection{Closing Notes}
 
-Regardless of the approach, we see wide
-opportunity for future research in better supporting and optimizing
-for these application patterns. We believe a blend of application-level analyses
-(e.g.,~\cite{statusquo,coord-avoid}) and pragmatically-oriented
-empirical study of real code
+Regardless of the approach, we see wide opportunity (coupled with
+pressing need) for future research in better supporting and optimizing
+for these application patterns. We believe a blend of
+application-level analyses (e.g.,~\cite{statusquo,coord-avoid}) and
+pragmatically-oriented empirical study of real code
 (Section~\ref{sec:conclusion}) will be instrumental to success.

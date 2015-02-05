@@ -231,7 +231,7 @@ these findings, in this section, we reflect upon this mismatch and
 make make several concrete, positive proposals for the database
 systems community.
 
-\subsection{Shortcomings Today}
+\subsection{Summary: Shortcomings Today}
 
 Core to our findings is a lack of database support for these
 feral mechanisms. In effect, today's databases effectively offer two
@@ -243,25 +243,25 @@ primary options for ORM framework developers and users:
   database invariants. This is core to the transaction concept:
   isolation is a means towards preserving integrity. \vspace{.5em}
 
-  \indent In practice, for application developers, ACID is a broken
-  promise. Given its performance and availability
+  \indent In practice, for application developers, transactions are
+  problematic. Given its performance and availability
   overheads~\cite{brewer-cap}, developers at scale have largely
-  eschewed the use of serializable transactions, which are not
+  eschewed the use of serializable transactions, which are anyway not
   required for correct enforcement of approximately 75\% of the
-  invariants we encountered in the Rails corpus. More pragmatically,
-  many databases offering ``ACID'' semantics do not provide
-  serializability by default and often, even among industry-standard
-  enterprise offerings, offer it as an option at all~\cite{hat-vldb}
-  (to say nothing of implementation difficulties, as in
-  Footnote~\ref{fn:pg-bug}). Instead, these developers must manually
-  reason about a host of complex, often obscure, and poorly understood
-  weak isolation models expressed interms of low-level read/write
-  anomalies such as Write Skew and Lost
+  invariants we encountered in the Rails corpus. Moreover, many
+  databases offering ``ACID'' semantics do not provide serializability
+  by default and often, even among industry-standard enterprise
+  offerings, offer it as an option at all~\cite{hat-vldb} (to say
+  nothing of implementation difficulties, as in
+  Footnote~\ref{fn:pg-bug}). Instead, developers using these systems
+  today must manually reason about a host of highly technical, often
+  obscure, and poorly understood weak isolation models expressed in
+  terms of low-level read/write anomalies such as Write Skew and Lost
   Update~\cite{adya-isolation,consistency-borders}. We have observed
   (e.g., Footnote~\ref{fn:si-rails}) that ORM and expert application
-  developers are familiar with this mislabeling. This
-  misrepresentation may even play a role in the relative unpopularity
-  of transactions within the web programming community.
+  developers are familiar with the prevalence of weak isolation, which
+  may also help explain the relative unpopularity of transactions
+  within the web programming community.
 
 \item\textbf{Do it yourself (ferally).} In principle, hand-rolling
   user-level concurrency control solutions on a per-framework
@@ -271,22 +271,25 @@ primary options for ORM framework developers and users:
   
   In practice, hand-rolling user-level concurrency control solutions
   is an expensive, error-prone, and difficult process. While this
-  solution is often sufficient to maintain correctness in the
-  approximately 75\% I-confluent feral invariants, the remainder
-  can---in modern ORM implementations---lead to data corruption on
-  behalf of applications. However, and perhaps most importantly, this
-  feral approach preserves a key tenet of the Rails philosophy: a
-  recurring insistence on expressing domain logic in the application.
+  solution is sufficient to maintain correctness in the 75\%
+  (I-confluent) invariants in our corpus, the remainder can---in
+  modern ORM implementations---lead to data corruption on behalf of
+  applications. However, and perhaps most importantly, this feral
+  approach preserves a key tenet of the Rails philosophy: a recurring
+  insistence on expressing domain logic in the application. This also
+  enables expressiveness in invariant declaration and enables the
+  declaration of invariants that are not among the few natively
+  supported today (e.g., uniqueness constraints).
 \end{impenumerate}
 
-In summary, neither of these solutions is good. Serializability is too
-expensive for some applications, is not widely supported, and is not
-necessary for many application invariants. Feral concurrency control
-is often less expensive and is trivially portable but is not
-sufficient for many other application invariants. In neither case does
-the database respect application programmer wishes for a clean,
-evidently idiomatic means of expressing correctness criteria in domain
-logic.
+In summary, neither of these solutions serves ORMs
+well. Serializability is too expensive for some applications, is not
+widely supported, and is not necessary for many application
+invariants. Feral concurrency control is often less expensive and is
+trivially portable but is not sufficient for many other application
+invariants. In neither case does the database respect application
+programmer wishes for a clean, evidently idiomatic means of expressing
+correctness criteria in domain logic.
 
 \subsection{Domesticating Feral Mechanisms}
 
@@ -344,10 +347,10 @@ program analysis for extracting invariants~\cite{writes-forest} and
 subroutines from imperative code~\cite{statusquo} may allow us to
 programatically suggest new invariants, perform correspondence
 checking for existing applications, and apply a range of automated
-optimizations~\cite{pyxis}. Finally, clean-slate language design and
-analysis obviate the need for explicit invariant declaration (thus
-alleviating concerns of specification
-completeness)~\cite{calm,blazes}; while adoption within the ORM
+optimizations to legacy code~\cite{pyxis,waves}. Finally, clean-slate language design and
+program analysis obviate the need for explicit invariant declaration
+(thus alleviating concerns of specification
+completeness)~\cite{calm,blazes,hilda}; while adoption within the ORM
 community is a challenge, we view this exploration as worthwhile.
 
 In all, the wide gap between research and current practice is both a

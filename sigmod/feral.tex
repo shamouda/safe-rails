@@ -51,17 +51,19 @@ basis~\cite{code-transaction-isolation}.
   only be saved to the database if all of its declared validations
   return true. These validations ensure, for example, that particular
   fields within a record are not null or, alternatively, are unique
-  within the database. Rails provides a number of built-in validators
+  within the database. Rails provides a number of built-in validations
   but also allows arbitrary user-defined validations (we discuss
   actual validations further in subsequent sections). Each validation
   declared for a given model is run sequentially within a
   database-backed transaction before actually updating the model state
-  in the database.\footnote{The practice
-    of wrapping validations in a transaction dates to the earliest public
-    Rails commit (albeit, in 2004, transactions were only supported via a
-    per-Ruby VM global lock~\cite{code-txn-lock}). However,
-    as late as 2010, updates were only partially protected by
-    transactions~\cite{code-txn-update}.}\\[-2mm]
+  in the database.  \footnote{The practice of wrapping validations in
+    a transaction dates to the earliest public Rails commit (albeit,
+    in 2004, transactions were only supported via a per-Ruby VM global
+    lock~\cite{code-txn-lock}). However, as late as 2010, updates were
+    only partially protected by
+    transactions~\cite{code-txn-update}.} Rails' supported
+  validations are a superset of the integrity constraints natively
+  supported by many commercial databases today.\\[-2mm] 
 
   Rails validations are a prominent feature of the Active Record
   model. In contrast, neither transactions nor locks are actually

@@ -58,7 +58,7 @@ created under serializable isolation when running a set of
 transactions derived from the Rails primary key validator. As of
 February 2015 (PostgreSQL 9.3.5) have confirmed this behavior with the
 core PostgreSQL developers.\footnote{``BUG \#11732: Non-serializable
-  outcomes under serializable isolation'' at \url{http://www.postgresql.org/message-id/20141021071458.2678.9080@wrigleys.postgresql.org}} Thus, any discussion of weak isolation
+  outcomes under serializable isolation'' at \url{http://www.postgresql.org/message-id/20141021071458.2678.9080@wrigleys.postgresql.org}\label{fn:pg-bug}} Thus, any discussion of weak isolation
 levels aside, PostgreSQL's implementation of serializability is not
 actually sufficient to provide correct behavior for the above
 uniqueness validations. We note that so-called ``serializable''

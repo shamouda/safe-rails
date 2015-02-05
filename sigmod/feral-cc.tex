@@ -45,7 +45,7 @@
 
 \newcommand{\miniheadnostop}[1]{{\vspace{.4em}\noindent\textit{#1} }}
 \newcommand{\minihead}[1]{{\vspace{.45em}\noindent\textbf{#1.} }}
-\newcommand{\miniheadit}[1]{{\vspace{.45em}\noindent\textit{#1.} }}
+\newcommand{\miniheadit}[1]{{\vspace{.45em}\noindent\textit{#1} }}
 \newcommand{\miniheadnopd}[2]{{\vspace{.4em}\noindent\textbf{#1}\hspace{.5em}{#2}\vspace{.4em} }}
 \newcommand{\minidef}[1]{{\vspace{.25em}\noindent\textit{#1} }}
 
@@ -148,6 +148,42 @@
 }
 {
     \end{list} 
+}
+
+
+\newenvironment{impenumerate}
+{
+
+   \newcounter{qdeceounter}
+    \begin{list}{\arabic{qdeceounter}.~}{\usecounter{qdeceounter}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+}
+
+% lol
+\newenvironment{interfaceenumerate}
+{
+\vspace{-0.25em}
+   \newcounter{qdeceounterr}
+    \begin{list}{\arabic{qdeceounterr}.~}{\usecounter{qdeceounterr}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+\vspace{-0.25em}
+
 }
 
 

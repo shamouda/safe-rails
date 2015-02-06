@@ -222,37 +222,33 @@ uses db foreign keys
 \section{Implications for Databases}
 \label{sec:discussion}
 
-This study highlights an important trend within common ORM systems and
-ORM-backed applications: the use of feral invariants. As we have seen,
-as implemented in practice, these invariants are not well-supported by
-today's database systems---evidence of the continued impedance
-mismatch between application writers and database systems. In light of
-these findings, in this section, we reflect upon this mismatch and
-make make several concrete, positive proposals for the database
-systems community.
+In light of this empirical evidence of the continued mismatch between
+ORM applications and databases, in this section, we reflect on the
+core database limitations for application writers today and suggest a
+set of directions for alleviating them.
 
 \subsection{Summary: Shortcomings Today}
 
-Core to our findings is a lack of database support for these
-feral mechanisms. In effect, today's databases effectively offer two
+The use of feral invariants is not well-supported by today's
+databases. At a high level, today's databases effectively offer two
 primary options for ORM framework developers and users:
 
 \begin{impenumerate}
-\item \textbf{Use ACID transactions.} In principle, serializable
-  transactions would be sufficient to correctly enforce arbitrary
-  database invariants. This is core to the transaction concept:
-  isolation is a means towards preserving integrity. \vspace{.5em}
+\item \textbf{Use ACID transactions.} Serializable transactions would
+  be sufficient to correctly enforce arbitrary database
+  invariants. This is core to the transaction concept: isolation is a
+  means towards preserving integrity. \vspace{.5em}
 
-  \indent In practice, for application developers, transactions are
-  problematic. Given its performance and availability
-  overheads~\cite{brewer-cap}, developers at scale have largely
-  eschewed the use of serializable transactions, which are anyway not
-  required for correct enforcement of approximately 75\% of the
-  invariants we encountered in the Rails corpus. Moreover, many
+  Unfortunately, in practice, for application developers, transactions
+  are problematic. Given serializability's performance and
+  availability overheads~\cite{brewer-cap}, developers at scale have
+  largely eschewed the use of serializable transactions (which are
+  anyway not required for correct enforcement of approximately 75\% of
+  the invariants we encountered in the Rails corpus). Moreover, many
   databases offering ``ACID'' semantics do not provide serializability
   by default and often, even among industry-standard enterprise
-  offerings, offer it as an option at all~\cite{hat-vldb} (to say
-  nothing of implementation difficulties, as in
+  offerings, do not offer it as an option at all~\cite{hat-vldb} (to
+  say nothing of implementation difficulties, as in
   Footnote~\ref{fn:pg-bug}). Instead, developers using these systems
   today must manually reason about a host of highly technical, often
   obscure, and poorly understood weak isolation models expressed in
@@ -263,101 +259,115 @@ primary options for ORM framework developers and users:
   may also help explain the relative unpopularity of transactions
   within the web programming community.
 
-\item\textbf{Do it yourself (ferally).} In principle, hand-rolling
-  user-level concurrency control solutions on a per-framework
-  or, worse, per-application basis is an expensive, error-prone, and
-  difficult process that neglects decades of intellectual achievement
-  in the database community.\vspace{.5em}
-  
-  In practice, hand-rolling user-level concurrency control solutions
-  is an expensive, error-prone, and difficult process. While this
-  solution is sufficient to maintain correctness in the 75\%
-  (I-confluent) invariants in our corpus, the remainder can---in
-  modern ORM implementations---lead to data corruption on behalf of
-  applications. However, and perhaps most importantly, this feral
-  approach preserves a key tenet of the Rails philosophy: a recurring
-  insistence on expressing domain logic in the application. This also
-  enables expressiveness in invariant declaration and enables the
+\item\textbf{Custom, feral enforcement.} Hand-rolling
+  user-level concurrency control solutions on a per-framework or,
+  worse, per-application basis is an expensive, error-prone, and
+  difficult process that neglects decades of contributions from the
+  database s community. While this solution is sufficient to maintain
+  correctness in the 75\% (I-confluent) invariants in our corpus, the
+  remainder can---in modern ORM implementations---lead to data
+  corruption on behalf of applications. \vspace{.5em}
+
+  However, and perhaps most importantly, this feral approach preserves
+  a key tenet of the Rails philosophy: a recurring insistence on
+  expressing domain logic in the application. This also enables the
   declaration of invariants that are not among the few natively
-  supported today (e.g., uniqueness constraints).
+  supported by databases today (e.g., uniqueness constraints).
 \end{impenumerate}
 
-In summary, neither of these solutions serves ORMs
-well. Serializability is too expensive for some applications, is not
-widely supported, and is not necessary for many application
-invariants. Feral concurrency control is often less expensive and is
-trivially portable but is not sufficient for many other application
-invariants. In neither case does the database respect application
-programmer wishes for a clean, evidently idiomatic means of expressing
-correctness criteria in domain logic.
+In summary, application writers today lack a solution that guarantees
+correctness while maintaining high performance \textit{and}
+programmability. Serializability is too expensive for some
+applications, is not widely supported, and is not necessary for many
+application invariants. Feral concurrency control is often less
+expensive, is trivially portable, but is not sufficient for many other
+application invariants. In neither case does the database respect and
+assist with application programmer desires for a clean, idiomatic
+means of expressing correctness criteria in domain logic. We believe
+there is an opportunity and pressing need to build systems that
+provide all three criteria: performance, correctness, and
+programmability.
 
 \subsection{Domesticating Feral Mechanisms}
 
-Constructively, we believe that, to properly provide database support
-and thereby ``domesticate'' these feral mechanisms, application users
-and framework authors need a new interface to the database will enable
-them to:
+Constructively, to properly provide database support and thereby
+``domesticate'' these feral mechanisms, we believe application users
+and framework authors need a new interface to the database that will
+enable them to:
 \begin{interfaceenumerate} 
 \item \textit{Express correctness criteria in the language of their
-    domain model with minimal friction while permitting their
+    domain model, with minimal friction, while permitting their
     automatic enforcement.} Per Section~\ref{sec:motivation}, a core
   factor behind the success of ORMs like Rails appears to be their
   promulgation of an idiomatic programming style that ``seems right''
-  for web programming. We believe any solution to domestication must
-  respect these patterns and programming style, including the ability
-  to specify invariants in a framework's native language. Ideally, ORM
-  programmers could enforce their existing invariants (and have them
-  automatically enforced) without modification. This is already
-  feasible for a subset of invariants---like uniqueness and foreign
-  key constraints---but not all. An ideal solution to domestication
-  would provide universal support.
+  for web programming. Rails' disregard for advanced database
+  functionality is evidence of a continued impedance mismatch between
+  applications and databases.  \vspace{.5em}
+
+  We believe any solution to domestication must respect ORM
+  application patterns and programming style, including the ability to
+  specify invariants in each framework's native language. Ideally,
+  database systems could enforce applications' existing feral
+  invariants without modification. This is already feasible for a
+  subset of invariants---like uniqueness and foreign key
+  constraints---but not all. An ideal solution to domestication would
+  provide universal support.
 
 \item \textit{Only pay the price of coordination when necessary.} Per
   Section~\ref{sec:apps}, many invariants can be safely executed
-  without coordination, while others cannot. An ideal solution to
-  domestication would enable applications to avoid coordination
-  whenever possible would improve performance and operation
-  availability, thus bypassing a common criticism of serializable
+  without coordination, while others cannot. The many that do not need
+  coordination should not be unnecessarily penalized. \vspace{.5em}
+
+  An ideal solution to domestication would enable applications to
+  avoid coordination whenever possible would improve performance and
+  operation availability. The database should facilitate this
+  avoidance, thus evading common issues with serializable
   transactions.
 
 \item \textit{Easily deploy to multiple database backends.}  ORM
   frameworks today are deployed across a range of database
   implementations, and, when deciding which database features to
   exercise, framework authors often choose the least common
-  denominator for compatibility purposes. An ideal solution to
-  domestication would preserve this compatibility.
+  denominator for compatibility purposes.  \vspace{.5em}
+
+  An ideal solution to domestication would preserve this
+  compatibility, possibly providing a ``bolt on'' compatibility layer
+  between ORM systems and databases lacking advanced functionality
+  (effectively, a ``blessed'' set of mechanisms beneath the
+  application/ORM that correctly enforce feral mechanisms).
 
 \end{interfaceenumerate}
-While fulfilling these design requirements represents a considerable
-challenge, we believe the search for a solution is both worthwhile and
-of imminent practical importance.
+Fulfilling these design requirements would enable high performance,
+correct execution, and programmability. However, doing so represents a
+considerable challenge.
 
-The actual vector for implementing this interface is an open question,
-but the literature lends several clues. On the one hand, we do not
-believe the answer lies in exposing additional read/write isolation or
-consistency guarantees like Read Committed; these fail our requirement
-for an abstraction operating the level of domain logic and, as we have
-noted, are challenging for developers (and researchers) to reason
-about. On the other hand, more recent proposals for invariant-based
-concurrency control~\cite{redblue-new,coord-avoid} and a litany of
-work from prior decades on rule-based~\cite{activedb-book} and,
-broadly, semantics-based concurrency control~\cite{tamer-book} appear
+\minihead{Promise in the literature} The actual vehicle for
+implementing this interface is an open question, but the literature
+lends several clues. On the one hand, we do not believe the answer
+lies in exposing additional read/write isolation or consistency
+guarantees like Read Committed; these fail our requirement for an
+abstraction operating the level of domain logic and, as we have noted,
+are challenging for developers (and researchers) to reason about. On
+the other hand, more recent proposals for invariant-based concurrency
+control~\cite{redblue-new,coord-avoid} and a litany of work from prior
+decades on rule-based~\cite{activedb-book} and, broadly,
+semantics-based concurrency control~\cite{tamer-book} appear
 immediately applicable and worth (re-)considering. Recent advances in
 program analysis for extracting invariants~\cite{writes-forest} and
 subroutines from imperative code~\cite{statusquo} may allow us to
 programatically suggest new invariants, perform correspondence
 checking for existing applications, and apply a range of automated
-optimizations to legacy code~\cite{pyxis,waves}. Finally, clean-slate language design and
-program analysis obviate the need for explicit invariant declaration
-(thus alleviating concerns of specification
+optimizations to legacy code~\cite{pyxis,waves}. Finally, clean-slate
+language design and program analysis obviate the need for explicit
+invariant declaration (thus alleviating concerns of specification
 completeness)~\cite{calm,blazes,hilda}; while adoption within the ORM
 community is a challenge, we view this exploration as worthwhile.
 
-In all, the wide gap between research and current practice is both a
-pressing concern and an exciting opportunity to revisit many decades of
-research on alternatives to serializability with an eye towards
+\minihead{Summary} In all, the wide gap between research and current practice is both a
+pressing concern and an exciting opportunity to revisit many decades
+of research on alternatives to serializability with an eye towards
 current operating conditions, application demands, and programmer
 practices. Our proposal here is demanding, but so are the framework
-and application writers our databases serve. While the latest
-incarnation of the ORM vision may have passed over database
-concurrency control, the dream is not (yet) lost.
+and application writers our databases serve. Given the correct
+primitives, database systems may yet have a role to play in ensuring
+application integrity.

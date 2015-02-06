@@ -2,6 +2,26 @@
 \appendix
 
 
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{figs/historical-median.pdf}\vspace{-2em}
+\caption{Median use of Rails mechanisms over time.}
+\label{fig:historical}
+\end{figure}
+
+
+\begin{figure}
+  \newcommand{\skipht}{\\[-2em]}
+\includegraphics[width=\columnwidth]{figs/commit-authorship-cdf.pdf}\vspace{-2em}
+\includegraphics[width=\columnwidth]{figs/invariant-authorship-cdf.pdf}\vspace{-1em}
+\caption{CDFs of authorship of invariants (validations plus
+  associations) and commits. Bolded line
+  shows the average CDF across projects, while faint lines show CDFs
+  for individual projects. The dotted line shows the 95th percentile
+  CDF value. }
+\label{fig:cdfs}
+\end{figure}
+
 \begin{table*}
 \scriptsize
 \begin{tabular}{{|l}*{12}{l}{l|}}\hline
@@ -91,18 +111,12 @@ Obtvse & {\scriptsize{Blogging}} & 27 & 427 & 393 & 1 & 0 & 0 & 0 & 3 & 0 & 1,51
 \small
 
 \section{Analysis Methodology}
-\subsection{Mechanism Analysis}
+
 \label{sec:appendix-methodology}
 
 To determine the occurrences and number of models, transactions, locks, validations, and associations in Rails, we used a very simple set of custom code analysis scripts. We do not consider the analysis techniques here a contribution; rather, our interest is in the output of the analysis.  (Though we hesitate to term this process ``program analysis,'' the scripts embody a very simple syntactic static analysis.) The syntactic approach proved portable between the many versions of Rails against which each application is linked; otherwise, porting between non-backwards-compatible Rails versions was difficult and, in fact, unsupported by several of the Rails code analysis tools we considered using as alternatives. The choice to use syntax as a means of distinguishing code constructs led to some ambiguity. To compensate, we introduced custom logic to handle esoteric syntaxes that arose in particular projects (e.g., some projects extend \texttt{ActiveRecord::Base} with a separate, project-specific base class, while some validation usages vary between constructs like \texttt{:validates\_presence} and \texttt{:validates\_presence\_of}).
 
 To determine code authorship, we used the output of git \texttt{log} and \texttt{blame} and did not attempt any sophisticated entity resolution.
-
-
-\subsection{Invariant Confluence}
-\label{sec:appendix-ic}
-
-Overall, our I-confluence analysis was relatively straightforward, and is similar to that of~\cite{coord-avoid} (in fact, many of the results from prior work, such as uniqueness constraints and foreign key constraints have already been classified). The primary incidence of non-pre-classified invariant-operation pairs came from data formatting constraints, but these closely resemble the ``Attribute Equality'' constraints considered in~\cite[Proof 1]{coord-avoid}. ActiveRecord is actually fairly easy to analyze in this manner as the entire write set is simply the model instance to be saved.
 
 \section{Detailed Validation Behavior}
 
@@ -149,8 +163,7 @@ We describe our applications from Section~\ref{sec:evaluation} in greater detail
 \subsection{Uniqueness Validation Schema}
 \label{sec:appendix-uniqueness-schema}
 
-We declare two models, each containing two attributes: \texttt{key}, a string, and \texttt{value}, also a string. The generated schema for each of the models, which we call \texttt{SimpleKeyValue} and \texttt{ValidatedKeyValue}, is the same. The schema for \texttt{SimpleKeyValue} is as follows:
-
+We declare two models, each containing two attributes: \texttt{key}, a string, and \texttt{value}, also a string. The generated schema for each of the models, which we call \texttt{SimpleKeyValue} and \texttt{ValidatedKeyValue}, is the same. The schema for \texttt{SimpleKeyValue} is as follows:\vspace{-.5em}
 \begin{lstlisting}
   create_table "validated_key_values", force: true do |t|
     t.string   "key"
@@ -158,9 +171,12 @@ We declare two models, each containing two attributes: \texttt{key}, a string, a
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-\end{lstlisting}
+\end{lstlisting}\vspace{-.5em}
+For the non-uniqueness-validated model, we simply require that the \texttt{key} and \texttt{value} fields are not null via a \texttt{presence: true} annotation.  For the ferally validated model, we add an additional \texttt{uniqueness: true} validation to the \texttt{key} field in the Active Record model. The remainder of the application consists of a simple View and Controller logic to allow us to \texttt{POST}, \texttt{GET}, and \texttt{DELETE} each kind of model instance programatically via HTTP.
 
-For the non-uniqueness-validated model, we simply require that the \texttt{key} and \texttt{value} fields are not null:
+
+
+\begin{comment}
 
 \begin{lstlisting}
 class SimpleKeyValue < ActiveRecord::Base
@@ -169,7 +185,10 @@ class SimpleKeyValue < ActiveRecord::Base
 end
 \end{lstlisting}
 
-For \texttt{ValidatedKeyValue}, we add a \texttt{uniqueness} constraint to the \texttt{key} field.
+\end{comment}
+
+
+\begin{comment}
 
 \begin{lstlisting}
 class ValidatedKeyValue < ActiveRecord::Base
@@ -178,14 +197,14 @@ class ValidatedKeyValue < ActiveRecord::Base
 end
 \end{lstlisting}
 
-The remainder of the application consists of a simple View and Controller logic to allow us to \texttt{POST}, \texttt{GET}, and \texttt{DELETE} each kind of model instance programatically via HTTP.
+\end{comment}
+
 
 
 \subsection{Uniqueness Stress Test}
 \label{sec:appendix-uniqueness-stress}
 
-For the uniqueness stress test (Figure~\ref{fig:pk-stress}), we repeatedly attempt to create duplicate records. We issue a set of 64 concurrent requests to create instances with the \texttt{key} field set to an increasing sequence number ($k$, below) and repeat 100 times. At the end of the run, we count the number of duplicate records in the table:
-
+For the uniqueness stress test (Figure~\ref{fig:pk-stress}), we repeatedly attempt to create duplicate records. We issue a set of 64 concurrent requests to create instances with the \texttt{key} field set to an increasing sequence number ($k$, below) and repeat 100 times. At the end of the run, we count the number of duplicate records in the table:\vspace{-1em}
 \begin{algorithm}[H]
 \begin{algorithmic}
 \For{model $m \in \{\texttt{SimpleKeyValue}, \texttt{ValidatedKeyValue}\}$}
@@ -198,15 +217,13 @@ For the uniqueness stress test (Figure~\ref{fig:pk-stress}), we repeatedly attem
    \State \hspace{6.5em}\texttt{GROUP BY key HAVING COUNT(key) > 1;})
 \EndFor
 \end{algorithmic}
-\end{algorithm}
-
+\end{algorithm}\vspace{-1em}
 Under correct validation, all but one of the creation requests per key should fail.
 
 \subsection{Uniqueness Workload Test}
 \label{sec:appendix-uniqueness-workload}
 
-For the uniqueness workload test (Figure~\ref{fig:pk-workload}), a set of 64 workers sequentially issues a set of 100 operations each. Each operation attempts to create a new model instance with the \texttt{key} field set to a random item generated according to the distributions described in Section~\ref{sec:evaluation}:
-
+For the uniqueness workload test (Figure~\ref{fig:pk-workload}), a set of 64 workers sequentially issues a set of 100 operations each. Each operation attempts to create a new model instance with the \texttt{key} field set to a random item generated according to the distributions described in Section~\ref{sec:evaluation}:\vspace{-1em}
 \begin{algorithm}[H]
 \begin{algorithmic}
 \For{model $m \in \{\texttt{SimpleKeyValue}, \texttt{ValidatedKeyValue}\}$}
@@ -225,7 +242,7 @@ For the uniqueness workload test (Figure~\ref{fig:pk-workload}), a set of 64 wor
 \subsection{Association Validation Schema}
 \label{sec:appendix-association-schema}
 
-We declare two sets of models, each containing two models each: a \texttt{User} model and a \texttt{Departments} model. Each \texttt{User} has a(n implicit) \texttt{id} (as generated by Rails ActiveRecord) and an integer corresponding \texttt{department\_i}. Each \texttt{Department} has an \texttt{id}. Both models have a timestamp of the last updated and creation time, as is auto-generated by Rails. Aside from the table names, both schemas are equivalent. Below is the schema for the non-validated users and departments:
+We declare two sets of models, each containing two models each: a \texttt{User} model and a \texttt{Departments} model. Each \texttt{User} has a(n implicit) \texttt{id} (as generated by Rails ActiveRecord) and an integer corresponding \texttt{department\_i}. Each \texttt{Department} has an \texttt{id}. Both models have a timestamp of the last updated and creation time, as is auto-generated by Rails. Aside from the table names, both schemas are equivalent. Below is the schema for the non-validated users and departments:\vspace{-.5em}
 \begin{lstlisting}
 create_table "simple_users", force: true do |t|
     t.integer  "simple_department_id"
@@ -237,8 +254,10 @@ create_table "simple_departments", force: true do |t|
   t.datetime "created_at"
   t.datetime "updated_at"
 end
-\end{lstlisting}
-The two pairs of models vary in their validations. One pair of models has no validations or associations:
+\end{lstlisting}\vspace{-.5em}
+The two pairs of models vary in their validations. One pair of models has no validations or associations. The other pair of models contain validations, including rules for cascading deletions. Specifically, we place an association \texttt{has\_many :users, :dependent => :destroy} on the department, and, on the user, an association \texttt{belongs\_to :department} and validation \texttt{validates :department, :presence => true} (note that we only delete from Departments in our workload, below). Thus, on deletion of a model of type \texttt{ValidatedDepartment}, ActiveRecord will attempt to call \texttt{destroy} on each matching \texttt{ValidatedUser}.
+
+\begin{comment}
 \begin{lstlisting}
 class SimpleDepartment < ActiveRecord::Base
 end
@@ -246,26 +265,27 @@ end
 class SimpleUser < ActiveRecord::Base
 end
 \end{lstlisting}
-The other pair of models contain validations, including rules for cascading deletions (note that we only delete from Departments in our workload, below):
+
 \begin{lstlisting}
 class ValidatedDepartment < ActiveRecord::Base
   has_many :validated_users, :dependent => :destroy
 end
 
 class ValidatedUser < ActiveRecord::Base
-  belongs_to :validated_department
+  belongs_to :validated_department 
   validates :validated_department, :presence => true
 end
 \end{lstlisting}
-Thus, on deletion of a model of type \texttt{ValidatedDepartment}, ActiveRecord will attempt to call \texttt{destroy} on each matching \texttt{ValidatedUser}.
+\end{comment} 
+
 
 \subsection{Association Stress Test}
 \label{sec:appendix-association-stress}
 
-For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly attempt to create orphan users. We issue a set of 64 concurrent requests to create Users belonging to a particular department, while simultaneously deleting that department and repeat 100 times. At the end of the run, we count the number of users with a department that does not exist:
-
+For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly attempt to create orphan users. We issue a set of 64 concurrent requests to create Users belonging to a particular department, while simultaneously deleting that department and repeat 100 times. At the end of the run, we count the number of users with a department that does not exist:\vspace{-.5em}
 \begin{algorithm}[H]
 \begin{algorithmic}
+
 \For{model $m \in \{\texttt{Simple}, \texttt{Validated}\}$}
   \For{$i \gets 1$ to $100$}
     \State via HTTP: create $m$Department with \texttt{id=$i$}
@@ -294,8 +314,7 @@ For the association stress test (Figure~\ref{fig:fk-stress}), we repeatedly atte
 \subsection{Association Workload Test}
 \label{sec:appendix-association-workload}
 
-For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$). We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of orphaned users, as above.
-
+For the association workload test (Figure~\ref{fig:fk-workload}), we begin by creating a variable number of departments (Figure~\ref{fig:fk-workload} x-axis; $D$). We next have 64 concurrent clients simultaneously attempt to create users belonging to a random department and delete random departments (in a 10:1 ratio of creations to deletions, for 100 operations each). We end by counting the number of orphaned users, as above. \vspace{-1em}
 \begin{algorithm}[H]
 \begin{algorithmic}
 \For{model $m \in \{\texttt{Simple}, \texttt{Validated}\}$}

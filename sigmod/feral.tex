@@ -39,10 +39,10 @@ basis~\cite{code-transaction-isolation}.
   database. Optimistic locking is invoked by declaring a special
   \texttt{lock\_version} field in an Active Record model. When a Rails
   process performs an update to an optimistically locked Model, Active
-  Record atomically checks that an object's \texttt{lock\_version} has
-  not changed since the process last read the object and, if it has
-  not changed, transactionally increments \texttt{lock\_version} and updates the
-  object in the database.
+  Record atomically checks whether the corresponding record's
+  \texttt{lock\_version} field has changed since the process last read
+  the object; if it has not changed, Rails transactionally increments
+  \texttt{lock\_version} and updates the database record.
 
 \item Rails provides support for application-level
   \textbf{validations}. Each Model has a set of zero or more
@@ -56,7 +56,7 @@ basis~\cite{code-transaction-isolation}.
   actual validations further in subsequent sections). Each validation
   declared for a given model is run sequentially within a
   database-backed transaction before actually updating the model state
-  in the database.  \footnote{The practice of wrapping validations in
+  in the database.\footnote{The practice of wrapping validations in
     a transaction dates to the earliest public Rails commit (albeit,
     in 2004, transactions were only supported via a per-Ruby VM global
     lock~\cite{code-txn-lock}). However, as late as 2010, updates were
@@ -81,18 +81,21 @@ basis~\cite{code-transaction-isolation}.
   \textbf{associations}. Like validations, associations are a core
   concept of the Active Record model. As the name suggests, ``an
   association is a connection between two Active Record models,''
-  effectively acting like a foreign key in an RDBMS. Associations can be declared on one or both sides of a
-  one-to-one or one-to-many relationship, including transitive
-  dependencies (via a \texttt{:through} annotation). Declaring an
-  association (e.g., \texttt{:belongs\_to dept}) produces a special
-  field for the associated record ID within the model (e.g.,
+  effectively acting like a foreign key in an RDBMS. Associations can
+  be declared on one or both sides of a one-to-one or one-to-many
+  relationship, including transitive dependencies (via a
+  \texttt{:through} annotation). Declaring an association (e.g.,
+  \texttt{:belongs\_to dept}) produces a special field for the
+  associated record ID within the model (e.g.,
   \texttt{dept\_id}). Coupling an association with an appropriate
   validation (e.g., \texttt{:presence}) ensures that the association
   is indeed valid (and is, via the validation, backed by a database
-  transaction). Rails does not currently provide native support for
-  database-backed foreign key constraints.\footnote{However, Rails 4.2
-    (in Beta as of November 2014) will add support for foreign key
-    constraints via manual schema annotation.}
+  transaction). Until the release of Rails 4.2 in December 2014, Rails
+  did not provide native support for database-backed foreign key
+  constraints. In Rails 4.2, foreign keys are supported via manual
+  schema annotations declared separately from each Model; declaring an
+  association does not declare a corresponding foreign key constraint
+  and vice-versa.
 \end{myenumerate}
 
 Overall, these four mechanisms provide a range of options for
@@ -154,8 +157,8 @@ average, applications used 0.13 transactions, 0.01 locks, 1.82
 validations, and 3.30 associations per model (with an average of 29.1
 models per application). While 46 (68.7\%) of applications used
 transactions, 66 (98.5\%) used validations or associations. Only six
-applications (8.9\%) used locks. Use of pessimistic locks was more than
-twice as common as the use of optimistic locks.
+applications used locks. Use of pessimistic locks was over twice
+as common as the use of optimistic locks.
 
 Overall, we find that validations and associations are, respectively,
 14 and 25 times more common than transactions and orders of magnitude
@@ -177,48 +180,46 @@ preserve (and whether they are actually correct in doing so).
 \minihead{Understanding specific applications} Over the course of our
 investigation, we found mechanism use varied across applications.
 
-For example, the eCommerce application Spree uses only
-six transactions, one for each of $1.)$ canceling an order, $2.)$
+For example, the eCommerce application Spree uses only six
+transactions, one for each of $1.)$ canceling an order, $2.)$
 approving an order (atomically setting the user ID and timestamp),
 $3.)$ transferring shipments between fulfillment locations (e.g.,
 warehouses), $4.)$ transferring items between shipments, $5.)$
 transfering stock between fulfillment locations, and $6.)$ updating an
 order's specific inventory status. While this is a reasonable set of
 locations for transactions, in an eCommerce application, one might
-expect a number of scenarios that require concurrency control,
-including order placement and stock adjustment.
+expect a larger number of scenarios to require transactions, including
+order placement and stock adjustment.
 
-In the case of stock adjustment, the inventory count for each item to
-is indeed a potential hotspot for concurrency issues. We found that
-performing differential addition and subtraction to the available
-stock of an item (\texttt{adjust\_count\_on\_hand(value)}) is indeed
-protected via a pessimistic lock, but simply setting the available
-stock (\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why
-one operation necessitates a lock but the other does not, given that
-both are ostensibly sensitive to concurrent accesses. Meanwhile, the
-stock level itself is wrapped in a validation ensuring non-negative
-balances, if not Lost Updates~\cite{adya-isolation}.
+In the case of Spree stock adjustment, the inventory count for each
+item to is indeed a potential hotspot for concurrency issues. Manual
+adjustments of available stock
+(\texttt{adjust\_count\_on\_hand(value)}) is indeed protected via a
+pessimistic lock, but simply setting the available stock
+(\texttt{set\_count\_on\_hand(value)}) is not. It is unclear why one
+operation necessitates a lock but the other does not, given that both
+are ostensibly sensitive to concurrent accesses. Meanwhile, the stock
+level field is wrapped in a validation ensuring non-negative balances,
+preventing negative balances but not necessarily classic Lost Update
+anomalies~\cite{adya-isolation}.
 
-At one point, Spree's inventory was protected by an optimistic lock;
-it was removed due to optimistic lock failure during customer
-checkouts. On relevant bug tracker issue, a committer notes that ``I
-think we should get rid of the [optimistic lock] if there's no
-documentation about why it's there...I think we can look at this issue
-again in a month's time and see if there's been any problems since you
-turned it off''~\cite{code-optimistic-issue}. The issue has, to our
+At one point, Spree's inventory count was protected by an optimistic
+lock; it was removed due to optimistic lock failure during customer
+checkouts. On relevant GitHub issue pertaining to this lock removal, a
+committer notes that ``I think we should get rid of the [optimistic
+lock] if there's no documentation about why it's there...I think we
+can look at this issue again in a month's time and see if there's been
+any problems since you turned it
+off''~\cite{code-optimistic-issue}. This removal has, to our
 knowledge, not been revisited, despite the potential dangers of
 removing this point of synchronization.
 
-Thus, the choice of (and even use of) concurrency control appears an
-ad-hoc process. The remainder of the corpus contains a number of such
-phenomena. The use of each style of concurrency control varies across
-repositories, but our results demonstrate a clear trend towards feral
-mechanisms within Rails rather than traditional use of
-transactions. As a consequence of the breadth of our study (and paper
-formatting limitations), we are not able to discuss every application
-in detail (though the source code of each and, fortunately, the Git
-history and issue trackers typically available for
-inspection).
+The remainder of the application corpus contains a number of such
+fascinating examples, illustrating the often ad-hoc process of
+deciding upon a concurrency control mechanism. Broadly, the use of
+each style of concurrency control varies across repositories, but our
+results demonstrate a clear trend towards feral mechanisms within
+Rails rather than traditional use of transactions.
 
 \begin{figure}
   \newcommand{\skipht}{\\[-2em]}
@@ -237,34 +238,26 @@ inspection).
 
 
 \minihead{Additional metrics} To better understand how programmers
-used each of these mechanisms, we report on two additional
+used each of these mechanisms, we performed two additional
 analyses.
 
 First, we analyzed the number of models, transactions, validations,
 and associations over each project's lifetime. Using each
 application's Git logs, we repeated the above analysis at a fixed set
-of intervals through the application's history (by commits). At each
-interval, we recorded the number of occurrences of each of these
-constructs relative to the total number of occurrences in the project
-in the latest repository we examined. Figure~\ref{fig:historical}
-plots the median number of occurences across all projects. Notably,
-these results demonstrate that, by the time 50\% of the commits have
-been entered into the repository, over 75\% of the models,
-transactions, validations, and associations have been written. This
-suggests that the Model layer may be less volatile than the View and
-Controller components of the applications. Moreover, the initial
-proportion of validations and associations is higher than the initial
-proportion of transactions; thus, the data model appears to stabilize
-faster than the controller logic. It is unclear whether the bulk of
-transaction usage is added in order to compensate for, say,
-concurrency violations, or is instead due to growth in Controller code
-and business logic.
+of intervals through the application's history (measured by
+commits). Figure~\ref{fig:historical} (see Appendix, page~\pageref{fig:historical}) plots the median number of
+occurences across all projects. Notably, these results demonstrate
+that, by the time 50\% of the commits have been entered into the
+repository, over 75\% of the models, transactions, validations, and
+associations have been written. This suggests that the Model layer may
+be less volatile than the View and Controller components of the
+applications. Moreover, the initial proportion of validations and
+associations is higher than the initial proportion of transactions;
+thus, the data model appears to stabilize faster than the controller
+logic. It is unclear whether the bulk of transaction usage is added in
+order to compensate for, say, concurrency violations, or is instead
+due to growth in Controller code and business logic.
 
-\begin{figure}
-\includegraphics[width=\columnwidth]{figs/historical-median.pdf}\vspace{-2em}
-\caption{Median use of Rails mechanisms over time.}
-\label{fig:historical}
-\end{figure}
 
 Second, we analyze the distribution of authors to commits compared to
 the distribution of authors to validations and associations
@@ -272,25 +265,14 @@ authored.\footnote{We chose to analyze commits authored rather than
   lines of code written because git tracks large-scale code
   refactoring commits as an often large set of deletions and
   insertions. Nevertheless, we observed a close correlation between
-  lines of code and commits authored.} As Figure~\ref{fig:cdfs}
-demonstrates, 95\% of all commits are authored by 42.4\% of
+  lines of code and commits authored.} As Figure~\ref{fig:cdfs} (see
+Appendix, page~\pageref{fig:cdfs}) demonstrates, 95\% of all commits are authored by 42.4\% of
 authors. However, 95\% of invariants (validations plus associations)
 are authored by only 20.3\% of authors. This is reminiscent of
 traditional database schema authorship, where a smaller number of
 authors (e.g., DBAs) modify the schema than contribute to the actual
 application code.
 
-\begin{figure}
-  \newcommand{\skipht}{\\[-2em]}
-\includegraphics[width=\columnwidth]{figs/commit-authorship-cdf.pdf}\vspace{-2em}
-\includegraphics[width=\columnwidth]{figs/invariant-authorship-cdf.pdf}\vspace{-1em}
-\caption{CDFs of authorship of invariants (validations plus
-  associations) and commits. Bolded line
-  shows the average CDF across projects, while faint lines show CDFs
-  for individual projects. The dotted line shows the 95th percentile
-  CDF value. }
-\label{fig:cdfs}
-\end{figure}
 
 \subsection{Summary and Discussion}
 
@@ -318,5 +300,5 @@ those that might be determined via more sophisticated techniques such
 as pre- and post-condition invariant
 mining~\cite{writes-forest,redblue-new} and/or by interviewing each
 developer on each project) would be instructive, this is difficult to
-scale. We view these forms of analysis as worthwhile avenues for
+scale. We view these forms of analysis as highly promising avenues for
 future research.

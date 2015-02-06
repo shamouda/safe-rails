@@ -10,10 +10,11 @@ require stronger forms of isolation.
 \subsection{Understanding Validation Behavior}
 
 To begin, we discuss validation behavior in the abstract. Recall that
-each of a model's declared validations is run before a model instance
-is saved to the database. Correctly enforcing validations entails
-ensuring concurrent validation execution preserves the intention of
-the declared validation.
+each of a model's declared validations is run (effectively, performing
+invariant checking) before a model instance is saved to the
+database. Correctly enforcing validations entails ensuring concurrent
+validation execution preserves the intention of the declared
+validation.
 
 \minihead{Isolated validations} If each sequence of validations (and, if validations pass, model
 update) is wrapped within a database-backed transaction, under
@@ -46,48 +47,42 @@ transactions. Informally, the condition ensures that, if transactions
 maintain database states that are correct with respect to an invariant
 when run in isolation, the transactions can be run simultaneously and
 their results combined (``merged'') to produce another correct
-state. In the context of a Rails application running on a MySQL or
-PostgreSQL back-end, validations are already preserved in isolation by
-Rails (as the model will not be saved otherwise). However, we need to
-ensure that, in the event of concurrent validations and model saves,
-the result of concurrent model saves will not violate the validation
-for either model. In the event that two concurrent controllers save
-the same model (backed by the same database record), only one will be
-persisted (a some-write-wins ``merge''). In the event that two
-concurrent controllers save different models (i.e., backed by
-different database records), both will be persisted (a set-based
-``merge''). In both cases, we must ensure that validations hold after
-merge.
+state. In the case of Rails, we wish to determine whether, in the
+event of concurrent validations and model saves, the result of
+concurrent model saves will not violate the validation for either
+model. In the event that two concurrent controllers save the same
+model (backed by the same database record), only one will be persisted
+(a some-write-wins ``merge''). In the event that two concurrent
+controllers save different models (i.e., backed by different database
+records), both will be persisted (a set-based ``merge''). In both
+cases, we must ensure that validations hold after merge.
 
-Per~\cite{coord-avoid}, the state of the art in I-confluence
-analysis currently relies on a combination of manual proofs and simple
-static analysis: given a set of invariant and operation pairs
-classified as providing the I-confluence property, we can
-iterate through all operations and declared invariants and check
-whether or not they appear in the set of I-confluent pairs. If
-so, we can label the pair as I-confluent. If not, we can
-either conservatively label the pair as unsafe under concurrent
-execution or prove the pair as I-confluent or not. (To prove a
-pair is I-confluent, we must show that the set of database
-states reachable by executing operations preserves the invariant under
-merge, as described in the paragraph above.)
+Our I-confluence analysis currently relies on a combination of manual
+proofs and simple static analysis: given a set of invariant and
+operation pairs classified as providing the I-confluence property, we
+can iterate through all operations and declared invariants and check
+whether or not they appear in the set of I-confluent pairs. If so, we
+label the pair as I-confluent. If not, we can either conservatively
+label the pair as unsafe under concurrent execution or prove the pair
+as I-confluent or not. (To prove a pair is I-confluent, we must show
+that the set of database states reachable by executing operations
+preserves the invariant under merge, as described above.)
 
 Returning to our task of classifying Rails validations and
 associations as safe or not, we applied this I-confluence analysis to
-the validations in the corpus we examined (see also
-Appendix~\ref{sec:appendix-ic}). Recall that Rails provides
-support for arbitrary, user-defined validation functions. In fact, in
-our analysis, we found that only 60 out of 3551 validations were
-expressed as user-defined functions. The remainder were drawn from the
-standard set of validations supported by Rails core.\footnote{It is
-  unclear exactly why this is the case. It is possible that, because
-  these invariants are standardized (in our case, in Rails, and,
-  in~\cite{coord-avoid}, in SQL), they are more accessible to
-  users. It is also possible that SQL and Rails have simply done a
-  good job of codifying common patterns that programmers tend to
-  use. This chicken-and-egg problem is an interesting subject for
-  further methodological study.} Accordingly, we begin by considering
-built-in validations, then examine each of the custom validations.
+the invariants\footnote{We focus on validations here as, while
+  associations \textit{do} represent an invariant, it is only when
+  they are coupled with validations that they are enforced.} in the
+corpus. In our analysis, we
+found that only 60 out of 3551 validations were expressed as
+user-defined functions. The remainder were drawn from the standard set
+of validations supported by Rails core.\footnote{It is unclear exactly
+  why this is the case. It is possible that, because these invariants
+  are standardized, they are more accessible to users. It is also
+  possible that Rails developers have simply done a good job of
+  codifying common patterns that programmers tend to use.}
+Accordingly, we begin by considering built-in validations, then
+examine each of the custom validations.
 
 \subsection{Built-In Validations}
 
@@ -118,9 +113,10 @@ ensures that the field contains a number rather than an alphanumeric
 string. These invariants are indeed I-confluent under concurrent
 update.
 
-Finally, \texttt{associated} (like \texttt{presence}) depends on
-whether or not the current updates are both insertions (I-confluent)
-or mixed insertions and deletions (not I-confluent).
+Finally, the safety of \texttt{associated} (like \texttt{presence}) is
+contingent on whether or not the current updates are both insertions
+(I-confluent) or mixed insertions and deletions (not
+I-confluent). Thus, correctness depends on the operation.
 
 Overall, a large number of built-in validations are safe under
 concurrent operation. Under insertions, 87.3\% of built-in validation

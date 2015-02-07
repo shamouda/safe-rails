@@ -4,8 +4,8 @@
 
 While our focus in this paper is on Rails, we briefly investigated
 support for uniqueness, foreign key, and custom validations in several
-other frameworks. We find widespread support for these constructs in
-addition to varying degrees of susceptibility to integrity errors.
+other frameworks. We find widespread support for validations and
+varying susceptibility to integrity errors.
 
 \newcommand{\orm}[1]{{\vspace{.45em}\noindent\textit{#1}}}
 
@@ -61,21 +61,20 @@ specify constraints in both their schema and in their validations,
 validations may lead to integrity violations.
 
 \orm{Laravel} (version 4.2)~\cite{code-laravel}, another PHP-based web
-framework, supports the same set of functionality as CakePHP. Laravel
-supports uniqueness, foreign key, and UDF validations in the
-application, but any database-backed constraints must be specified
-manually in the schema. Per one set of community documentation~\cite{laravel-book}, ``database-level
-validations can efficiently handle some things (such as uniqueness of
-a column in heavily-used tables) that can be difficult to implement
-otherwise'' but ``[t]esting and maintenance is more difficult...[and]
-your validations would be database- and schema-specific, which makes
+framework, supports the same set of functionality as CakePHP,
+including application-level uniqueness, foreign key, and UDF
+validations in the application. Any database-backed constraints must
+be specified manually in the schema. Per one set of community
+documentation~\cite{laravel-book}, ``database-level validations can
+efficiently handle some things (such as uniqueness of a column in
+heavily-used tables) that can be difficult to implement otherwise''
+but ``[t]esting and maintenance is more difficult...[and] your
+validations would be database- and schema-specific, which makes
 migrations or switching to another database backend more difficult in
 the future.'' In contrast, model-level validations are ``the
 recommended way to ensure that only valid data is saved into your
 database. They are database agnostic, cannot be bypassed by end users,
-and are convenient to test and maintain.'' There
-is no mention of concurrency in this current treatment, despite the
-glaring potential for integrity errors.
+and are convenient to test and maintain.'' 
 
 \orm{Django} (version 1.7)~\cite{code-django}, a popular Python-based
 framework, backs declared uniqueness and foreign key constraints with
@@ -93,6 +92,12 @@ supported via transactions; e.g., ``TO-DO: This should all be wrapped
 in a transaction. That's coming next but for the meantime just hope we
 don't get in a nasty state where the operation
 fails!''~\cite{code-waterline-txn}).
+
+\minihead{Summary} In all, we observe wide, cross-framework support
+for feral validation/invariants, with inconsistent use of mechanisms
+for enforcing them ranging from the use of in-database constraints to
+transactions to no ostensible use of concurrency control in either
+application or database.
 
 % Implementing and using unique indexes~\cite{waterline-unique-one,waterline-unique-two}.
 

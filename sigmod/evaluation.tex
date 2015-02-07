@@ -14,7 +14,7 @@ built-in validation uses we encountered. In this section, we discuss
 how Rails implements uniqueness and show that this is---at least
 theoretically---unsafe.
 
-When a Model field is declared with a \texttt{:validates\_uniqueness}
+When a model field is declared with a \texttt{:validates\_uniqueness}
 annotation, any instance of that model is compared against all other
 corresponding records in the database to ensure that the field is
 indeed unique. ActiveRecord accomplishes this by issuing a
@@ -109,48 +109,41 @@ database table.
 
 \subsection{Quantifying Uniqueness Anomalies}
 
-Given that feral uniqueness validations are $i.)$ acknowledged to be
-broken (at least under non-serializable isolation), $ii.)$ have a
-work-around by correctly declaring them within the database, yet
-$iii.)$ are widely used, we sought to understand exactly how often
-uniqueness anomalies occur in an actual deployment. In this section,
-we show that uniqueness validations in Rails are indeed unsafe under
+Given that feral uniqueness validations are acknowledged to be unsafe
+under non-serializable isolation yet are widely used, we sought to
+understand exactly how often uniqueness anomalies occur in an
+experimental deployment. In this section, we demonstrate that
+uniqueness validations in Rails are indeed unsafe under
 non-serializable isolation. While they prevent some data integrity
 errors, we observe---depending on the workload---many duplicate
-records to be created.
+records.
 
 \minihead{Experimental setup} We developed a Rails 4.1.5 application
 that performed insertions to a non-indexed string column and compared
 the incidence of violations both with and without a uniqueness
-validator (for more details, see
+validator (see also
 Appendix~\ref{sec:appendix-uniqueness-schema}).\footnote{In our
   experimental evaluation, we use the custom applications described
   below (and in Appendix~\ref{sec:appendix-experiments}) for two
   reasons. First, these test cases allow us to isolate ActiveRecord
   behavior to the relevant set of validations as they are deployed by
-  default and independent of any specialized controller logic. Second,
-  this reduces the complexity of programmatic deployment and testing;
-  we are able to bypass sessionization and authentication logic when
-  triggering ActiveRecord. Many of the applications in our corpus
-  indeed use the same code paths within ActiveRecord, but, to, say,
-  create a new user in an application (without modifying the actual
-  application code) would otherwise require additional inputs,
-  including a session and authorization token as well as email and/or
-  Captcha authentication. These applications indeed allow concurrent
-  accesses, but the process of actually producing concurrency using
-  their native HTTP interfaces is more complex.} We deployed this
-application across two Amazon EC2 \texttt{m2.4xlarge} instances,
-offering 68.4 GB RAM, 8 CPU cores, and 1680GB local storage, running
-Ubuntu 14.04 LTS. On one instance, we deployed our application, using
-Nginx 1.6.2 as a web frontend proxied to a set of Unicorn 4.8.3 (Ruby
-VM pool) workers. That is, Nginx acts as a HTTP frontend and forwards
-incoming requests to a variably sized pool of Rails VMs (managed by
-Unicorn, in a multi-process single-threaded concurrency model) that,
-in effect, \texttt{epoll} on a shared Linux file descriptor. On the
-other EC2 instance, we deployed PostgreSQL 9.3.5 and configured it to
-run on the instance local storage. We used a third EC2 instance to
-direct traffic to the front-end instance and drive load. We plot the
-average and standard deviation of three runs per experiment.
+  default, independent of any specialized controller logic. Second,
+  this reduces the complexity of automated testing. Many of the
+  applications in our corpus indeed use the same code paths within
+  ActiveRecord, but evaluating these custom applications simplifies
+  programmatic triggering of validation logic.} We deployed this
+application on two Amazon EC2 \texttt{m2.4xlarge} instances, offering
+68.4 GB RAM, 8 CPU cores, and 1680GB local storage, running Ubuntu
+14.04 LTS. On one instance, we deployed our application, using Nginx
+1.6.2 as a web frontend proxied to a set of Unicorn 4.8.3 (Ruby VM
+pool) workers. Nginx acts as a HTTP frontend and forwards incoming
+requests to a variably sized pool of Rails VMs (managed by Unicorn, in
+a multi-process, single-threaded server) that \texttt{epoll} on a
+shared Linux file descriptor. On the other EC2 instance, we deployed
+PostgreSQL 9.3.5 and configured it to run on the instance local
+storage. We used a third EC2 instance to direct traffic to the
+front-end instance and drive load. We plot the average and standard
+deviation of three runs per experiment.
 
 \minihead{Stress test} We began our study by issuing a simple stress
 test that executed a number of concurrent insertion requests against a
@@ -264,7 +257,7 @@ association validations. We first, again, discuss how Rails enforces
 these validations and describe how---at least
 theoretically---validations might result in integrity errors.
 
-When a Model field is declared with an association (e.g., it
+When a model field is declared with an association (e.g., it
 \texttt{:belongs\_to} another model) \textit{and} a
 \texttt{:validates\_presence} validation, Rails will attempt to ensure
 that the declared validation is valid before saving the model. Rails
@@ -293,7 +286,7 @@ Unlike uniqueness validations, there is no discussion of associations
 and concurrency anomalies in the Rails documentation. Moreover, in
 Rails 4.1, there is no way to natively declare a foreign key
 constraint\footnote{Rails 4.2 added support for foreign keys via
-  migration annotation (separate from Models; similarly to adding a
+  migration annotation (separate from models; similarly to adding a
   unique index) in December 2014.}; it must be done via a third-party
 library such as \texttt{foreigner}~\cite{foreigner} or
 \texttt{schema\_plus}~\cite{schemaplus}. Only two applications
@@ -402,9 +395,7 @@ concurrent deletions and insertions drops.
 
 The preceding experiments demonstrate that, indeed, Active Record is
 unsafe as deployed by default. Validations are susceptible to data
-corruption due to sensitivity to weak isolation anomalies. Moreover,
-in PostgreSQL, current transaction support is insufficient to prevent
-all anomalies.
+corruption due to sensitivity to weak isolation anomalies.
 
 This raises the question: why declare validations at all? As we
 observe, validations protect against \textit{some} data

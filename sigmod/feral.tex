@@ -38,44 +38,31 @@ basis~\cite{code-transaction-isolation}.
   which invokes a \texttt{SELECT FOR UPDATE} statement in the
   database. Optimistic locking is invoked by declaring a special
   \texttt{lock\_version} field in an Active Record model. When a Rails
-  process performs an update to an optimistically locked Model, Active
+  process performs an update to an optimistically locked model, Active
   Record atomically checks whether the corresponding record's
   \texttt{lock\_version} field has changed since the process last read
   the object; if it has not changed, Rails transactionally increments
   \texttt{lock\_version} and updates the database record.
 
 \item Rails provides support for application-level
-  \textbf{validations}. Each Model has a set of zero or more
-  validations, or boolean-valued functions that should be run before
-  the object is actually saved to the database. A model instance many
+  \textbf{validations}. Each Active Record model has a set of zero or more
+  validations, or boolean-valued functions, and a model instance many
   only be saved to the database if all of its declared validations
   return true. These validations ensure, for example, that particular
   fields within a record are not null or, alternatively, are unique
   within the database. Rails provides a number of built-in validations
   but also allows arbitrary user-defined validations (we discuss
-  actual validations further in subsequent sections). Each validation
-  declared for a given model is run sequentially within a
-  database-backed transaction before actually updating the model state
-  in the database.\footnote{The practice of wrapping validations in
-    a transaction dates to the earliest public Rails commit (albeit,
-    in 2004, transactions were only supported via a per-Ruby VM global
-    lock~\cite{code-txn-lock}). However, as late as 2010, updates were
-    only partially protected by
-    transactions~\cite{code-txn-update}.} Rails' supported
-  validations are a superset of the integrity constraints natively
-  supported by many commercial databases today.\\[-2mm] 
-
-  Rails validations are a prominent feature of the Active Record
-  model. In contrast, neither transactions nor locks are actually
-  discussed in the official ``Rails Guides,'' and, generally, are not
-  promoted as a means of ensuring data integrity. Instead, the Rails
-  documentation~\cite{rails-guide} prefers validations as they are
-  ``are database agnostic, cannot be bypassed by end users, and are
-  convenient to test and maintain.'' Moreover, the Rails documentation
-  opines that ``[d]atabase constraints and/or stored procedures make
-  the validation mechanisms database-dependent and can make testing
-  and maintenance more difficult.'' As we will see in the next
-  subsection, validations are widely used by many actual applications.
+  actual validations further in subsequent sections). The framework
+  runs each declared validation sequentially and, if all succeed, the
+  model state is updated in the database; this happens within a
+  database-backed transaction.\footnote{The practice of wrapping
+    validations in a transaction dates to the earliest public Rails
+    commit (albeit, in 2004, transactions were only supported via a
+    per-Ruby VM global lock~\cite{code-txn-lock}). However, as late as
+    2010, updates were only partially protected by
+    transactions~\cite{code-txn-update}.} The validations supported by
+  Rails today include ones that are natively supported by many
+  commercial databases today, as well as others.\\[-2mm]
 
 \item Rails provides support for application-level
   \textbf{associations}. Like validations, associations are a core
@@ -93,7 +80,7 @@ basis~\cite{code-transaction-isolation}.
   transaction). Until the release of Rails 4.2 in December 2014, Rails
   did not provide native support for database-backed foreign key
   constraints. In Rails 4.2, foreign keys are supported via manual
-  schema annotations declared separately from each Model; declaring an
+  schema annotations declared separately from each model; declaring an
   association does not declare a corresponding foreign key constraint
   and vice-versa.
 \end{myenumerate}
@@ -105,13 +92,25 @@ user-level implementation of single-record transactions via
 database-level ``compare-and-swap'' primitives (implemented via
 \texttt{SELECT FOR UPDATE}). However, the latter two---validations and
 associations---operate, in effect, at the application level. Although
-some validations, such as uniqueness validations, have natural analogs
-in an RDBMS, the semantics of these validations in Rails are entirely
-contained within the Rails code. In effect, from the database's
-perspective, these validations exist external to the system and are
-\textit{feral} concurrency control mechanisms. As we will show
+some validations like uniqueness validations have analogs in an RDBMS,
+the semantics of these validations are entirely contained within the
+Rails code. In effect, from the database's perspective, these
+validations exist external to the system and are \textit{feral}
+concurrency control mechanisms.
+
+Rails's feral mechanisms---validations and associations---are a
+prominent feature of the Active Record model. In contrast, neither
+transactions nor locks are actually discussed in the official ``Rails
+Guides,'' and, generally, are not promoted as a means of ensuring data
+integrity. Instead, the Rails documentation~\cite{rails-guide} prefers
+validations as they are ``are database agnostic, cannot be bypassed by
+end users, and are convenient to test and maintain.'' Moreover, the
+Rails documentation opines that ``[d]atabase constraints and/or stored
+procedures make the validation mechanisms database-dependent and can
+make testing and maintenance more difficult.''  As we will show
 shortly, these feral mechanisms dominate in terms of developer
-popularity.
+popularity. As we will see in the next subsection, these feral
+mechanisms are widely used by many actual applications.
 
 \subsection{Adoption in Practice}
 

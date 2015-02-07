@@ -9,19 +9,13 @@ require stronger forms of isolation.
 
 \subsection{Understanding Validation Behavior}
 
-To begin, we discuss validation behavior in the abstract. Recall that
-each of a model's declared validations is run (effectively, performing
-invariant checking) before a model instance is saved to the
-database. Correctly enforcing validations entails ensuring concurrent
-validation execution preserves the intention of the declared
-validation.
-
-\minihead{Isolated validations} If each sequence of validations (and, if validations pass, model
-update) is wrapped within a database-backed transaction, under
-serializable isolation, validations would appear to execute
-correctly. However, relational database engines often default to
-non-serializable isolation~\cite{hat-vldb}; notably, PostgreSQL and
-MySQL actually default to respectively, the weaker Read Committed and
+To begin, recall that each sequence of validations (and model update
+as well, if validations pass) is wrapped within a database-backed
+transaction, the validation's intended integrity will be preserved
+provided the database is using serializable isolation. However,
+relational database engines often default to non-serializable
+isolation~\cite{hat-vldb}; notably for Rails, PostgreSQL and MySQL
+actually default to respectively, the weaker Read Committed and
 Repeatable Read isolation levels.
 
 We did not encounter evidence that applications changed the isolation
@@ -32,7 +26,7 @@ doing so in documentation). Thus, although we cannot prove that this
 is indeed the case, this data suggests that validations are likely
 to run at default database isolation in production environments.
 
-\minihead{Validations without isolation} Given that validations are
+\minihead{Validations with weak isolation} Given that validations are
 not likely to be perfectly isolated, does this lack of serializable
 isolation actually affect these invariants?  Just because validations
 effectively run concurrently does not mean that they are necessarily

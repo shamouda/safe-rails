@@ -707,20 +707,20 @@
  \null
  \setbox\@acmtitlebox\vbox{%
 \baselineskip 20pt
-\vskip 0em                   % Vertical space above title.
+\vskip 2em                   % Vertical space above title.
    \begin{center}
     {\ttlfnt \@title\par}       % Title set in 18pt Helvetica (Arial) bold size.
-    \vskip 0em                % Vertical space after title.
+    \vskip 1.5em                % Vertical space after title.
 %This should be the subtitle.
 {\subttlfnt \the\subtitletext\par}\vskip 1.25em%\fi
-    {\baselineskip 12pt\aufnt   % each author set in \12 pt Arial, in a
-     \lineskip 0em             % tabular environment
+    {\baselineskip 16pt\aufnt   % each author set in \12 pt Arial, in a
+     \lineskip .5em             % tabular environment
      \begin{tabular}[t]{c}\@author
      \end{tabular}\par}
     \vskip 1.5em               % Vertical space after author.
    \end{center}}
  \dimen0=\ht\@acmtitlebox
- \advance\dimen0 by -8.75pc\relax % Increased space for title box -- KBT
+ \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
  \unvbox\@acmtitlebox
  \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 

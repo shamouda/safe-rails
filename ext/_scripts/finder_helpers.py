@@ -18,7 +18,7 @@ def find_files(directory, pattern):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 filename = path.join(root, basename)
-                if filename.find("/spec/") == -1 and filename.find("/test/") == -1 and filename.find("vendor/plugins") == -1:
+                if filename.find("/spec/") == -1 and filename.find("/test/") == -1 and filename.find("vendor/plugins") == -1 and filename.find("vendor/rails") == -1:
                     yield filename
 
 def numlines_rails(project_dir):

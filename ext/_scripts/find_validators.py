@@ -86,6 +86,11 @@ for p in projects:
             print c
 
 for p in projects:
+    for v in p.builtins["validates_each"]:
+        print "%s %s %s:%d" % (p.name, "validates_each", v.fileName, v.lineNo)
+
+
+for p in projects:
     print "\t".join([str(i) for i in [p.name, sum([len(i) for i in p.builtins.values()]), p.total_lines_measured]])
 
 

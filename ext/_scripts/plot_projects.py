@@ -271,7 +271,7 @@ for p in toplot:
             plot([65, 66], [9.65, 9.65], '-', color="black", linewidth=.25)
 
     if label == "Invariants":
-        ylabel("Invariants/Table")
+        ylabel("Constraints/Table")
         #print "AVERAGES:", avg(ys)
         for i in range(0, len(ys)):
             if ys[i] > 10:
@@ -284,6 +284,7 @@ for p in toplot:
     gca().get_yaxis().tick_left()
     gca().xaxis.set_tick_params(width=0)
     if label == "Associations":
+        print "MAXXX", max(ys)
         xticks([i*10 for i in range(0, 7)])
         xlabel("Project Number")
     else:

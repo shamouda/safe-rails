@@ -720,7 +720,7 @@
     \vskip 1.5em               % Vertical space after author.
    \end{center}}
  \dimen0=\ht\@acmtitlebox
- \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
+ \advance\dimen0 by -12.25pc\relax % Increased space for title box -- KBT
  \unvbox\@acmtitlebox
  \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 
@@ -842,7 +842,7 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,6) %Space for copyright notice
+\begin{picture}(20,6.8) %Space for copyright notice
 \put(0,-0.95){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
@@ -1428,7 +1428,7 @@
 \def\crdata#1{\global\acmcopyr{#1}}
 \def\permission#1{\global\boilerplate{#1}}
 %
-\global\boilerplate={Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page.  To copy otherwise, to republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee.}
+\global\boilerplate={Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.}
 \newtoks\copyrightetc
 \global\copyrightetc{Copyright \the\copyrtyr\ ACM \the\acmcopyr\ ...\$15.00} % Gerry changed to 15 May 2012
 \toappear{\the\boilerplate\par

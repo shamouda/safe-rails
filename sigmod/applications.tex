@@ -5,7 +5,8 @@
 We now turn our attention to understanding which of Rails' feral
 validations and associations are actually correct under concurrent
 execution as described in Section~\ref{sec:deployment} and which
-require stronger forms of isolation.
+require stronger forms of isolation or synchronization for correct
+enforcement.
 
 \subsection{Understanding Validation Behavior}
 
@@ -15,7 +16,7 @@ transaction, the validation's intended integrity will be preserved
 provided the database is using serializable isolation. However,
 relational database engines often default to non-serializable
 isolation~\cite{hat-vldb}; notably for Rails, PostgreSQL and MySQL
-actually default to respectively, the weaker Read Committed and
+actually default to, respectively, the weaker Read Committed and
 Repeatable Read isolation levels.
 
 We did not encounter evidence that applications changed the isolation
@@ -68,7 +69,7 @@ the invariants\footnote{We focus on validations here as, while
   associations \textit{do} represent an invariant, it is only when
   they are coupled with validations that they are enforced.} in the
 corpus. In our analysis, we
-found that only 60 out of 3551 validations were expressed as
+found that only 60 out of 3505 validations were expressed as
 user-defined functions. The remainder were drawn from the standard set
 of validations supported by Rails core.\footnote{It is unclear exactly
   why this is the case. It is possible that, because these invariants
@@ -84,7 +85,7 @@ We now discuss common, built-in validations and their
 I-confluence. Many are I-confluent and are therefore safe to execute
 concurrently.
 
-Table~\ref{table:builtins} presents the eleven most common built-in
+Table~\ref{table:builtins} presents the ten most common built-in
 validations by usage and their occurences in our application
 corpus. The exact coordination requirements depended on their usage.
 
@@ -113,8 +114,8 @@ contingent on whether or not the current updates are both insertions
 I-confluent). Thus, correctness depends on the operation.
 
 Overall, a large number of built-in validations are safe under
-concurrent operation. Under insertions, 87.3\% of built-in validation
-occurrences as I-confluent. Under deletions, only 35.2\% of
+concurrent operation. Under insertions, 86.9\% of built-in validation
+occurrences as I-confluent. Under deletions, only 36.6\% of
 occurrences are I-confluent.  However, associations and multi-record
 uniqueness are---depending on the workload---not I-confluent and are
 therefore likely to cause problems. In the next section, we examine
@@ -126,18 +127,17 @@ these validations in greater detail.
 \begin{tabular}{|l l l |}
 \hline
 Name & Occurrences & I-Confluent?\\\hline
-\texttt{validates\_presence\_of} & 1764 & Depends\\
-\texttt{validates\_uniqueness\_of} & 442 & No \\
-\texttt{validates\_length\_of} & 302 & Yes \\
-\texttt{validates\_inclusion\_of} & 167 & Yes\\
-\texttt{validates\_length} & 138 & Yes \\
-\texttt{validates\_format\_of} & 118 & Yes\\
-\texttt{validates\_numericality\_of} & 137 & Yes \\
-\texttt{validates\_format} & 69 & Yes \\
-\texttt{validates\_associated} & 41 & Depends\\
-\texttt{validates\_inclusion} & 36 & Yes \\
+\texttt{validates\_presence\_of} & 1762 & Depends\\
+\texttt{validates\_uniqueness\_of} & 440 & No \\
+\texttt{validates\_length\_of} & 438 & Yes \\
+\texttt{validates\_inclusion\_of} & 201 & Yes\\
+\texttt{validates\_numericality\_of} & 133 & Yes \\
+\texttt{validates\_associated} & 39 & Depends\\
 \texttt{validates\_email} & 34 & Yes \\
-Other & 303 & \\\hline
+\texttt{validates\_attachment\_content\_type} & 29 & Yes \\
+\texttt{validates\_attachment\_size} & 29 & Yes \\
+\texttt{validates\_confirmation\_of} & 19 & Yes \\
+Other & 321 & \\\hline
 \end{tabular}
 \end{center}\vspace{-1em}
 \caption{Use of and invariant confluence of built-in validations.}
@@ -151,9 +151,9 @@ We also manually inspected the coordination requirements of the 60
 of these custom validations were declared inline via Rails's
 \texttt{validates\_each} syntax, while 8 were custom classes that
 implemented Rails's validation interface. 42 of 60 validations were
-I-confluent, while the remaining 18 were not. For brevity, we omit a
-discussion of each validation but discuss several trends and notable
-examples below.
+I-confluent, while the remaining 18 were not. Due to space
+constraints, we omit a discussion of each validation but discuss
+several trends and notable examples of custom validations below.
 
 Among the custom validations that were I-confluent, many consisted of
 simple format checks or other domain-specific validations, including

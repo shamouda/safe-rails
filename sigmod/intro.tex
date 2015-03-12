@@ -26,13 +26,13 @@ continues to be a popular means of developing responsive web
 application front-end and business logic, with an active open source
 community and user base. Rails recently celebrated its tenth
 anniversary and enjoys considerable commercial interest, both in terms
-of deployment and the availability of hosted ``cloud'' 
-environments such as Heroku. Thus, Rails programmers represent a large
-class of consumers of database technology. Second, and perhaps more
+of deployment and the availability of hosted ``cloud'' environments
+such as Heroku. Thus, Rails programmers represent a large class of
+consumers of database technology. Second, and perhaps more
 importantly, Rails is ``opinionated
 software''~\cite{dhh-opinionated}. That is, Rails embodies the strong
 personal convictions of its developer community, and, in particular,
-David Heinemeier Hansson (DHH), its creator. Rails is particularly
+David Heinemeier Hansson (known as DHH), its creator. Rails is particularly
 opinionated towards the database systems that it tasks with data
 storage. To quote DHH:
 \begin{quote}
@@ -62,8 +62,8 @@ Customer Relationship Management and social networking. We find that,
 these applications overwhelmingly use Rails' built-in support for
 declarative invariants---\textit{validations} and
 \textit{associations}---to protect data integrity---instead of
-application-defined transactions, which are more than 38 times less
-commonly used. Across the survey, we find over $9980$ uses of
+application-defined transactions, which are used more than 37 times less
+frequently. Across the survey, we find over $9950$ uses of
 application-level validations designed to ensure correctness criteria
 including referential integrity, uniqueness, and adherence to common
 data formats.
@@ -77,7 +77,7 @@ concern, as many DBMS platforms use non-serializable isolation by
 default and in many cases (despite labeling otherwise) do not provide
 serializable isolation as an option at all.  Accordingly, we apply
 invariant confluence analysis~\cite{coord-avoid} and show that, in
-fact, over $74.7\%$ of Rails validation usage by volume is actually
+fact, up to $86.9\%$ of Rails validation usage by volume is actually
 safe under concurrent execution. However, the remainder---which
 include uniqueness violations under insertion and foreign key
 constraint violations under deletion---are not. Therefore, we quantify

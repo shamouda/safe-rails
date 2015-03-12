@@ -89,8 +89,9 @@ application that can't [sic?!]  be enforced on the DB level''; the
 Rails committer responds that ``with the possible exception of
 [associations,] all of the other validations are constrained by the
 attribute values currently in memory, so aren't susceptible to similar
-flaws.'' This is an interesting claim, which we investigate in the
-remainder of this section and further discuss in
+flaws.'' This final statement is correct for many of the built-in
+validations but is not correct for arbitrary user-defined
+validations. We discuss the user-defined validation issue further in
 Section~\ref{sec:discussion}.
 
 \minihead{Understanding validation behavior} Given that entirely feral
@@ -98,7 +99,7 @@ mechanisms can introduce duplicates, how many duplicates can be
 introduced? Once a record is written, any later validations will
 observe it via \texttt{SELECT} calls. However, \textit{while} a record
 is being validated, any number of concurrent validations can
-(un)safely proceed. In practice, the number of concurrent validations
+unsafely proceed. In practice, the number of concurrent validations
 is dependent on the Rails environment. In a Rails deployment
 permitting $P$ concurrent validations (e.g., a single-threaded,
 multi-process environment with $P$ processes), each value in the
@@ -187,7 +188,7 @@ experiment, we observed no duplicates, as expected.
 
 \begin{figure}\vspace{-1em}
 \includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}\vspace{-1.5em}
-\caption{Uniqueness stress test integrity violations.}
+\caption{Uniqueness stress test integrity violations.}\vspace{-.5em}
 \label{fig:pk-stress}
 \end{figure} 
 
@@ -241,12 +242,12 @@ rapidly with increased numbers of keys.
 \includegraphics[angle=90, width=.185in]{figs/pk-workload-ylabel.pdf}
 \end{minipage}
 \begin{minipage}{\columnwidth}
-\includegraphics[width=1\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2em}
-\includegraphics[width=1\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2em}
-\includegraphics[width=1\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-uniform-violations.pdf}\vspace{-2.5em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-ycsb-violations.pdf}\vspace{-2.5em}
+\includegraphics[width=1\columnwidth]{figs/pk-workload-linkbench-ins-violations.pdf}\vspace{-2.5em}
 \includegraphics[width=1\columnwidth]{figs/pk-workload-linkbench-upd-violations.pdf}\vspace{-1em}
 \end{minipage}
-\caption{Uniqueness workload integrity violations.}
+\caption{Uniqueness workload integrity violations.}\vspace{-.5em}
 \label{fig:pk-workload}
 \end{figure}
 
@@ -285,9 +286,9 @@ result and the feral validation will fail to prevent data corruption.
 Unlike uniqueness validations, there is no discussion of associations
 and concurrency anomalies in the Rails documentation. Moreover, in
 Rails 4.1, there is no way to natively declare a foreign key
-constraint\footnote{Rails 4.2 added support for foreign keys via
+constraint;\footnote{Rails 4.2 added support for foreign keys via
   migration annotation (separate from models; similarly to adding a
-  unique index) in December 2014.}; it must be done via a third-party
+  unique index) in December 2014.} it must be done via a third-party
 library such as \texttt{foreigner}~\cite{foreigner} or
 \texttt{schema\_plus}~\cite{schemaplus}. Only two applications
 (\texttt{canvaslms} and \texttt{diaspora}) used \texttt{foreigner},
@@ -357,8 +358,8 @@ database\footnote{In this case, we introduced the constraint via SQL
 again, we observe no inconsistency.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}\vspace{-1em}
-\caption{Foreign key stress association anomalies.}
+\includegraphics[width=\columnwidth]{figs/fk-stress-violations.pdf}\vspace{-1.5em}
+\caption{Foreign key stress association anomalies.}\vspace{-.5em}
 \label{fig:fk-stress}
 \end{figure}
 
@@ -386,8 +387,8 @@ racing. However, as the number of Departments increases, the chance of
 concurrent deletions and insertions drops.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}\vspace{-1em}
-\caption{Foreign key workload association anomalies.}
+\includegraphics[width=\columnwidth]{figs/fk-workload-violations.pdf}\vspace{-1.5em}
+\caption{Foreign key workload association anomalies.}\vspace{-.5em}
 \label{fig:fk-workload}
 \end{figure}
 

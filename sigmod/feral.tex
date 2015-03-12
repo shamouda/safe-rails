@@ -3,13 +3,13 @@
 \label{sec:rails-cc}
 
 As we discussed in Section~\ref{sec:deployment}, Rails services user
-requests entirely independently, with the database acting as a point
+requests independently, with the database acting as a point
 of rendezvous for concurrent operations. Given Rails's design goals of
 maintaining application logic at the user level, this appears---on its
 face---a somewhat cavalier proposition with respect to application
 integrity. In response, Rails has developed a range of concurrency
-control strategies, two of which operate external to the database and
-at the application level, which we term \textit{feral concurrency
+control strategies, two of which operate external to the database, at
+the application level, which we term \textit{feral concurrency
   control} mechanisms.
 
 In this section, we outline four major mechanisms for guarding against
@@ -65,24 +65,22 @@ basis~\cite{code-transaction-isolation}.
   commercial databases today, as well as others.\\[-2mm]
 
 \item Rails provides support for application-level
-  \textbf{associations}. Like validations, associations are a core
-  concept of the Active Record model. As the name suggests, ``an
-  association is a connection between two Active Record models,''
-  effectively acting like a foreign key in an RDBMS. Associations can
-  be declared on one or both sides of a one-to-one or one-to-many
-  relationship, including transitive dependencies (via a
-  \texttt{:through} annotation). Declaring an association (e.g.,
-  \texttt{:belongs\_to dept}) produces a special field for the
-  associated record ID within the model (e.g.,
-  \texttt{dept\_id}). Coupling an association with an appropriate
-  validation (e.g., \texttt{:presence}) ensures that the association
-  is indeed valid (and is, via the validation, backed by a database
-  transaction). Until the release of Rails 4.2 in December 2014, Rails
-  did not provide native support for database-backed foreign key
-  constraints. In Rails 4.2, foreign keys are supported via manual
-  schema annotations declared separately from each model; declaring an
-  association does not declare a corresponding foreign key constraint
-  and vice-versa.
+  \textbf{associations}. As the name suggests, ``an association is a
+  connection between two Active Record models,'' effectively acting
+  like a foreign key in an RDBMS. Associations can be declared on one
+  or both sides of a one-to-one or one-to-many relationship, including
+  transitive dependencies (via a \texttt{:through}
+  annotation). Declaring an association (e.g., \texttt{:belongs\_to
+    dept}) produces a special field for the associated record ID
+  within the model (e.g., \texttt{dept\_id}). Coupling an association
+  with an appropriate validation (e.g., \texttt{:presence}) ensures
+  that the association is indeed valid (and is, via the validation,
+  backed by a database transaction). Until the release of Rails 4.2 in
+  December 2014, Rails did not provide native support for
+  database-backed foreign key constraints. In Rails 4.2, foreign keys
+  are supported via manual schema annotations declared separately from
+  each model; declaring an association does not declare a
+  corresponding foreign key constraint and vice-versa.
 \end{myenumerate}
 
 Overall, these four mechanisms provide a range of options for
@@ -105,12 +103,11 @@ Guides,'' and, generally, are not promoted as a means of ensuring data
 integrity. Instead, the Rails documentation~\cite{rails-guide} prefers
 validations as they are ``are database agnostic, cannot be bypassed by
 end users, and are convenient to test and maintain.'' Moreover, the
-Rails documentation opines that ``[d]atabase constraints and/or stored
+Rails documentation opines that ``database constraints and/or stored
 procedures make the validation mechanisms database-dependent and can
 make testing and maintenance more difficult.''  As we will show
-shortly, these feral mechanisms dominate in terms of developer
-popularity. As we will see in the next subsection, these feral
-mechanisms are widely used by many actual applications.
+shortly, these feral mechanisms accordingly dominate in terms of
+developer popularity in real applications.
 
 \subsection{Adoption in Practice}
 
@@ -128,8 +125,8 @@ management, build management, project management, personal task
 tracking, community management and forums, commenting, calendaring,
 file sharing, Git hosting, link aggregation, crowdfunding, social
 networking, and blogging. We sought projects with substantial
-code-bases (average: 26,380 lines of Ruby) multiple contributors
-(average: 69.2), and relative popularity (measured according to GitHub
+code-bases (average: 26,809 lines of Ruby) multiple contributors
+(average: 69.1), and relative popularity (measured according to GitHub
 stars) on the site. Table~\ref{table:app-summary} (in the Appendix)
 provides a detailed overview.
 
@@ -137,13 +134,13 @@ provides a detailed overview.
 While several of these applications are projects undertaken by
 hobbyists, many are either commercially supported (e.g., Canvas LMS,
 Discourse, Spree, GitLab) and/or have a large open source community
-(e.g., Radiant, Comfortable Mexican Sofa, Diaspora). Undoubtedly, a
-larger-scale commercial, closed-source Rails projects such as Twitter,
-GitHub, or Airbnb might exhibit different trends than those we observe
-here. However, in the open source domain, we believe these
-applications represent a diverse selection of Rails use cases, and a
-good-faith effort to obtain a representative sample of open source
-Rails applications as hosted on GitHub.
+(e.g., Radiant, Comfortable Mexican Sofa, Diaspora). A
+larger-scale commercial, closed-source Rails application such as
+Twitter, GitHub, or Airbnb might exhibit different trends than those
+we observe here. However, in the open source domain, we believe these
+applications represent a diverse selection of Rails use cases and are
+a good-faith effort to obtain a representative sample of
+popular open source Rails applications as hosted on GitHub.
 
 \minihead{Mechanism usage} We performed a simple analysis of the
 applications to determine how each of the concurrency control
@@ -152,39 +149,41 @@ methodological details).
 
 Overwhelmingly, applications did not use transactions or locks
 (Figure~\ref{fig:usages} and Table~\ref{table:app-summary}). On
-average, applications used 0.13 transactions, 0.01 locks, 1.82
-validations, and 3.30 associations per model (with an average of 29.1
+average, applications used 0.13 transactions, 0.01 locks, 1.80
+validations, and 3.19 associations per model (with an average of 29.1
 models per application). While 46 (68.7\%) of applications used
-transactions, 66 (98.5\%) used validations or associations. Only six
+transactions, all used some validations or associations. Only six
 applications used locks. Use of pessimistic locks was over twice
 as common as the use of optimistic locks.
 
-Overall, we find that validations and associations are, respectively,
-14 and 25 times more common than transactions and orders of magnitude
-more common than locking. These feral mechanisms are---in keeping with
-the Rails philosophy---favored by these application developers. That
-is, rather than adopting the use of traditional transactional
-programming primitives, Rails application writers chose to instead declaratively specify
-correctness criteria and have the ORM system check the criteria for
-them instead. It is unclear and even unlikely that these declarative
+Perhaps most notable among these general trends, we find that
+validations and associations are, respectively, 13.6 and 24.2 times
+more common than transactions and orders of magnitude more common than
+locking. These feral mechanisms are---in keeping with the Rails
+philosophy---favored by these application developers. That is, rather
+than adopting the use of traditional transactional programming
+primitives, Rails application writers chose to instead specify
+correctness criteria and have the ORM system enforce the criteria on
+their behalf. It is unclear and even unlikely that these declarative
 criteria are a complete specification of program correctness:
-undoubtedly, some of these programs contain errors. However, from the
-perspective of database usability and idiomatic web programming
-patterns, this reliance on application-level correctness criteria
-hints at an alternative developer mentality than users of traditional
-database concurrency control.  We devote much of the remainder of this
-work to examining exactly what these feral mechanisms are attempting
-preserve (and whether they are actually correct in doing so).
+undoubtedly, some of these programs contain errors. However, given
+that these criteria are nevertheless being declared by application
+writers and represent a departure from traditional,
+transaction-oriented programming, we devote much of the remainder of
+this work to examining exactly what they are attempting to preserve
+(and whether they are actually sufficient to do so).
 
 \minihead{Understanding specific applications} Over the course of our
-investigation, we found mechanism use varied across applications.
+investigation, we found that application use of mechanisms
+varied. While our focus is largely on aggregate behavior, studying
+individual applications is also interesting. For example, consider
+Spree, a popular eCommerce application:
 
-For example, the eCommerce application Spree uses only six
-transactions, one for each of $1.)$ canceling an order, $2.)$
-approving an order (atomically setting the user ID and timestamp),
-$3.)$ transferring shipments between fulfillment locations (e.g.,
-warehouses), $4.)$ transferring items between shipments, $5.)$
-transfering stock between fulfillment locations, and $6.)$ updating an
+Spree uses only six transactions, one for each of $1.)$ canceling an
+order, $2.)$ approving an order (atomically setting the user ID and
+timestamp), $3.)$ transferring shipments between fulfillment locations
+(e.g., warehouses), $4.)$ transferring items between shipments, $5.)$
+transferring stock between fulfillment locations, and $6.)$ updating an
 order's specific inventory status. While this is a reasonable set of
 locations for transactions, in an eCommerce application, one might
 expect a larger number of scenarios to require transactions, including
@@ -245,7 +244,7 @@ and associations over each project's lifetime. Using each
 application's Git logs, we repeated the above analysis at a fixed set
 of intervals through the application's history (measured by
 commits). Figure~\ref{fig:historical} (see Appendix, page~\pageref{fig:historical}) plots the median number of
-occurences across all projects. Notably, these results demonstrate
+occurrences across all projects. Notably, these results demonstrate
 that, by the time 50\% of the commits have been entered into the
 repository, over 75\% of the models, transactions, validations, and
 associations have been written. This suggests that the Model layer may

@@ -4,19 +4,20 @@
 
 In this work, we examined the use of concurrency control mechanisms in
 a set of 67 open source Ruby on Rails applications and, to a less
-thorough extent, concurrency control support in a range of other web
-frameworks. We found that, in contrast with traditional transaction
-processing, these applications overwhelmingly prefer to leverage
-application-level \textit{feral} support for data integrity, typically
-in the form of declarative (sometimes user-defined) validation and
-association logic. Despite the popularity of these invariants, we find
-limited use of in-database support to correctly implement them,
-leading to a range of quantifiable inconsistencies for Rails' built-in
-uniqueness and association validations. While indeed many validations
-are invariant confluent and therefore correct under concurrent
-execution given standard RDBMS weak isolation and concurrent update
-semantics, we see considerable opportunity to better support these
-users and their feral invariants in the future.
+thorough extent, concurrency control support in a range of other
+web-oriented ORM frameworks. We found that, in contrast with
+traditional transaction processing, these applications overwhelmingly
+prefer to leverage application-level \textit{feral} support for data
+integrity, typically in the form of declarative (sometimes
+user-defined) validation and association logic. Despite the popularity
+of these invariants, we find limited use of in-database support to
+correctly implement them, leading to a range of quantifiable
+inconsistencies for Rails' built-in uniqueness and association
+validations. While many validations are invariant confluent and
+therefore correct under concurrent execution given standard RDBMS weak
+isolation and concurrent update semantics, we see considerable
+opportunity to better support these users and their feral invariants
+in the future.
 
 
 \subsection*{Coda: A Call for Empiricism}
@@ -30,26 +31,24 @@ programmers. Lightweight program analysis has never been easier, and
 the corpus of readily-accessible code---especially in an academic
 context---has never been larger.
 
-Undoubtedly, these open source applications are dwarfed by many other
+These open source applications are undoubtedly dwarfed by many other
 commercial and enterprise-grade codebases in terms of size, quality,
-and complexity. However, compared to alternatives like TPC-C, which
-today is almost 23 years old and is still the preferred benchmark for
+and complexity. However, compared to alternatives such as TPC-C, which
+today is almost 23 years old and is still the preferred standard for
 transaction processing evaluation, open source corpuses are far better
-proxies for modern applications (say, written more than a year after
-the creation of the World Wide Web). Recent efforts like the
-OLTPBenchmark suite~\cite{oltpbench} are a promising step forwards but
-are nevertheless (and perhaps necessarily) not a substitute for real
-application code. The opportunity to perform both quantitative surveys
-across a large set of applications as well as longitudinal studies
-over the history of each application repository (and the behavior of a
-given programmer over time and across repositories) are particularly
-compelling. While these studies are inherently imprecise (due to
-limitations of the corpuses), the resulting quantitative trends are
-invaluable.
+proxies for modern applications. Recent efforts like the OLTPBenchmark
+suite~\cite{oltpbench} are promising but are nevertheless (and perhaps
+necessarily) not a substitute for real applications. The opportunity
+to perform both quantitative surveys across a large set of
+applications as well as longitudinal studies over the history of each
+application repository (and the behavior of a given programmer over
+time and across repositories) are particularly compelling. While these
+studies are inherently imprecise (due to limitations of the corpuses),
+the resulting quantitative trends are invaluable.
 
 In summary, in this era of ``Big Data'' analytics, we see great
 promise in turning these analyses inwards, towards an empirical
-understanding of the usage of database systems today, in service of
+understanding of the usage of data management systems today, in service of
 better problem selection and a more quantitatively informed community
 dialogue.
 

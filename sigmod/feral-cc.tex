@@ -131,7 +131,46 @@
 }
 {
     \end{list} 
+
+}
+
+
+
+\newenvironment{myenumeratee}
+{
+
+   \vspace{-.5em}
+   \newcounter{qdecounter}
+    \begin{list}{\arabic{qdecounter}.~}{\usecounter{qdecounter}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
     \vspace{-.5em}
+}
+
+
+\newenvironment{myenumerateee}
+{
+
+   \vspace{-.5em}
+   \newcounter{qdeecounter}
+    \begin{list}{\arabic{qdeecounter}.~}{\usecounter{qdeecounter}\leftmargin=1em}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}         
+        \setlength{\itemsep}{.5em} 
+        \setlength{\itemindent}{0em}
+}
+{
+    \end{list} 
+    \vspace{-1em}
 }
 
 \newenvironment{defendenumerate}
@@ -187,12 +226,23 @@
 }
 
 
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
+
+\permission{Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.}
+\conferenceinfo{SIGMOD'15,}{May 31--June 4, 2015, Melbourne, Victoria, Australia.\\
+{\mycrnotice{Copyright is held by the owner/author(s). Publication rights licensed to ACM.}}}
+\copyrightetc{ACM \the\acmcopyr}
+\crdata{978-1-4503-2758-9/15/05\ ...\$15.00.\\
+http://dx.doi.org/10.1145/2723372.2737784}
+
 \usepackage[leftmargin=0em]{quoting}
 
 \begin{document}
 %
 % --- Author Metadata here ---
-\conferenceinfo{XXX}{YYY}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
@@ -216,6 +266,8 @@
 
 \input{applications}
 
+\pagebreak
+
 \input{evaluation}
 
 \input{discussion}
@@ -224,7 +276,6 @@
 
 \input{conclusion}
 
-\small
 
 \minihead{Acknowledgments} The authors would like to thank Peter Alvaro, Michael R. Bernstein,
 Colin Jones, Xavier Shay, and the SIGMOD reviewers for their

@@ -2,9 +2,9 @@
 \section{Other Frameworks}
 \label{sec:other-orms}
 
-While our focus in this paper is on Rails, we briefly investigated
+While our primary focus in this paper is Rails, we briefly investigated
 support for uniqueness, foreign key, and custom validations in several
-other frameworks. We find widespread support for validations and
+other ORM frameworks. We find widespread support for validations and
 varying susceptibility to integrity errors.
 
 \newcommand{\orm}[1]{{\vspace{.45em}\noindent\textit{#1}}}
@@ -45,7 +45,7 @@ database foreign key. Instead, for both uniqueness and foreign key
 constraints, Hibernate relies on JPA schema annotations for
 correctness. Therefore, without appropriate schema annotations,
 Hibernate's basic associations may contain dangling references. Hibernate also has an extensive user-level validation
-framework implementing on the JPA Validation Bean
+framework implementing the JPA Validation Bean
 specification~\cite{code-hibernate-validator} and is sensitive to weak
 isolation anomalies, similar to Rails validations.
 
@@ -68,7 +68,7 @@ be specified manually in the schema. Per one set of community
 documentation~\cite{laravel-book}, ``database-level validations can
 efficiently handle some things (such as uniqueness of a column in
 heavily-used tables) that can be difficult to implement otherwise''
-but ``[t]esting and maintenance is more difficult...[and] your
+but ``testing and maintenance is more difficult...[and] your
 validations would be database- and schema-specific, which makes
 migrations or switching to another database backend more difficult in
 the future.'' In contrast, model-level validations are ``the
@@ -83,19 +83,18 @@ these validations are not wrapped in a
 transaction~\cite{code-django-constraints}. Thus, Django also appears
 problematic, but only for custom validations.
 
-\orm{Waterline} (version 0.10), a persistence layer for
-node.js~\cite{code-waterline} (backing Sails.js, a popular MVC
-framework written in Node.js~\cite{code-sails}), provides support for
-in-DB foreign key and uniqueness constraints (when supported by the
-database) as well as custom validations (that are \textit{not}
-supported via transactions; e.g., ``TO-DO: This should all be wrapped
-in a transaction. That's coming next but for the meantime just hope we
-don't get in a nasty state where the operation
+\orm{Waterline} (version 0.10)~\cite{code-waterline}, the default ORM
+for Sails.js (a popular MVC framework for Node.js~\cite{code-sails}),
+provides support for in-DB foreign key and uniqueness constraints
+(when supported by the database) as well as custom validations (that
+are \textit{not} supported via transactions; e.g., ``TO-DO: This
+should all be wrapped in a transaction. That's coming next but for the
+meantime just hope we don't get in a nasty state where the operation
 fails!''~\cite{code-waterline-txn}).
 
-\minihead{Summary} In all, we observe wide, cross-framework support
+\minihead{Summary} In all, we observe common cross-framework support
 for feral validation/invariants, with inconsistent use of mechanisms
-for enforcing them ranging from the use of in-database constraints to
+for enforcing them, ranging from the use of in-database constraints to
 transactions to no ostensible use of concurrency control in either
 application or database.
 
@@ -239,11 +238,11 @@ databases. At a high level, today's databases effectively offer two
 primary options for ORM framework developers and users:
 
 \begin{impenumerate}
-\item \textbf{Use ACID transactions.} Serializable transactions would
-  be sufficient to correctly enforce arbitrary database
-  invariants. This is core to the transaction concept: isolation is a
-  means towards preserving integrity. \vspace{.5em}
-
+\item \textbf{Use ACID transactions.} Serializable transactions are
+  sufficient to correctly enforce arbitrary application invariants,
+  including transaction-backed feral validations. This is core to the
+  transaction concept: isolation is a means towards preserving
+  integrity.\vspace{.5em}
   Unfortunately, in practice, for application developers, transactions
   are problematic. Given serializability's performance and
   availability overheads~\cite{brewer-cap}, developers at scale have
@@ -264,14 +263,14 @@ primary options for ORM framework developers and users:
   may also help explain the relative unpopularity of transactions
   within the web programming community.
 
-\item\textbf{Custom, feral enforcement.} Hand-rolling
-  user-level concurrency control solutions on a per-framework or,
-  worse, per-application basis is an expensive, error-prone, and
-  difficult process that neglects decades of contributions from the
-  database s community. While this solution is sufficient to maintain
-  correctness in the 75\% (I-confluent) invariants in our corpus, the
-  remainder can---in modern ORM implementations---lead to data
-  corruption on behalf of applications. \vspace{.5em}
+\item\textbf{Custom, feral enforcement.} Building user-level
+  concurrency control solutions on a per-framework or, worse,
+  per-application basis is an expensive, error-prone, and difficult
+  process that neglects decades of contributions from the database 
+  community. While this solution is sufficient to maintain correctness
+  in the approximately 87\% (I-confluent) invariants in our corpus, the remainder
+  can---in many modern ORM implementations---lead to data corruption on
+  behalf of applications. \vspace{.5em}
 
   However, and perhaps most importantly, this feral approach preserves
   a key tenet of the Rails philosophy: a recurring insistence on
@@ -297,8 +296,9 @@ programmability.
 
 Constructively, to properly provide database support and thereby
 ``domesticate'' these feral mechanisms, we believe application users
-and framework authors need a new interface to the database that will
-enable them to:
+and framework authors need a new database interface that will enable
+them to:
+
 \begin{interfaceenumerate} 
 \item \textit{Express correctness criteria in the language of their
     domain model, with minimal friction, while permitting their
@@ -307,7 +307,9 @@ enable them to:
   promulgation of an idiomatic programming style that ``seems right''
   for web programming. Rails' disregard for advanced database
   functionality is evidence of a continued impedance mismatch between
-  applications and databases.  \vspace{.5em}
+  application domain logic and current database primitives: databases
+  today do not understand the semantics of feral validations.
+  \vspace{.25em}
 
   We believe any solution to domestication must respect ORM
   application patterns and programming style, including the ability to
@@ -316,27 +318,29 @@ enable them to:
   invariants without modification. This is already feasible for a
   subset of invariants---like uniqueness and foreign key
   constraints---but not all. An ideal solution to domestication would
-  provide universal support.
+  provide universal support with no additional overhead for
+  application writers.
 
 \item \textit{Only pay the price of coordination when necessary.} Per
   Section~\ref{sec:apps}, many invariants can be safely executed
   without coordination, while others cannot. The many that do not need
-  coordination should not be unnecessarily penalized. \vspace{.5em}
+  coordination should not be unnecessarily penalized. \vspace{.25em}
 
   An ideal solution to domestication would enable applications to
-  avoid coordination whenever possible would improve performance and
-  operation availability. The database should facilitate this
-  avoidance, thus evading common issues with serializable
+  avoid coordination whenever possible, thus maximizing both
+  performance and operation availability. The database should
+  facilitate this avoidance, thus evading common complaints (especially
+  within the Internet community) about serializable
   transactions.
 
 \item \textit{Easily deploy to multiple database backends.}  ORM
   frameworks today are deployed across a range of database
   implementations, and, when deciding which database features to
   exercise, framework authors often choose the least common
-  denominator for compatibility purposes.  \vspace{.5em}
+  denominator for compatibility purposes.  \vspace{.25em}
 
   An ideal solution to domestication would preserve this
-  compatibility, possibly providing a ``bolt on'' compatibility layer
+  compatibility, possibly by providing a ``bolt on'' compatibility layer
   between ORM systems and databases lacking advanced functionality
   (effectively, a ``blessed'' set of mechanisms beneath the
   application/ORM that correctly enforce feral mechanisms).

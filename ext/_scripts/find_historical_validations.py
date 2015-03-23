@@ -25,7 +25,7 @@ outfile.write(",".join(["name",
                         "last_commit_date"])+"\n")
 
 for proj in listdir('.'):
-    if proj == "_scripts":
+    if proj == "_scripts" or proj == ".DS_Store":
         continue
 
     hashes = get_githashes(proj)
@@ -53,7 +53,7 @@ for proj in listdir('.'):
                                githash,                               
                                len(p.authors),
                                str(p.num_lines_ruby),
-                               nild(p.customs)+nilp(p.builtins),
+                               nild(p.customs)+nild(p.builtins),
                                nild(p.builtins),
                                nild(p.customs),
                                nild(p.associations),

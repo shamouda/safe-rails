@@ -8,7 +8,7 @@ ys = []
 
 lw=1
 ms=6
-fontsize = 6.5
+fontsize = 7.2
 
 matplotlib.rcParams['lines.linewidth'] = lw
 matplotlib.rcParams['axes.linewidth'] = lw

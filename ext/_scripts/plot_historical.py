@@ -6,8 +6,8 @@ from glob import glob
 from itertools import groupby
 
 lw=1
-ms=6
-fontsize = 7
+ms=8
+fontsize = 8
 
 fmts = ['-', '--', '-.', ':']
 
@@ -17,6 +17,7 @@ def interpolate(target_xs, actual_xs, actual_ys):
     for x in target_xs:
         idx = 0
         while True:
+            # if we are at the end of the list
             if idx == len(actual_xs):
                 below_x = actual_xs[-1]
                 below_y = actual_ys[-1]
@@ -47,6 +48,8 @@ def interpolate(target_xs, actual_xs, actual_ys):
         
         # interpolate
         interpolated_y = below_y+(above_y-below_y)*(x-below_x)/(above_x-below_x)
+        if x == 1 and interpolated_y == 0:
+            print actual_ys
         return_ys.append(interpolated_y)
     return return_ys
 
@@ -78,7 +81,8 @@ for line in lines:
     line[1] = int(line[2])-int(line[1])
     projects[line[0]].append(line)
 
-xmarks = [i/100. for i in range(1, 101)]
+xmarks = [i/100. for i in xrange(1, 101, 4)]+[1.]
+print xmarks
 
 all_txn_pcts = []
 all_invariant_pcts = []
@@ -101,35 +105,43 @@ for p in projects:
                             commit_pcts,
                            [int(i[14])/tot_txns*int(i[12])/tot_models for i in commits])
         all_txn_pcts.append(txn_pcts)
+    #else:
+    #    all_txn_pcts.append([1 for i in xmarks])
 
     model_pcts = interpolate(xmarks,
                             commit_pcts,
                            [int(i[12])/tot_models for i in commits])
-    all_model_pcts.append(txn_pcts)
-        
-    tot_invariants = max(float(commits[-1][6]), 1)
+    all_model_pcts.append(model_pcts)
+
+
+    tot_invariants = max(float(commits[-1][6]), 0)
     if tot_invariants != 0:
         invariant_pcts = interpolate(xmarks,
                                     commit_pcts,
                                     [int(i[6])/tot_invariants*int(i[12])/tot_models for i in commits])
         all_invariant_pcts.append(invariant_pcts)
+    #else:
+    #    all_invariant_pcts.append([1 for i in xmarks])
 
-    tot_associations = max(float(commits[-1][9]), 1)
+    tot_associations = max(float(commits[-1][9]), 0)
     if tot_associations != 0:
         association_pcts = interpolate(xmarks,
                                     commit_pcts,
                                    [int(i[9])/tot_associations*int(i[12])/tot_models for i in commits])
         all_association_pcts.append(association_pcts)
+    #else:
+    #    all_association_pcts.append([1 for i in xmarks])
 
-metric = median
+metric = mean
 
-plot(xmarks, [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], '--', label="Associations per Model")
-plot(xmarks, [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], '-s', label="Transactions per Model", markersize=2, markeredgecolor="None")
-plot(xmarks, [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], '.-', label="Validations per Model", markersize=2)
-plot(xmarks, [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], '-', label="Models")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], '--', label="Associations per Model")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], '.-', label="Validations per Model", markersize=5)
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], '-s', label="Transactions per Model", markersize=3, markeredgecolor="None")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], '-', label="Models")
 
-ylabel("% of Final Occurrences")
-xlabel("Normalized Application History (Commits)")
+ylabel("\% of Final Occurrences")
+ylim(ymin=0, ymax=100)
+xlabel("Normalized Application History (\% of Commits)")
 
 legend(loc="lower right", frameon=False)
 

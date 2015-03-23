@@ -7,7 +7,7 @@ from itertools import groupby
 
 lw=1
 ms=6
-fontsize = 6.5
+fontsize = 7.5
 
 optimistic_locks = defaultdict(int)
 
@@ -25,7 +25,7 @@ matplotlib.rcParams['lines.markeredgewidth'] = lw
 matplotlib.rcParams['lines.markersize'] = 6
 matplotlib.rcParams['font.size'] = fontsize
 matplotlib.rcParams['font.weight'] = 'normal'
-matplotlib.rcParams['figure.figsize'] = 3.3, 1.2
+matplotlib.rcParams['figure.figsize'] = 3.3, 1.4
 matplotlib.rcParams['legend.fontsize'] = fontsize
 
 project_to_github = {}
@@ -256,13 +256,16 @@ for p in toplot:
     #legend(loc="upper right", frameon=False, numpoints=0)
     xlim(xmax=len(projects)+1)
 
-    N_YMAX = 10
+    N_YMAX = 8
 
     if label == "Models":
         yticks([0, 30, 60, 90, 120, 150, 180])
     
     if normalized:
         ylim(ymax=N_YMAX)
+
+        #yticks([0, 1, 2, 3, 4, 5, 6, 7, 8], ["0", "", "2", "", "4", "", "6", "", "8"])
+        yticks([0, 2,4,6,8])
 
         print ys[-2]
         if ys[-2] > N_YMAX:
@@ -277,7 +280,7 @@ for p in toplot:
             if ys[i] > 10:
                 print i, ys[i]
     else:
-        ylabel("%s%s" % (label, "/Table" if normalized else ""))
+        ylabel("%s%s" % (label, "/Model" if normalized else ""))
     gca().spines['top'].set_visible(False)
     gca().spines['right'].set_visible(False)
     gca().get_xaxis().tick_bottom()
@@ -288,7 +291,8 @@ for p in toplot:
         xticks([i*10 for i in range(0, 7)])
         xlabel("Project Number")
     else:
-        xticks([i*10 for i in range(0, 7)], ["" for i in range(0, 7)])        
+        xticks([i*10 for i in range(0, 7)], ["" for i in range(0, 7)])
+    subplots_adjust(bottom=.23, right=0.95, top=0.9, left=.12)        
     savefig(label.lower()+"-single-bar.pdf", transparent=True)
     cla()
 

@@ -56,15 +56,19 @@ def get_authors(project_dir):
         ret[author] = (insertions, deletions, commits)
     return ret
 
-def get_githashes(project_dir):
+def get_githashes(project_dir, resetMaster=False):
     if not DO_CHECK_LINES:
         return {}
+
+    if resetMaster:
+        system("cd "+project_dir+"; git checkout master")
     
     system("cd "+project_dir+"; git log --oneline > /tmp/hashes.txt")
     return [line.split(' ')[0] for line in open("/tmp/hashes.txt").read().split('\n')]
 
 def get_lastcommit_date(project_dir):
     system("cd "+project_dir+"; git log -1 --format=%cd . > /tmp/date.txt")
+
     return open("/tmp/date.txt").read().strip()
 
 def switch_hash(project_dir, which):

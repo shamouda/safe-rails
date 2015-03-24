@@ -3,7 +3,9 @@ from collections import defaultdict
 
 projects = []
 
-max_hashes_per_proj = 100
+max_hashes_per_proj = 30
+
+system("git submodule foreach git reset --hard")
 
 outfile = open("_scripts/historical.txt", 'w')
 
@@ -28,7 +30,7 @@ for proj in listdir('.'):
     if proj == "_scripts" or proj == ".DS_Store":
         continue
 
-    hashes = get_githashes(proj)
+    hashes = get_githashes(proj, resetMaster=True)
     if len(hashes) > max_hashes_per_proj:
         spacing = int(len(hashes)/float(max_hashes_per_proj))
         print len(hashes), spacing, spacing*max_hashes_per_proj
@@ -46,6 +48,7 @@ for proj in listdir('.'):
         print "%s %d/%d (commit number %d)" % (proj, cnt, len(to_check), i)
         githash = hashes[i]
         switch_hash(proj, githash)
+
         p = analyze_project(proj)
         outfile.write(",".join([str(i) for i in [p.name,
                                i,
@@ -63,4 +66,4 @@ for proj in listdir('.'):
                                                  p.num_locks,
                                                  p.num_transactions,
                                                  p.last_commit_date]])+"\n")
-        outfile.flush
+        outfile.flush()

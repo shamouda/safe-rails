@@ -8,22 +8,7 @@ lw=1
 ms=6
 fontsize = 7
 
-HL=1.7
-
 DISTRIBUTION_NKEYS = 1000
-
-pk_fmts = {"simple_key_value": 'o-', "unique_key_value": 's-'}
-pk_colors = {"simple_key_value": 'blue', "unique_key_value": 'green'}
-fk_fmts = {"simple": 'o-', "belongs_to": 's-'}
-fk_colors = {"simple": 'blue', "belongs_to": 'green'}
-
-relabel = {"simple_key_value": "Without validation",
-           "unique_key_value": "With validation",
-           "simple": "Without validation",
-           "belongs_to": "With validation"}
-
-
-PAD_INCHES = 0
 
 matplotlib.rcParams['lines.linewidth'] = lw
 matplotlib.rcParams['axes.linewidth'] = lw
@@ -35,7 +20,7 @@ matplotlib.rcParams['figure.figsize'] = 3.3, 1.4
 matplotlib.rcParams['legend.fontsize'] = fontsize
 
 results = []
-for r in glob("../results/clean/*.pkl"):
+for r in glob("../results/*.pkl"):
     results += pickle.load(open(r))
 
 pk_results = [r for r in results if r['bench'] == "PK_STRESS"]
@@ -52,7 +37,7 @@ for r in pk_results:
         badkeys = len(r['dups'][model])
         num_dup_keys_by_model[model][r['rails_procs']].append(badkeys)
         violations_by_model[model][r['rails_procs']].append(violations)
-        #latencies_by_model[model][r['rails_procs']].append((average([i.lat_ms for i in r['results'][model][1][0][100:]]), var([i.lat_ms for i in r['results'][model][1][0][100:]])))
+        latencies_by_model[model][r['rails_procs']].append(average([i.lat_ms for i in r['results'][model][1]]))
         procs.add(r['rails_procs'])
 
 proc_list = list(procs)
@@ -62,15 +47,9 @@ pp = []
 labels=[]
 
 for model in violations_by_model:
-
-    print model
-    for n in proc_list:
-        print "LOOK",
-        #print n, average(violations_by_model[model][n]), average([i[0] for i in latencies_by_model[model][n]]), sqrt(average([i[1] for i in latencies_by_model[model][n][200:]])), average(num_dup_keys_by_model[model][n][200:])
-
     if model == "indexed_key_value":
         continue
-    
+
     p = plot(range(0, len(proc_list)),
             [average(violations_by_model[model][n]) for n in proc_list],
             pk_fmts[model],
@@ -92,8 +71,12 @@ for model in violations_by_model:
             label=relabel[model])
     
 
+    print model
+    for n in proc_list:
+        print n, average(violations_by_model[model][n]), average(latencies_by_model[model][n]), average(num_dup_keys_by_model[model][n])
+
 xticks(range(0, len(proc_list)), [str(i) for i in proc_list])
-legend(pp, labels, loc="lower right", frameon=False, numpoints=1, handlelength=HL)
+legend(pp, labels, loc="lower right", frameon=False, numpoints=1)
 xlabel("Number of Rails Processes")
 ylabel("Number of Duplicate Records")
 gca().set_yscale('symlog')
@@ -123,7 +106,7 @@ for workload in workloads:
             violations_by_model[model][r['records']].append(violations)
             badkeys = len(r['dups'][model])
             num_dup_keys_by_model[model][r['records']].append(badkeys)         
-            #latencies_by_model[model][r['records']].append(average([i.lat_ms for i in r['results'][model][1]]))
+            latencies_by_model[model][r['records']].append(average([i.lat_ms for i in r['results'][model][1]]))
             procs.add(r['records'])
 
     proc_list = list(procs)
@@ -173,29 +156,29 @@ for workload in workloads:
         for m in ['simple_key_value', 'unique_key_value']:
             pp.append(plot([0, -100], pk_fmts[m], color=pk_colors[m], markerfacecolor="None", markeredgecolor=pk_colors[m])[0])
             labels.append(relabel[m])
-        legend(pp, labels, loc=(.04, .5), frameon=False, numpoints=1, handlelength=HL)
+        legend(pp, labels, loc=(.04, .5), frameon=False, numpoints=1)
 
     #title(workload)
     subplots_adjust(bottom=.26, right=0.95, top=0.87, left=.18)        
-    savefig("pk-workload-%s-violations.pdf" % (workload), transparent=True)
+    savefig("pk-workload-%s-violations.pdf" % (workload), transparent=True-0)
 
     cla()
-    continue
 
     # find out all the duplicate keys for the validator-based implementaton
+    continue
     dup_lists_for_plot = [r['dups']['uniform_key_value'] for r in pk_results if r['records'] == DISTRIBUTION_NKEYS and r['workload'] == workload]
 
     dup_list_for_plot = defaultdict(int)
     
     # now add up all of the duplicate key entries, normalizing for number of entries
-    for run in dup_list_for_plot:
+    for run in dup_lists_for_plot:
         for pair in run:
-            dup_lists_for_plot[int(pair[0])] += pair[1]/float(len(dup_lists_for_plot))
+            dup_list_for_plot[int(pair[0])] += pair[1]/float(len(dup_lists_for_plot))
 
 
     cla()
     xs = range(0, DISTRIBUTION_NKEYS)
-    bar(xs, [dup_lists_for_plot[i] for i in xs])
+    bar(xs, [dup_list_for_plot[i] for i in xs])
     xlabel("key")
     ylabel("number of duplicate entries")
     savefig("pk-dups-by-key-%s.pdf" % (workload), bbox_inches="tight")
@@ -214,7 +197,7 @@ for r in fk_results:
     for model in r['dups']:
         violations = sum(r[1] for r in r['dups'][model])
         violations_by_model[model][r['records']].append(violations)
-        #latencies_by_model[model][r['records']].append((average([i.lat_ms for i in r['results'][model][1][200+r['records']:]]), var([i.lat_ms for i in r['results'][model][1][200+r['records']:]])))
+        latencies_by_model[model][r['records']].append(average([i.lat_ms for i in r['results'][model][1]]))
         procs.add(r['records'])
 
 proc_list = list(procs)
@@ -224,11 +207,6 @@ pp = []
 labels=[]
 
 for model in violations_by_model:
-    print model
-    for n in proc_list:
-        print "LOOK",        
-        print n, average(violations_by_model[model][n]), average([i[0] for i in latencies_by_model[model][n]]), sqrt(average([i[1] for i in latencies_by_model[model][n]]))
-    
     if model == "dbfk":
         continue
 
@@ -254,8 +232,13 @@ for model in violations_by_model:
                 label=relabel[model])
 
 
+    
+    print model
+    for n in proc_list:
+        print n, average(violations_by_model[model][n]), average(latencies_by_model[model][n])
+
 xticks(range(0, len(proc_list)), [str(int(i/10.)) for i in proc_list])
-legend(pp, labels, loc="lower left", frameon=False, numpoints=1, handlelength=HL)
+legend(pp, labels, loc="lower left", frameon=False, numpoints=1)
 xlabel("Number of Departments")
 ylabel("Number of Orphaned Users")
 
@@ -279,7 +262,7 @@ for r in fk_results:
     for model in r['dangling']:
         violations = sum(r[1] for r in r['dangling'][model])
         violations_by_model[model][r['rails_procs']].append(violations)
-        #latencies_by_model[model][r['rails_procs']].append(average([i.lat_ms for i in r['results'][model][1][0]]))
+        latencies_by_model[model][r['rails_procs']].append(average([i.lat_ms for i in r['results'][model][1]]))
         procs.add(r['rails_procs'])
 
 proc_list = list(procs)
@@ -289,11 +272,6 @@ pp = []
 labels = []
 
 for model in violations_by_model:
-    print model
-    for n in proc_list:
-        print n, average(violations_by_model[model][n]), average(latencies_by_model[model][n])
-
-    
     if model == "dbfk":
         continue
 
@@ -317,13 +295,16 @@ for model in violations_by_model:
                 yerr=[std(violations_by_model[model][n]) for n in proc_list],
                 label=relabel[model])
 
+    print model
+    for n in proc_list:
+        print n, average(violations_by_model[model][n]), average(latencies_by_model[model][n])
 
 xticks(range(0, len(proc_list)), [str(i) for i in proc_list])
 xlim(xmax=len(proc_list)-1)
 
 print pp
 
-legend(pp, labels, loc="lower right", frameon=False, numpoints=1, handlelength=HL)
+legend(pp, labels, loc="lower right", frameon=False, numpoints=1)
 xlabel("Number of Rails Workers")
 ylabel("Number of Orphaned Users")
 

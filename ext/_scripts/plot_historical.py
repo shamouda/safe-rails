@@ -59,7 +59,7 @@ matplotlib.rcParams['lines.markeredgewidth'] = lw
 matplotlib.rcParams['lines.markersize'] = 6
 matplotlib.rcParams['font.size'] = fontsize
 matplotlib.rcParams['font.weight'] = 'normal'
-matplotlib.rcParams['figure.figsize'] = 3.5, 2.3
+matplotlib.rcParams['figure.figsize'] = 3.5, 2.1
 matplotlib.rcParams['legend.fontsize'] = fontsize
 
 lines = open("historical.txt").read().split("\n")
@@ -120,6 +120,8 @@ for p in projects:
                                     commit_pcts,
                                     [int(i[6])/tot_invariants*int(i[12])/tot_models for i in commits])
         all_invariant_pcts.append(invariant_pcts)
+    else:
+        print p
     #else:
     #    all_invariant_pcts.append([1 for i in xmarks])
 
@@ -132,12 +134,13 @@ for p in projects:
     #else:
     #    all_association_pcts.append([1 for i in xmarks])
 
-metric = mean
+metric = median
 
-plot([x*100 for x in xmarks], [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], '--', label="Associations per Model")
-plot([x*100 for x in xmarks], [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], '.-', label="Validations per Model", markersize=5)
-plot([x*100 for x in xmarks], [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], '-s', label="Transactions per Model", markersize=3, markeredgecolor="None")
-plot([x*100 for x in xmarks], [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], '-', label="Models")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_model_pcts])*100. for i in range(0, len(xmarks))], '-', label="Models", color="c")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_association_pcts])*100. for i in range(0, len(xmarks))], '--', label="Associations per Model", color="blue")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_invariant_pcts])*100. for i in range(0, len(xmarks))], '.-', label="Validations per Model", markersize=5, color="green")
+plot([x*100 for x in xmarks], [metric([t[i] for t in all_txn_pcts])*100. for i in range(0, len(xmarks))], '-s', label="Transactions per Model", markersize=3, markeredgecolor="None", color="red")
+
 
 ylabel("\% of Final Occurrences")
 ylim(ymin=0, ymax=100)
@@ -145,7 +148,7 @@ xlabel("Normalized Application History (\% of Commits)")
 
 legend(loc="lower right", frameon=False)
 
-subplots_adjust(bottom=.24, right=0.95, top=0.9, left=.18)
+subplots_adjust(bottom=.22, right=0.95, top=0.9, left=.15)
 savefig("historical-median.pdf")
 
     

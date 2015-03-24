@@ -23,7 +23,7 @@ Rails updates the instance state in the database
 (Appendix~\ref{sec:appendix-uniqueness-behavior}).
 
 While this user-level uniqueness validation runs within a transaction,
-the exact isolation level of the transaction affects its
+the isolation level of the transaction affects its
 correctness. For correct execution, the \texttt{SELECT} query must
 effectively attain a predicate lock on the validated column for the
 duration of the transaction. This behavior \textit{is} supported under
@@ -33,7 +33,7 @@ potential inconsistency.\footnote{Using \texttt{SELECT FOR UPDATE}
   under these weaker models would be safe, but Rails does not
   implement its predicate-based lookups as such (i.e., it instead opts
   for a simple \texttt{SELECT} statement).}  Moreover, under Snapshot Isolation,
-insertions to different records will similarly result in
+may similarly result in
 inconsistency.\footnote{The first reference to the potential integrity
   violations resulting from this implementation in the Rails code that
   we are aware of dates to December 2007, in Rails
@@ -47,34 +47,34 @@ inconsistency.\footnote{The first reference to the potential integrity
   (as in Oracle 12c documentation and PostgreSQL documentation prior
   to the introduction of SSI in version 9.1.1 in September
   2011)\label{fn:si-rails}. } Thus, unless the database is configured
-for serializable isolation, inconsistency may result and the feral
-validation will fail.
+for serializable isolation, integrity violations may result.
 
 As we have discussed, MySQL and PostgreSQL each support serializable
 isolation but default to weaker isolation. Moreover, in our
 investigation, we discovered a bug in PostgreSQL's implementation of
 Serializable Snapshot Isolation that allowed duplicate records to be
 created under serializable isolation when running a set of
-transactions derived from the Rails primary key validator. As of
-February 2015 (PostgreSQL 9.3.5) have confirmed this behavior with the
-core PostgreSQL developers.\footnote{``BUG \#11732: Non-serializable
-  outcomes under serializable isolation'' at \url{http://www.postgresql.org/message-id/20141021071458.2678.9080@wrigleys.postgresql.org}\label{fn:pg-bug}} Thus, any discussion of weak isolation
-levels aside, PostgreSQL's implementation of serializability is not
-actually sufficient to provide correct behavior for the above
-uniqueness validations. We note that so-called ``serializable''
-databases such as Oracle 12c that actually provide Snapshot Isolation
-will similarly fall prey to duplicate validations.
+transactions derived from the Rails primary key validator. We have
+confirmed this anomalous behavior with the core PostgreSQL
+developers\footnote{``BUG \#11732: Non-serializable outcomes under
+  serializable isolation'' at
+  \url{http://www.postgresql.org/message-id/20141021071458.2678.9080@wrigleys.postgresql.org}\label{fn:pg-bug}}
+and, as of March 2015, the behavior persists. Thus, any discussion of
+weak isolation levels aside, PostgreSQL's implementation of
+serializability is non-serializable and is insufficient to provide
+correct behavior for Rails' uniqueness validations. So-called
+``serializable'' databases such as Oracle 12c that actually provide
+Snapshot Isolation will similarly fall prey to duplicate validations.
 
-Interestingly, the Rails documentation actually warns that duplicate
-records may be inserted even despite uniqueness
-validations~\cite{rails-guide}. However, despite the existence of
-patches that remedy this behavior by the use of an in-database
-constraint and/or index, Rails provides this incorrect behavior out of
-the box. (The patch was rejected; a developer reports ``[t]he reasons
-for it not being incorporated...are lost in the mists of time but I
-suspect it's to do with backwards compatibility, cross database
-compatibility and applications varying on how they want/need to handle
-these kind of errors.''~\cite{code-index-patch}).
+The Rails documentation warns that uniqueness validations may fail and
+admit duplicate records~\cite{rails-guide}. Yet, despite the
+availability patches that remedy this behavior by the use of an
+in-database constraint and/or index, Rails provides this incorrect
+behavior by default. (One patch was rejected; a developer reports
+``[t]he reasons for it not being incorporated...are lost in the mists
+of time but I suspect it's to do with backwards compatibility, cross
+database compatibility and applications varying on how they want/need
+to handle these kind of errors.''~\cite{code-index-patch}).
 
 In another bug report complaining of duplicates due to concurrent
 uniqueness validation, a commenter asserts ``this is not a bug but
@@ -162,29 +162,29 @@ concurrent requests succeed, resulting in 6300 duplicate records (100
 rounds of 64-1 duplicate keys). With validations enabled, the number
 of violations depends on the degree of concurrency allowed by
 Unicorn. With only one process, Unicorn performs the validations
-serially, resulting in no duplicates. However, with two processes,
-Unicorn processes begin to race, resulting in 70 duplicate records
-spread across 70 keys. With three processes, Unicorn produces 249
-duplicate records across all 100 keys. The number of duplicates
-increases with the number of processes, maximizing at 16 worker
-processes. With additional processes, duplicates slightly decrease,
-which we attribute to thrashing between processes and within
-PostgreSQL (given that each instance has only 8 cores). Nevertheless,
-using validations, the microbenchmark duplicate count remains below
-700---nearly an order-of-magnitude fewer duplicates than without using
-validations. Therefore, even though these validations are, in fact,
-incorrectly implemented, they still result in fewer
-anomalies. However, when we added in in-database unique index on the
-\texttt{key} column\footnote{In this case, we added a unique index to
-  the model using Active Record's \textit{database migration}, or
-  manual schema change functionality. Migrations are written
-  separately from the Active Record model declarations. Adding the
-  index was not difficult, but, nevertheless, the index addition logic
-  is separate from the domain model. Without using third-party models,
-  we are unaware of a way to enforce uniqueness within Rails without
-  first declaring an index that is \textit{also} annotated with a
-  special \texttt{unique: true} attribute.} and repeated the
-experiment, we observed no duplicates, as expected.
+serially, creating no duplicates. However, with two processes, Unicorn
+processes race, resulting in 70 duplicate records spread across 70
+keys. With three processes, Unicorn produces 249 duplicate records
+across all 100 keys. The number of duplicates increases with the
+number of processes, peaking at 16 workers. With additional workers,
+duplicate counts decrease slightly, which we attribute to thrashing
+between workers and within PostgreSQL (recall that each instance has
+only 8 cores). Nevertheless, using validations, the microbenchmark
+duplicate count remains below 700---nearly an order-of-magnitude fewer
+duplicates than without using validations. Therefore, even though
+these validations are incorrectly implemented, they still
+result in fewer anomalies. However, when we added in in-database
+unique index on the \texttt{key} column\footnote{In this case, we
+  added a unique index to the model using Active Record's
+  \textit{database migration}, or manual schema change
+  functionality. Migrations are written separately from the Active
+  Record model declarations. Adding the index was not difficult, but,
+  nevertheless, the index addition logic is separate from the domain
+  model. Without using third-party models, we are unaware of a way to
+  enforce uniqueness within Rails without first declaring an index
+  that is \textit{also} annotated with a special \texttt{unique: true}
+  attribute.} and repeated the experiment, we observed no duplicates,
+as expected.
 
 \begin{figure}\vspace{-1em}
 \includegraphics[width=\columnwidth]{figs/pk_stress_violations.pdf}\vspace{-1.5em}

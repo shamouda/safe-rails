@@ -240,21 +240,22 @@ used each of these mechanisms, we performed two additional
 analyses.
 
 First, we analyzed the number of models, transactions, validations,
-and associations over each project's lifetime. Using each
-application's Git logs, we repeated the above analysis at a fixed set
-of intervals through the application's history (measured by
-commits). Figure~\ref{fig:historical} (see Appendix, page~\pageref{fig:historical}) plots the median number of
-occurrences across all projects. Notably, these results demonstrate
-that, by the time 50\% of the commits have been entered into the
-repository, over 75\% of the models, transactions, validations, and
-associations have been written. This suggests that the Model layer may
-be less volatile than the View and Controller components of the
-applications. Moreover, the initial proportion of validations and
-associations is higher than the initial proportion of transactions;
-thus, the data model appears to stabilize faster than the controller
-logic. It is unclear whether the bulk of transaction usage is added in
-order to compensate for, say, concurrency violations, or is instead
-due to growth in Controller code and business logic.
+and associations over each project's lifetime. Using each project's
+Git history, we repeated the above analysis at a fixed set of
+intervals through the project's lifespan (measured by
+commits). Figure~\ref{fig:historical} (see Appendix) plots the median
+number of occurrences across all projects. The results show that
+concurrency control mechanisms (of all forms) tend to be introduced
+after models are introduced. That is, additions to the data model
+precede (often by a considerable amount) additional uses of
+transactions, validations, and associations. It is unclear whether the
+bulk of concurrency control usage additions are intended to correct
+concurrency issues or are instead due to natural growth in Controller
+code and business logic. However, the gap between models and
+concurrency control usage shrinks over time; thus, the data model
+appears to stabilize faster than the controller logic, but both
+eventually stabilize. We view additional longitudinal analysis along
+these lines as worthwhile future work.
 
 
 Second, we analyze the distribution of authors to commits compared to

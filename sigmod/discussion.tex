@@ -17,19 +17,19 @@ use the database to enforce these constraints. In 2009, JPA introduced
 support for UDF validations via a JavaBean
 interface~\cite{code-bean-validation}. Interestingly, both the
 original (and current) Bean validation specifications specifically
-address the use of uniqueness validations in their notes:
+address the use of uniqueness validations in their notes:\vspace{-.25em}
 \begin{quote}
 ``Question: should we add @Unique that would map to @Column(unique=true)?
 @Unique cannot be tested at the Java level reliably but could generate
 a database unique constraint generation. @Unique is not part
-of the [Bean Validation] spec today.''~\cite{jsr-bean}
+of the [Bean Validation] spec today.''~\cite{jsr-bean}\vspace{-.25em}
 \end{quote}
-An author of a portion of the code specification notes separately:
+An author of a portion of the code specification notes separately:\vspace{-.25em}
 \begin{quote}
   ``The reason @Unique is not part of the built-in constraints is the
   fact that accessing the [database] during a valiation [sic] is
   opening yourself up for potenital [sic] phantom reads. Think twice
-  before you go for [an application-level] approach.''~\cite{unique-bean}
+  before you go for [an application-level] approach.''~\cite{unique-bean}\vspace{-.25em}
 \end{quote}
 %http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1414639627_4654729130380ec6809634192c3faacb
 By default, JPA Validations are run upon model save and run in a
@@ -284,7 +284,7 @@ correctness while maintaining high performance \textit{and}
 programmability. Serializability is too expensive for some
 applications, is not widely supported, and is not necessary for many
 application invariants. Feral concurrency control is often less
-expensive, is trivially portable, but is not sufficient for many other
+expensive and is trivially portable but is not sufficient for many other
 application invariants. In neither case does the database respect and
 assist with application programmer desires for a clean, idiomatic
 means of expressing correctness criteria in domain logic. We believe

@@ -32,9 +32,9 @@ Read isolation, no such mutual exclusion will be performed, leading to
 potential inconsistency.\footnote{Using \texttt{SELECT FOR UPDATE}
   under these weaker models would be safe, but Rails does not
   implement its predicate-based lookups as such (i.e., it instead opts
-  for a simple \texttt{SELECT} statement).}  Moreover, under Snapshot Isolation,
+  for a simple \texttt{SELECT} statement).}  Moreover, validation under Snapshot Isolation
 may similarly result in
-inconsistency.\footnote{The first reference to the potential integrity
+inconsistencies.\footnote{The first reference to the potential integrity
   violations resulting from this implementation in the Rails code that
   we are aware of dates to December 2007, in Rails
   v.2.0.0~\cite{code-unique-race-one}.  In September 2008, another

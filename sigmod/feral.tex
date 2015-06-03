@@ -190,7 +190,7 @@ expect a larger number of scenarios to require transactions, including
 order placement and stock adjustment.
 
 In the case of Spree stock adjustment, the inventory count for each
-item to is indeed a potential hotspot for concurrency issues. Manual
+item is a potential hotspot for concurrency issues. Manual
 adjustments of available stock
 (\texttt{adjust\_count\_on\_hand(value)}) is indeed protected via a
 pessimistic lock, but simply setting the available stock

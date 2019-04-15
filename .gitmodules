@@ -61,9 +61,6 @@
 [submodule "ext/communityengine"]
 	path = ext/communityengine
 	url = https://github.com/bborn/communityengine
-[submodule "ext/onebody"]
-	path = ext/onebody
-	url = https://github.com/churchio/onebody
 [submodule "ext/juvia"]
 	path = ext/juvia
 	url = https://github.com/phusion/juvia

@@ -184,9 +184,6 @@
 [submodule "ext/danbooru"]
 	path = ext/danbooru
 	url = https://github.com/r888888888/danbooru.git
-[submodule "ext/adopt-a-hydrant"]
-	path = ext/adopt-a-hydrant
-	url = https://github.com/codeforamerica/adopt-a-hydrant
 [submodule "ext/boxroom"]
 	path = ext/boxroom
 	url = https://github.com/mischa78/boxroom.git

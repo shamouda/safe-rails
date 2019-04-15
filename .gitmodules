@@ -118,9 +118,6 @@
 [submodule "ext/opencongress"]
 	path = ext/opencongress
 	url = https://github.com/opencongress/opencongress
-[submodule "ext/nimbleshop"]
-	path = ext/nimbleshop
-	url = https://github.com/nimbleshop/nimbleshop
 [submodule "ext/carter"]
 	path = ext/carter
 	url = https://github.com/gillies-dunlop/carter/
